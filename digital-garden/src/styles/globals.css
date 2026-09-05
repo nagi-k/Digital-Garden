@@ -1,0 +1,324 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* 背景 */
+  --bg-primary: #faf9f6;
+  --bg-secondary: #f2f0eb;
+  --bg-card: #ffffff;
+  --bg-dark: #1a1a1a;
+
+  /* 文字 */
+  --text-primary: #1a1a1a;
+  --text-secondary: #6b6b6b;
+  --text-muted: #9a9a9a;
+  --text-inverse: #faf9f6;
+
+  /* 强调色 - 低饱和、高级 */
+  --accent-terracotta: #c4a484;
+  --accent-sage: #a8b5a0;
+  --accent-lavender: #b8b3d3;
+  --accent-clay: #c78d7b;
+
+  /* 功能色 */
+  --border: rgba(26, 26, 26, 0.08);
+  --border-strong: rgba(26, 26, 26, 0.2);
+  --shadow-soft: 0 4px 24px rgba(26, 26, 26, 0.05);
+  --shadow-medium: 0 8px 40px rgba(26, 26, 26, 0.08);
+
+  /* 间距 */
+  --space-section: clamp(6rem, 15vh, 12rem);
+  --container-max: 1400px;
+  --container-padding: clamp(1.5rem, 5vw, 4rem);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+html.lenis {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+body {
+  font-family: 'Inter', 'Source Han Sans CN', 'Noto Sans SC', 'PingFang SC', -apple-system,
+    BlinkMacSystemFont, sans-serif;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::selection {
+  background-color: var(--accent-terracotta);
+  color: var(--text-inverse);
+}
+
+/* 自定义光标 */
+.cursor-dot,
+.cursor-ring {
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate(-50%, -50%);
+}
+
+.cursor-dot {
+  width: 8px;
+  height: 8px;
+  background-color: var(--text-primary);
+  border-radius: 50%;
+}
+
+.cursor-ring {
+  width: 24px;
+  height: 24px;
+  border: 1px solid var(--text-primary);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: width 0.3s ease, height 0.3s ease, border-color 0.3s ease, background-color 0.3s ease;
+}
+
+.cursor-ring.is-hover {
+  width: 48px;
+  height: 48px;
+  border-color: var(--accent-terracotta);
+  background-color: rgba(196, 164, 132, 0.1);
+}
+
+.cursor-ring.is-image-hover {
+  width: 64px;
+  height: 64px;
+  border-color: transparent;
+  background-color: rgba(26, 26, 26, 0.8);
+  color: var(--text-inverse);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+}
+
+/* 中英混排字体类 */
+.font-display-en {
+  font-family: 'Playfair Display', 'Canela', 'Tiempos Headline', Georgia, serif;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.font-display-zh {
+  font-family: 'Source Han Serif CN', 'Noto Serif SC', '方正兰亭宋', 'SimSun', serif;
+  letter-spacing: 0.05em;
+}
+
+.font-body-en {
+  font-family: 'Inter', 'Suisse Int\'l', 'Helvetica Now', sans-serif;
+}
+
+.font-body-zh {
+  font-family: 'Source Han Sans CN', 'Noto Sans SC', 'PingFang SC', sans-serif;
+}
+
+/* 链接下划线动画 */
+.link-underline {
+  position: relative;
+  display: inline-block;
+}
+
+.link-underline::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  width: 0;
+  height: 1px;
+  background-color: currentColor;
+  transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1), left 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.link-underline:hover::after {
+  left: 0;
+  width: 100%;
+}
+
+/* 图片容器 */
+.img-container {
+  overflow: hidden;
+  border-radius: 8px;
+  background-color: var(--bg-secondary);
+}
+
+.img-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.img-container:hover img {
+  transform: scale(1.03);
+}
+
+/* 卡片 */
+.card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.card:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-medium);
+  border-color: var(--border-strong);
+}
+
+/* 磁吸按钮基础 */
+.magnetic-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.875rem 2rem;
+  border: 1px solid var(--text-primary);
+  background-color: transparent;
+  color: var(--text-primary);
+  font-size: 0.875rem;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
+}
+
+.magnetic-btn::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background-color: var(--text-primary);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: width 0.5s cubic-bezier(0.16, 1, 0.3, 1), height 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.magnetic-btn:hover::before {
+  width: 300px;
+  height: 300px;
+}
+
+.magnetic-btn:hover {
+  color: var(--text-inverse);
+}
+
+.magnetic-btn span {
+  position: relative;
+  z-index: 1;
+}
+
+/* 滚动进度条 */
+.scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: transparent;
+  z-index: 100;
+}
+
+.scroll-progress-bar {
+  height: 100%;
+  background-color: var(--accent-terracotta);
+  width: 0%;
+  transition: width 0.1s linear;
+}
+
+/* 遮罩 reveal 动画 */
+.mask-reveal {
+  overflow: hidden;
+  display: inline-block;
+}
+
+.mask-reveal > * {
+  transform: translateY(110%);
+  animation: maskReveal 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes maskReveal {
+  to {
+    transform: translateY(0);
+  }
+}
+
+/* 页面过渡 */
+.page-enter {
+  opacity: 0;
+  transform: translateY(40px);
+}
+
+.page-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.page-exit {
+  opacity: 1;
+}
+
+.page-exit-active {
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+/* 生长状态标识 */
+.status-seedling {
+  color: var(--accent-sage);
+}
+
+.status-growing {
+  color: var(--accent-terracotta);
+}
+
+.status-mature {
+  color: var(--accent-clay);
+}
+
+/* 打印隐藏 */
+@media print {
+  .no-print {
+    display: none;
+  }
+}
+
+/* 移动端隐藏自定义光标 */
+@media (hover: none) and (pointer: coarse) {
+  .cursor-dot,
+  .cursor-ring {
+    display: none;
+  }
+}
