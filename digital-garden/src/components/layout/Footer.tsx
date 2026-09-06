@@ -7,7 +7,7 @@ const Footer = () => {
   };
 
   return (
-    <footer className="bg-bg-primary">
+    <footer className="border-t border-border bg-bg-secondary/50">
       <div className="max-w-container mx-auto px-container py-6 md:py-8">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
