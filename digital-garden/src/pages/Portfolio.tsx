@@ -2,6 +2,7 @@ import { ArrowRight, ArrowUpRight, Monitor, Box, Smartphone, Upload } from 'luci
 import PageTransition from '@/components/layout/PageTransition';
 import SectionTitle from '@/components/ui/SectionTitle';
 import FadeIn from '@/components/effects/FadeIn';
+import GlbViewer from '@/components/3d/GlbViewer';
 
 const Portfolio = () => {
   return (
@@ -88,9 +89,21 @@ const Portfolio = () => {
                   <h3 className="font-display-zh text-h3">3D 建模</h3>
                 </div>
                 <div className="grid grid-cols-1 gap-6">
-                  {/* 3D 模型查看器已集成；上传 .glb 文件后替换下方占位为 <GlbViewer glbUrl="/models/xxx.glb" /> */}
+                  {/* 真实模型预览 */}
+                  <div className="card p-6 group">
+                    <div className="rounded-xl overflow-hidden mb-4">
+                      <GlbViewer
+                        glbUrl={`${import.meta.env.BASE_URL}models/2.glb`}
+                        aspect="video"
+                        className="rounded-xl"
+                      />
+                    </div>
+                    <h4 className="font-display-zh text-lg mb-1">模型一</h4>
+                    <p className="text-sm text-text-secondary">工业设计模型展示</p>
+                  </div>
+
+                  {/* 占位卡位：等待更多 .glb 文件 */}
                   {[
-                    { name: '模型一', desc: '工业设计模型展示' },
                     { name: '模型二', desc: '产品造型与 CMF 细节' },
                     { name: '模型三', desc: '结构与人机工程验证' },
                   ].map((item, i) => (
