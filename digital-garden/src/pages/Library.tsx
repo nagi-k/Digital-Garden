@@ -1,20 +1,22 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, ArrowRight, Image, Link2, Palette, Sparkles } from 'lucide-react';
+import { Search, ArrowRight, Link2 } from 'lucide-react';
 import PageTransition from '@/components/layout/PageTransition';
 import SectionTitle from '@/components/ui/SectionTitle';
 import Tag from '@/components/ui/Tag';
 import FadeIn from '@/components/effects/FadeIn';
 
 // 素材类型：image（图片素材）/ link（设计网站）
+// 图片分类固定四类：产品、摄影、版式、绘画
+type ImageCategory = '产品' | '摄影' | '版式' | '绘画';
+
 type LibraryItem =
   | {
       id: string;
       type: 'image';
-      title: string;
       src: string;
-      note?: string;
-      tags: string[];
+      category: ImageCategory;
+      createdAt: string; // ISO 日期字符串，用于排序
     }
   | {
       id: string;
@@ -25,103 +27,96 @@ type LibraryItem =
       tags: string[];
     };
 
+const IMAGE_CATEGORIES: ImageCategory[] = ['产品', '摄影', '版式', '绘画'];
+
+const formatDate = (date: Date) =>
+  `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, '0')}.${String(date.getDate()).padStart(2, '0')}`;
+
 const libraryItems: LibraryItem[] = [
-  // 示例图片素材（可以后续替换为你自己的上传）
+  // 示例图片素材（按上传时间倒序排列，越新越靠前）
   {
     id: 'img-1',
     type: 'image',
-    title: '建筑光影',
     src: 'images/library-1.jpg',
-    note: '混凝土立面与几何阴影',
-    tags: ['建筑', '光影'],
+    category: '摄影',
+    createdAt: '2026-09-06T10:00:00.000Z',
   },
   {
     id: 'img-2',
     type: 'image',
-    title: '静物花瓶',
     src: 'images/library-2.jpg',
-    note: '陶瓷与干花的质感对比',
-    tags: ['静物', '质感'],
+    category: '摄影',
+    createdAt: '2026-09-06T09:50:00.000Z',
   },
   {
     id: 'img-3',
     type: 'image',
-    title: '水墨笔触',
     src: 'images/library-3.jpg',
-    note: '东方水墨的留白意境',
-    tags: ['抽象', '水墨'],
+    category: '绘画',
+    createdAt: '2026-09-06T09:40:00.000Z',
   },
   {
     id: 'img-4',
     type: 'image',
-    title: '人像侧光',
     src: 'images/library-4.jpg',
-    note: '戏剧性侧光人像',
-    tags: ['人像', '光影'],
+    category: '摄影',
+    createdAt: '2026-09-06T09:30:00.000Z',
   },
   {
     id: 'img-5',
     type: 'image',
-    title: '树枝剪影',
     src: 'images/library-5.jpg',
-    note: '冬日枝干的线条韵律',
-    tags: ['自然', '线条'],
+    category: '摄影',
+    createdAt: '2026-09-06T09:20:00.000Z',
   },
   {
     id: 'img-6',
     type: 'image',
-    title: '布料褶皱',
     src: 'images/library-6.jpg',
-    note: '织物纹理的柔和曲线',
-    tags: ['抽象', '质感'],
+    category: '摄影',
+    createdAt: '2026-09-06T09:10:00.000Z',
   },
   {
     id: 'img-7',
     type: 'image',
-    title: '极简空间',
     src: 'images/library-7.jpg',
-    note: '光影流动的室内留白',
-    tags: ['建筑', '空间'],
+    category: '版式',
+    createdAt: '2026-09-06T09:00:00.000Z',
   },
   {
     id: 'img-8',
     type: 'image',
-    title: '花瓣微距',
     src: 'images/library-8.jpg',
-    note: '柔焦下的花瓣层次',
-    tags: ['自然', '微距'],
+    category: '摄影',
+    createdAt: '2026-09-06T08:50:00.000Z',
   },
   {
     id: 'img-9',
     type: 'image',
-    title: '城市斑马线',
     src: 'images/library-9.jpg',
-    note: '都市街景的对角线构图',
-    tags: ['街景', '线条'],
+    category: '摄影',
+    createdAt: '2026-09-06T08:40:00.000Z',
   },
   {
     id: 'img-10',
     type: 'image',
-    title: '折纸几何',
     src: 'images/library-10.jpg',
-    note: '纸张折叠的立体构成',
-    tags: ['抽象', '几何'],
+    category: '产品',
+    createdAt: '2026-09-06T08:30:00.000Z',
   },
   {
     id: 'img-11',
     type: 'image',
-    title: '旧书堆叠',
     src: 'images/library-11.jpg',
-    note: '木质桌面上的书籍质感',
-    tags: ['静物', '质感'],
+    category: '摄影',
+    createdAt: '2026-09-06T08:20:00.000Z',
   },
   {
     id: 'img-12',
     type: 'image',
-    title: '水面涟漪',
     src: 'images/library-12.jpg',
-    note: '水波反射的光影流动',
-    tags: ['自然', '光影'],
+    category: '摄影',
+    createdAt: '2026-09-06T08:10:00.000Z',
   },
   // 示例设计网站
   {
@@ -160,21 +155,34 @@ const libraryItems: LibraryItem[] = [
 
 const Library = () => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeTag, setActiveTag] = useState<string | null>(null);
+  const [activeCategory, setActiveCategory] = useState<ImageCategory | null>(null);
   const [activeType, setActiveType] = useState<'image' | 'link'>('image');
 
-  const allTags = Array.from(new Set(libraryItems.flatMap((i) => i.tags)));
+  const allLinkTags = Array.from(
+    new Set(libraryItems.filter((i): i is Extract<LibraryItem, { type: 'link' }> => i.type === 'link').flatMap((i) => i.tags))
+  );
 
-  const filteredItems = libraryItems.filter((item) => {
-    const matchesType = item.type === activeType;
-    const matchesTag = !activeTag || item.tags.includes(activeTag);
-    const matchesSearch =
-      !searchQuery ||
-      item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      ('description' in item &&
-        item.description.toLowerCase().includes(searchQuery.toLowerCase()));
-    return matchesType && matchesTag && matchesSearch;
-  });
+  const filteredItems = libraryItems
+    .filter((item) => {
+      const matchesType = item.type === activeType;
+      if (item.type === 'image') {
+        const matchesCategory = !activeCategory || item.category === activeCategory;
+        const matchesSearch = !searchQuery || item.category.includes(searchQuery);
+        return matchesType && matchesCategory && matchesSearch;
+      }
+      const matchesTag = !activeCategory || item.tags.includes(activeCategory);
+      const matchesSearch =
+        !searchQuery ||
+        item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.description.toLowerCase().includes(searchQuery.toLowerCase());
+      return matchesType && matchesTag && matchesSearch;
+    })
+    .sort((a, b) => {
+      if (a.type === 'image' && b.type === 'image') {
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+      }
+      return 0;
+    });
 
   const imageCount = libraryItems.filter((i) => i.type === 'image').length;
   const linkCount = libraryItems.filter((i) => i.type === 'link').length;
@@ -243,19 +251,19 @@ const Library = () => {
                 />
               </div>
 
-              {/* Tags */}
+              {/* Category Filter */}
               <div className="flex flex-wrap gap-2">
                 <Tag
-                  label="全部标签"
-                  active={!activeTag}
-                  onClick={() => setActiveTag(null)}
+                  label="全部"
+                  active={!activeCategory}
+                  onClick={() => setActiveCategory(null)}
                 />
-                {allTags.map((tag) => (
+                {(activeType === 'image' ? IMAGE_CATEGORIES : allLinkTags).map((tag) => (
                   <Tag
                     key={tag}
                     label={tag}
-                    active={activeTag === tag}
-                    onClick={() => setActiveTag(tag)}
+                    active={activeCategory === tag}
+                    onClick={() => setActiveCategory(tag as ImageCategory)}
                   />
                 ))}
               </div>
@@ -271,28 +279,17 @@ const Library = () => {
                     <div className="overflow-hidden relative">
                       <img
                         src={item.src}
-                        alt={item.title}
-                        className="w-full h-auto object-cover group-hover:scale-110 transition-transform duration-500"
+                        alt={item.category}
+                        className="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-500"
                       />
-                      <div className="absolute top-3 left-3 bg-bg-primary/80 backdrop-blur-sm px-2 py-1 text-xs text-text-secondary">
-                        <Image size={12} className="inline mr-1" />
-                        图片
-                      </div>
                     </div>
-                    <div className="p-5">
-                      <h3 className="font-display-zh text-lg mb-1 group-hover:text-accent-terracotta transition-colors">
-                        {item.title}
-                      </h3>
-                      {item.note && (
-                        <p className="text-sm text-text-secondary mb-3">{item.note}</p>
-                      )}
-                      <div className="flex flex-wrap gap-2">
-                        {item.tags.map((tag) => (
-                          <span key={tag} className="text-xs text-text-muted">
-                            #{tag}
-                          </span>
-                        ))}
-                      </div>
+                    <div className="p-4 flex items-center justify-between">
+                      <span className="text-sm font-medium text-text-secondary">
+                        {item.category}
+                      </span>
+                      <span className="text-xs text-text-muted">
+                        {formatDate(new Date(item.createdAt))}
+                      </span>
                     </div>
                   </article>
                 ) : (
