@@ -60,8 +60,8 @@ export default function GlbViewer({
     const controls = new OrbitControls(camera, canvas)
     controls.enableDamping = true
     controls.dampingFactor = 0.05
-    controls.minDistance = 1.5
-    controls.maxDistance = 8
+    controls.minDistance = 3
+    controls.maxDistance = 20
     controls.maxPolarAngle = Math.PI / 1.8
     controls.target.set(0, 0.3, 0)
 
@@ -137,15 +137,27 @@ export default function GlbViewer({
         const maxDim = Math.max(size.x, size.y, size.z)
         const scale = 9 / maxDim
         model.scale.setScalar(scale)
-        model.position.sub(center.multiplyScalar(scale))
+
+        // 只在水平方向居中，垂直方向根据实际包围盒抬高，避免底部穿入地面
+        model.position.x = -center.x * scale
+        model.position.z = -center.z * scale
+        model.position.y = -center.y * scale
+
+        const scaledBox = new THREE.Box3().setFromObject(model)
+        const bottomLift = -scaledBox.min.y + 0.05
+        model.position.y += bottomLift
 
         if (currentModel) scene.remove(currentModel)
         scene.add(model)
         currentModel = model
 
+        // 地面固定在模型底部下方，留出一点间隙避免闪烁
+        ground.position.y = scaledBox.min.y + bottomLift - 0.05
+
+        const modelCenterY = (scaledBox.max.y + scaledBox.min.y) / 2 + bottomLift
         const dist = maxDim * scale * 0.85
-        camera.position.set(dist * 0.8, dist * 0.5, dist)
-        controls.target.set(0, 0.2, 0)
+        camera.position.set(dist * 0.8, dist * 0.6, dist)
+        controls.target.set(0, modelCenterY, 0)
         controls.update()
 
         setLoading(false)
