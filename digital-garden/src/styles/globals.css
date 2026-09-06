@@ -233,7 +233,7 @@ body {
   font-family: 'Source Han Sans CN', 'Noto Sans SC', 'PingFang SC', sans-serif;
 }
 
-/* ============ Hero 英文标题 · 粗斜体描边风 ============ */
+/* ============ Hero 英文标题 · 黑白灰渐变高级设计感 ============ */
 .hero-title-en {
   font-family: 'Archivo Black', 'Anton', 'Impact', 'Arial Black', sans-serif;
   font-weight: 900;
@@ -241,23 +241,35 @@ body {
   font-size: clamp(3.5rem, 9vw, 8rem);
   letter-spacing: 0.02em;
   text-transform: uppercase;
-  color: var(--text-primary);
-  text-shadow:
-    -2px -2px 0 #fff,
-    2px -2px 0 #fff,
-    -2px 2px 0 #fff,
-    2px 2px 0 #fff,
-    0 0 0 #fff,
-    4px 4px 0 rgba(10, 10, 10, 0.18);
-  transform: rotate(-4deg) skewX(-6deg);
-  transform-origin: left bottom;
+  background: linear-gradient(
+    135deg,
+    #0a0a0a 0%,
+    #404040 35%,
+    #8a8a8a 55%,
+    #d4d4d4 75%,
+    #0a0a0a 100%
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: heroShimmer 6s ease-in-out infinite;
+  filter: drop-shadow(0 6px 18px rgba(0, 0, 0, 0.12));
 }
 
 @supports ((-webkit-text-stroke: 1px #fff)) {
   .hero-title-en {
-    text-shadow: none;
-    -webkit-text-stroke: 2.5px #ffffff;
+    -webkit-text-stroke: 1.5px rgba(10, 10, 10, 0.12);
     paint-order: stroke fill;
+  }
+}
+
+@keyframes heroShimmer {
+  0%, 100% {
+    background-position: 0% center;
+  }
+  50% {
+    background-position: 100% center;
   }
 }
 
