@@ -73,15 +73,17 @@ const Hero = () => {
             <motion.div variants={staggerItem}>
               <div className="flex items-center gap-3 mb-6">
                 <Sparkles size={16} className="text-accent-terracotta" />
-                <span className="font-display-en text-sm text-text-muted tracking-widest">
-                  DIGITAL GARDEN
+                <span className="font-display-zh text-sm text-text-muted tracking-widest">
+                  数字花园
                 </span>
               </div>
               <motion.h1
                 style={{ rotateX, rotateY, transformStyle: 'preserve-3d' }}
-                className="font-display-zh text-hero-zh leading-tight text-gradient"
+                className="hero-title-en leading-none"
               >
-                数字花园
+                Digital
+                <br />
+                Garden
               </motion.h1>
             </motion.div>
 

@@ -233,6 +233,34 @@ body {
   font-family: 'Source Han Sans CN', 'Noto Sans SC', 'PingFang SC', sans-serif;
 }
 
+/* ============ Hero 英文标题 · 粗斜体描边风 ============ */
+.hero-title-en {
+  font-family: 'Archivo Black', 'Anton', 'Impact', 'Arial Black', sans-serif;
+  font-weight: 900;
+  font-style: italic;
+  font-size: clamp(3.5rem, 9vw, 8rem);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--text-primary);
+  text-shadow:
+    -2px -2px 0 #fff,
+    2px -2px 0 #fff,
+    -2px 2px 0 #fff,
+    2px 2px 0 #fff,
+    0 0 0 #fff,
+    4px 4px 0 rgba(10, 10, 10, 0.18);
+  transform: rotate(-4deg) skewX(-6deg);
+  transform-origin: left bottom;
+}
+
+@supports ((-webkit-text-stroke: 1px #fff)) {
+  .hero-title-en {
+    text-shadow: none;
+    -webkit-text-stroke: 2.5px #ffffff;
+    paint-order: stroke fill;
+  }
+}
+
 /* ============ 文字渐变（黑白灰版本） ============ */
 .text-gradient {
   background: linear-gradient(135deg, var(--text-primary) 0%, #737373 50%, var(--text-primary) 100%);
