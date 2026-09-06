@@ -37,6 +37,7 @@ function App() {
           <Route path="/guestbook" element={<Guestbook />} />
         </Routes>
       </AnimatePresence>
+      <div className="h-32 md:h-40" aria-hidden="true" />
       <Footer />
     </div>
   );
