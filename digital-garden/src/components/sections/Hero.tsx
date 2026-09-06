@@ -1,9 +1,15 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion, useMotionValue, useSpring, useTransform, useScroll } from 'framer-motion';
-import { ArrowRight, ArrowDown, Sparkles } from 'lucide-react';
+import { ArrowRight, Sparkles } from 'lucide-react';
 import MagneticButton from '@/components/ui/MagneticButton';
 import { siteData } from '@/data/site';
 import { staggerContainer, staggerItem } from '@/utils/animations';
+
+const slides = [
+  { src: 'images/hero-1.jpg', label: 'MONO 01' },
+  { src: 'images/hero-2.jpg', label: 'MONO 02' },
+  { src: 'images/hero-3.jpg', label: 'MONO 03' },
+];
 
 const Hero = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -12,6 +18,14 @@ const Hero = () => {
   const [typedText, setTypedText] = useState('');
   const fullText = '用界面讲述故事，在数字空间里持续生长。';
   const [typeIndex, setTypeIndex] = useState(0);
+  const [slideIndex, setSlideIndex] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setSlideIndex((prev) => (prev + 1) % slides.length);
+    }, 4200);
+    return () => clearInterval(timer);
+  }, []);
 
   const { scrollY } = useScroll();
   const y1 = useTransform(scrollY, [0, 500], [0, 100]);
@@ -124,7 +138,7 @@ const Hero = () => {
             </motion.div>
           </motion.div>
 
-          {/* Right: Portrait with decorative elements */}
+          {/* Right: Image carousel with decorative elements */}
           <motion.div
             style={{ y: y2, opacity }}
             variants={staggerItem}
@@ -134,22 +148,44 @@ const Hero = () => {
               style={{ x: translateX, y: translateY }}
               className="relative"
             >
-              <div className="img-container aspect-[3/4] max-w-sm mx-auto lg:ml-auto relative z-10">
-                <img
-                  src="/images/portrait.jpg"
-                  alt="王颖"
-                  className="w-full h-full object-cover"
-                  loading="eager"
-                />
+              <div className="img-container aspect-[3/4] max-w-sm mx-auto lg:ml-auto relative z-10 overflow-hidden">
+                {slides.map((slide, i) => (
+                  <motion.img
+                    key={slide.src}
+                    src={slide.src}
+                    alt={slide.label}
+                    className="absolute inset-0 w-full h-full object-cover"
+                    loading={i === 0 ? 'eager' : 'lazy'}
+                    initial={false}
+                    animate={{ opacity: i === slideIndex ? 1 : 0 }}
+                    transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                  />
+                ))}
               </div>
 
               {/* 装饰元素 */}
-              <div className="absolute -bottom-6 -right-6 w-28 h-28 border border-accent-terracotta/30  flex items-center justify-center bg-bg-primary/80 backdrop-blur-sm z-20">
-                <span className="font-display-en text-xs text-accent-terracotta">EST. 2026</span>
+              <div className="absolute -bottom-6 -right-6 w-28 h-28 border border-accent-terracotta/30 flex items-center justify-center bg-bg-primary/80 backdrop-blur-sm z-20">
+                <span className="font-display-en text-xs text-accent-terracotta">
+                  {slides[slideIndex].label}
+                </span>
               </div>
 
-              <div className="absolute -top-4 -left-4 w-16 h-16 border border-accent-lavender/30  rotate-12 z-0" />
-              <div className="absolute top-1/2 -right-8 w-20 h-20 border border-accent-sage/30  z-0" />
+              {/* 轮播指示点 */}
+              <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 flex gap-2 z-20">
+                {slides.map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setSlideIndex(i)}
+                    className={`h-1 transition-all duration-300 ${
+                      i === slideIndex ? 'w-6 bg-text-primary' : 'w-2 bg-border-strong'
+                    }`}
+                    aria-label={`切换到第 ${i + 1} 张`}
+                  />
+                ))}
+              </div>
+
+              <div className="absolute -top-4 -left-4 w-16 h-16 border border-accent-lavender/30 rotate-12 z-0" />
+              <div className="absolute top-1/2 -right-8 w-20 h-20 border border-accent-sage/30 z-0" />
             </motion.div>
           </motion.div>
         </motion.div>
@@ -159,11 +195,11 @@ const Hero = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 2, duration: 1 }}
-          className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-text-muted"
+          className="absolute bottom-2 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-text-muted"
         >
           <span className="text-xs font-display-en tracking-widest">SCROLL</span>
-          <div className="w-6 h-10 border border-border  flex justify-center pt-2">
-            <div className="w-1 h-2 bg-accent-terracotta  animate-bounce" />
+          <div className="w-6 h-10 border border-border flex justify-center pt-2">
+            <div className="w-1 h-2 bg-accent-terracotta animate-bounce" />
           </div>
         </motion.div>
       </div>
