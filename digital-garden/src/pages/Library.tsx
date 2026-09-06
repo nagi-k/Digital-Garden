@@ -271,7 +271,7 @@ const Library = () => {
           </FadeIn>
 
           {/* Items Masonry */}
-          <div className="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6">
+          <div className="columns-1 sm:columns-2 lg:columns-3 gap-6 space-y-6">
             {filteredItems.map((item, index) => (
               <FadeIn key={item.id} delay={index * 0.08}>
                 {item.type === 'image' ? (
