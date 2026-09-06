@@ -195,12 +195,9 @@ const Hero = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 2, duration: 1 }}
-          className="absolute bottom-2 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-text-muted"
+          className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-text-muted"
         >
           <span className="text-xs font-display-en tracking-widest">SCROLL</span>
-          <div className="w-6 h-10 border border-border flex justify-center pt-2">
-            <div className="w-1 h-2 bg-accent-terracotta animate-bounce" />
-          </div>
         </motion.div>
       </div>
     </section>
