@@ -93,7 +93,7 @@ const Portfolio = () => {
                   <div className="card p-6 group">
                     <div className="rounded-xl overflow-hidden mb-4">
                       <GlbViewer
-                        glbUrl={`${import.meta.env.BASE_URL}models/2.glb`}
+                        glbUrl="models/2.glb"
                         aspect="video"
                         className="rounded-xl"
                       />
@@ -106,7 +106,7 @@ const Portfolio = () => {
                   <div className="card p-6 group">
                     <div className="rounded-xl overflow-hidden mb-4">
                       <GlbViewer
-                        glbUrl={`${import.meta.env.BASE_URL}models/aircraft.glb`}
+                        glbUrl="models/aircraft.glb"
                         aspect="video"
                         className="rounded-xl"
                       />
