@@ -19,7 +19,7 @@ export const siteData = {
 export const navLinks = [
   { path: '/ui', label: '作品', en: 'WORKS' },
   { path: '/notes', label: '笔记', en: 'NOTES' },
+  { path: '/library', label: '素材库', en: 'LIBRARY' },
   { path: '/interests', label: '兴趣', en: 'INTERESTS' },
   { path: '/about', label: '关于', en: 'ABOUT' },
-  { path: '/now', label: 'Now', en: 'NOW' },
 ];

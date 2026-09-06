@@ -11,7 +11,7 @@ import Notes from '@/pages/Notes';
 import NoteDetail from '@/pages/NoteDetail';
 import Interests from '@/pages/Interests';
 import About from '@/pages/About';
-import Now from '@/pages/Now';
+import Library from '@/pages/Library';
 import Uses from '@/pages/Uses';
 import Guestbook from '@/pages/Guestbook';
 
@@ -31,8 +31,8 @@ function App() {
           <Route path="/notes" element={<Notes />} />
           <Route path="/notes/:slug" element={<NoteDetail />} />
           <Route path="/interests" element={<Interests />} />
+          <Route path="/library" element={<Library />} />
           <Route path="/about" element={<About />} />
-          <Route path="/now" element={<Now />} />
           <Route path="/uses" element={<Uses />} />
           <Route path="/guestbook" element={<Guestbook />} />
         </Routes>
