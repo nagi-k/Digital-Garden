@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import {
   Bike,
@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 import SectionTitle from '@/components/ui/SectionTitle';
 import FadeIn from '@/components/effects/FadeIn';
-import { nanjingDistricts, yangtzeRiver, qinhuaiRiver, mainRoads, landmarks, ridingRoutesDetailed } from '@/data/nanjingMap';
+import { districts, waterBodies, roads, landmarks, ridingRoutes, RidingRoute } from '@/data/nanjingMap';
 
 const landmarkIcons = {
   mountain: Mountain,
@@ -28,7 +28,7 @@ const landmarkIcons = {
 };
 
 const RidingMap = () => {
-  const [selectedRoute, setSelectedRoute] = useState<typeof ridingRoutesDetailed[0] | null>(null);
+  const [selectedRoute, setSelectedRoute] = useState<RidingRoute | null>(null);
   const [hoveredRoute, setHoveredRoute] = useState<string | null>(null);
   const [zoom, setZoom] = useState(1);
   const [pan, setPan] = useState({ x: 0, y: 0 });
@@ -36,8 +36,8 @@ const RidingMap = () => {
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const svgRef = useRef<SVGSVGElement>(null);
 
-  const riddenCount = ridingRoutesDetailed.filter((r) => r.ridden).length;
-  const totalLength = ridingRoutesDetailed
+  const riddenCount = ridingRoutes.filter((r) => r.ridden).length;
+  const totalLength = ridingRoutes
     .filter((r) => r.ridden)
     .reduce((acc, r) => acc + parseInt(r.length.replace(/\D/g, '')), 0);
 
@@ -144,7 +144,7 @@ const RidingMap = () => {
               >
                 <svg
                   ref={svgRef}
-                  viewBox="0 0 600 600"
+                  viewBox="0 0 1200 1200"
                   className="w-full h-full"
                   style={{
                     transform: `scale(${zoom}) translate(${pan.x / zoom}px, ${pan.y / zoom}px)`,
@@ -153,67 +153,109 @@ const RidingMap = () => {
                   }}
                 >
                   <defs>
-                    {/* 水域渐变 */}
-                    <linearGradient id="waterGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <linearGradient id="waterGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stopColor="#d4e5f7" />
+                      <stop offset="100%" stopColor="#b8d4f0" />
+                    </linearGradient>
+                    <linearGradient id="lakeGrad" x1="0%" y1="0%" x2="0%" y2="100%">
                       <stop offset="0%" stopColor="#d4e5f7" />
                       <stop offset="100%" stopColor="#c8ddf5" />
-                    </linearGradient>
-                    {/* 绿地渐变 */}
-                    <linearGradient id="greenGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-                      <stop offset="0%" stopColor="#e8f5e9" />
-                      <stop offset="100%" stopColor="#c8e6c9" />
                     </linearGradient>
                   </defs>
 
                   {/* 背景 */}
-                  <rect width="100%" height="100%" fill="#f8f8f8" />
+                  <rect width="1200" height="1200" fill="#f8f8f8" />
 
                   {/* 城市网格 */}
-                  {Array.from({ length: 15 }).map((_, i) => (
-                    <line key={`h-${i}`} x1="0" y1={i * 40} x2="600" y2={i * 40} stroke="#e8e8e8" strokeWidth="0.5" />
+                  {Array.from({ length: 30 }).map((_, i) => (
+                    <line key={`h-${i}`} x1="0" y1={i * 40} x2="1200" y2={i * 40} stroke="#e8e8e8" strokeWidth="0.5" />
                   ))}
-                  {Array.from({ length: 15 }).map((_, i) => (
-                    <line key={`v-${i}`} x1={i * 40} y1="0" x2={i * 40} y2="600" stroke="#e8e8e8" strokeWidth="0.5" />
+                  {Array.from({ length: 30 }).map((_, i) => (
+                    <line key={`v-${i}`} x1={i * 40} y1="0" x2={i * 40} y2="1200" stroke="#e8e8e8" strokeWidth="0.5" />
                   ))}
 
                   {/* 长江 */}
-                  <path d={yangtzeRiver} fill="url(#waterGrad)" stroke="#b8d4f0" strokeWidth="1" />
+                  {waterBodies
+                    .filter((w) => w.id === 'yangtze')
+                    .map((river) => (
+                      <path
+                        key={river.id}
+                        d={river.path}
+                        fill="url(#waterGrad)"
+                        stroke="#a8c8e8"
+                        strokeWidth="2"
+                      />
+                    ))}
 
                   {/* 秦淮河 */}
-                  <path d={qinhuaiRiver} fill="none" stroke="#b8d4f0" strokeWidth="4" strokeLinecap="round" />
+                  {waterBodies
+                    .filter((w) => w.id === 'qinhuai-river')
+                    .map((river) => (
+                      <path
+                        key={river.id}
+                        d={river.path}
+                        fill="none"
+                        stroke="#b8d4f0"
+                        strokeWidth="6"
+                        strokeLinecap="round"
+                      />
+                    ))}
 
-                  {/* 区域 */}
-                  {nanjingDistricts.map((district) => (
+                  {/* 玄武湖 */}
+                  {waterBodies
+                    .filter((w) => w.id === 'xuanwu-lake')
+                    .map((lake) => (
+                      <path
+                        key={lake.id}
+                        d={lake.path}
+                        fill="url(#lakeGrad)"
+                        stroke="#a8c8e8"
+                        strokeWidth="1.5"
+                      />
+                    ))}
+
+                  {/* 莫愁湖 */}
+                  {waterBodies
+                    .filter((w) => w.id === 'mochou-lake')
+                    .map((lake) => (
+                      <path
+                        key={lake.id}
+                        d={lake.path}
+                        fill="url(#lakeGrad)"
+                        stroke="#a8c8e8"
+                        strokeWidth="1"
+                      />
+                    ))}
+
+                  {/* 行政区划 */}
+                  {districts.map((district) => (
                     <path
                       key={district.id}
                       d={district.path}
-                      fill={district.color}
+                      fill={district.fill}
                       stroke="#d0d0d0"
                       strokeWidth="1"
                     />
                   ))}
 
                   {/* 区域标签 */}
-                  {nanjingDistricts.map((district) => {
-                    const center = getPathCenter(district.path);
-                    return (
-                      <text
-                        key={`label-${district.id}`}
-                        x={center.x}
-                        y={center.y}
-                        textAnchor="middle"
-                        fontSize="11"
-                        fill="#888"
-                        fontFamily="'Noto Sans SC', sans-serif"
-                        style={{ pointerEvents: 'none' }}
-                      >
-                        {district.name}
-                      </text>
-                    );
-                  })}
+                  {districts.map((district) => (
+                    <text
+                      key={`label-${district.id}`}
+                      x={district.labelX}
+                      y={district.labelY}
+                      textAnchor="middle"
+                      fontSize="12"
+                      fill="#888"
+                      fontFamily="'Noto Sans SC', sans-serif"
+                      style={{ pointerEvents: 'none' }}
+                    >
+                      {district.name}
+                    </text>
+                  ))}
 
                   {/* 主要道路 */}
-                  {mainRoads.map((road) => (
+                  {roads.map((road) => (
                     <g key={road.id}>
                       <path
                         d={road.path}
@@ -233,28 +275,26 @@ const RidingMap = () => {
                   ))}
 
                   {/* 骑行路线 */}
-                  {ridingRoutesDetailed.map((route) => {
+                  {ridingRoutes.map((route) => {
                     const isHovered = hoveredRoute === route.id;
                     const isSelected = selectedRoute?.id === route.id;
 
                     return (
                       <g key={route.id}>
-                        {/* 路线光晕 */}
                         <path
                           d={route.path}
                           fill="none"
                           stroke={route.ridden ? '#0a0a0a' : '#999'}
-                          strokeWidth={isHovered || isSelected ? 10 : route.ridden ? 6 : 3}
-                          opacity={isHovered || isSelected ? 0.15 : route.ridden ? 0.08 : 0.05}
+                          strokeWidth={isHovered || isSelected ? 8 : route.ridden ? 5 : 2.5}
+                          opacity={isHovered || isSelected ? 0.12 : route.ridden ? 0.06 : 0.04}
                           strokeLinecap="round"
                           strokeLinejoin="round"
                         />
-                        {/* 主路线 */}
                         <path
                           d={route.path}
                           fill="none"
                           stroke={route.ridden ? '#0a0a0a' : '#999'}
-                          strokeWidth={isHovered || isSelected ? 3.5 : route.ridden ? 2.5 : 1.5}
+                          strokeWidth={isHovered || isSelected ? 3 : route.ridden ? 2 : 1.5}
                           opacity={route.ridden ? 1 : 0.6}
                           strokeLinecap="round"
                           strokeLinejoin="round"
@@ -275,13 +315,13 @@ const RidingMap = () => {
                     const Icon = landmarkIcons[landmark.type as keyof typeof landmarkIcons] || MapPin;
                     return (
                       <g key={landmark.id} style={{ pointerEvents: 'none' }}>
-                        <circle cx={landmark.x} cy={landmark.y} r="14" fill="#fff" stroke="#ddd" strokeWidth="1" />
-                        <Icon x={landmark.x - 7} y={landmark.y - 7} size={14} color="#666" />
+                        <circle cx={landmark.x} cy={landmark.y} r="16" fill="#fff" stroke="#ddd" strokeWidth="1" />
+                        <Icon x={landmark.x - 8} y={landmark.y - 8} size={16} color="#666" />
                         <text
                           x={landmark.x}
-                          y={landmark.y + 28}
+                          y={landmark.y + 32}
                           textAnchor="middle"
-                          fontSize="10"
+                          fontSize="11"
                           fill="#666"
                           fontFamily="'Noto Sans SC', sans-serif"
                         >
@@ -292,7 +332,7 @@ const RidingMap = () => {
                   })}
 
                   {/* 路线 hover 标签 */}
-                  {ridingRoutesDetailed.map((route) => {
+                  {ridingRoutes.map((route) => {
                     const isHovered = hoveredRoute === route.id;
                     if (!isHovered) return null;
 
@@ -301,19 +341,19 @@ const RidingMap = () => {
                     return (
                       <g key={`tooltip-${route.id}`} style={{ pointerEvents: 'none' }}>
                         <rect
-                          x={center.x - 70}
-                          y={center.y - 35}
-                          width="140"
-                          height="45"
+                          x={center.x - 75}
+                          y={center.y - 38}
+                          width="150"
+                          height="48"
                           fill="#0a0a0a"
                           opacity="0.9"
                         />
                         <text
                           x={center.x}
-                          y={center.y - 12}
+                          y={center.y - 14}
                           textAnchor="middle"
                           fill="#fff"
-                          fontSize="13"
+                          fontSize="14"
                           fontWeight="500"
                           fontFamily="'Noto Sans SC', sans-serif"
                         >
@@ -321,10 +361,10 @@ const RidingMap = () => {
                         </text>
                         <text
                           x={center.x}
-                          y={center.y + 5}
+                          y={center.y + 6}
                           textAnchor="middle"
                           fill="#aaa"
-                          fontSize="10"
+                          fontSize="11"
                           fontFamily="'Inter', sans-serif"
                         >
                           {route.length} · {route.ridden ? '已骑行' : '待骑行'}
@@ -352,7 +392,7 @@ const RidingMap = () => {
                 </div>
                 <div className="card p-4 text-center">
                   <div className="text-2xl font-display-zh text-text-primary">
-                    {ridingRoutesDetailed.length - riddenCount}
+                    {ridingRoutes.length - riddenCount}
                   </div>
                   <div className="text-xs text-text-muted mt-1">待探索</div>
                 </div>
@@ -367,7 +407,7 @@ const RidingMap = () => {
                   路线列表
                 </h3>
                 <div className="space-y-2">
-                  {ridingRoutesDetailed.map((route) => (
+                  {ridingRoutes.map((route) => (
                     <button
                       key={route.id}
                       onClick={() => setSelectedRoute(route)}
@@ -462,7 +502,6 @@ const RidingMap = () => {
   );
 };
 
-// 辅助函数：计算路径中心点
 function getPathCenter(pathData: string) {
   const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
   path.setAttribute('d', pathData);
