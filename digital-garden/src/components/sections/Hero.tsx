@@ -83,7 +83,7 @@ const Hero = () => {
           className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center"
         >
           {/* Left: Text Content */}
-          <motion.div style={{ y: y1, opacity }} className="lg:col-span-7 space-y-8">
+          <motion.div style={{ y: y1, opacity }} className="lg:col-span-5 space-y-8">
             <motion.div variants={staggerItem}>
               <div className="flex items-center gap-3 mb-6">
                 <Sparkles size={16} className="text-accent-terracotta" />
@@ -142,13 +142,13 @@ const Hero = () => {
           <motion.div
             style={{ y: y2, opacity }}
             variants={staggerItem}
-            className="lg:col-span-5 relative"
+            className="lg:col-span-7 relative"
           >
             <motion.div
               style={{ x: translateX, y: translateY }}
               className="relative"
             >
-              <div className="img-container aspect-[4/3] w-full max-w-xl mx-auto lg:ml-auto relative z-10 overflow-hidden">
+              <div className="img-container aspect-[4/3] w-full max-w-3xl mx-auto lg:ml-auto relative z-10 overflow-hidden">
                 {slides.map((slide, i) => (
                   <motion.img
                     key={slide.src}
