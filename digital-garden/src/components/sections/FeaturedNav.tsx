@@ -12,7 +12,6 @@ const navItems = [
     description: '精选的 UI/UX 设计项目，从概念到落地的完整过程。',
     color: 'var(--accent-terracotta)',
     icon: Palette,
-    gradient: 'from-accent-terracotta/20 to-transparent',
   },
   {
     path: '/notes',
@@ -21,7 +20,6 @@ const navItems = [
     description: '设计思考、学习笔记与项目复盘，持续生长的知识花园。',
     color: 'var(--accent-sage)',
     icon: BookOpen,
-    gradient: 'from-accent-sage/20 to-transparent',
   },
   {
     path: '/interests',
@@ -30,7 +28,6 @@ const navItems = [
     description: '电影、音乐、书籍、旅行，设计师的生活策展。',
     color: 'var(--accent-lavender)',
     icon: Heart,
-    gradient: 'from-accent-lavender/20 to-transparent',
   },
   {
     path: '/about',
@@ -39,7 +36,6 @@ const navItems = [
     description: '我的故事、设计理念与职业旅程。',
     color: 'var(--accent-clay)',
     icon: User,
-    gradient: 'from-accent-clay/20 to-transparent',
   },
 ];
 
@@ -47,8 +43,8 @@ const FeaturedNav = () => {
   return (
     <section className="py-section px-container bg-bg-secondary/30 relative overflow-hidden">
       {/* 背景装饰 */}
-      <div className="absolute top-0 right-0 w-96 h-96 bg-accent-lavender/10  blur-3xl" />
-      <div className="absolute bottom-0 left-0 w-80 h-80 bg-accent-sage/10  blur-3xl" />
+      <div className="absolute top-0 right-0 w-96 h-96 bg-accent-lavender/10 blur-3xl" />
+      <div className="absolute bottom-0 left-0 w-80 h-80 bg-accent-sage/10 blur-3xl" />
 
       <div className="max-w-container mx-auto relative z-10">
         <SectionTitle en="EXPLORE" zh="探索花园" align="center" />
@@ -64,20 +60,24 @@ const FeaturedNav = () => {
                     className="gradient-border block p-8 md:p-10 h-full group relative overflow-hidden"
                     data-cursor-text="进入"
                   >
-                    {/* 内部渐变背景 */}
-                    <div className={`absolute inset-0 bg-gradient-to-br ${item.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
+                    {/* 深色渐变背景 */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-text-primary via-text-primary/90 to-text-primary/80 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
                     <div className="relative z-10">
                       <div className="flex justify-between items-start mb-6">
                         <div className="flex items-center gap-3">
                           <div
-                            className="w-10 h-10  flex items-center justify-center"
+                            className="w-10 h-10 flex items-center justify-center transition-colors duration-500 group-hover:bg-white/10"
                             style={{ backgroundColor: `${item.color}20` }}
                           >
-                            <Icon size={18} style={{ color: item.color }} />
+                            <Icon
+                              size={18}
+                              style={{ color: item.color }}
+                              className="transition-colors duration-500 group-hover:text-white"
+                            />
                           </div>
                           <span
-                            className="font-display-en text-xs tracking-wider"
+                            className="font-display-en text-xs tracking-wider transition-colors duration-500 group-hover:text-white/80"
                             style={{ color: item.color }}
                           >
                             {item.en}
@@ -85,22 +85,21 @@ const FeaturedNav = () => {
                         </div>
                         <ArrowUpRight
                           size={24}
-                          className="text-text-muted group-hover:text-text-primary group-hover:translate-x-1 group-hover:-translate-y-1 transition-all duration-300"
+                          className="text-text-muted group-hover:text-white group-hover:translate-x-1 group-hover:-translate-y-1 transition-all duration-300"
                         />
                       </div>
 
-                      <h3 className="font-display-zh text-h3 mb-3 group-hover:translate-x-2 transition-transform duration-300">
+                      <h3 className="font-display-zh text-h3 mb-3 group-hover:translate-x-2 group-hover:text-white transition-all duration-300">
                         {item.zh}
                       </h3>
 
-                      <p className="text-text-secondary text-sm leading-relaxed group-hover:translate-x-2 transition-transform duration-300 delay-75">
+                      <p className="text-text-secondary text-sm leading-relaxed group-hover:translate-x-2 group-hover:text-white/70 transition-all duration-300 delay-75">
                         {item.description}
                       </p>
 
                       {/* 底部装饰线 */}
                       <div
-                        className="absolute bottom-0 left-0 h-1 w-0 group-hover:w-full transition-all duration-500"
-                        style={{ background: `linear-gradient(90deg, ${item.color}, transparent)` }}
+                        className="absolute bottom-0 left-0 h-1 w-0 group-hover:w-full transition-all duration-500 bg-white"
                       />
                     </div>
                   </Link>
