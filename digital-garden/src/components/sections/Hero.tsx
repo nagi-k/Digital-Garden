@@ -142,13 +142,13 @@ const Hero = () => {
           <motion.div
             style={{ y: y2, opacity }}
             variants={staggerItem}
-            className="lg:col-span-7 relative"
+            className="lg:col-span-7 relative lg:pl-12"
           >
             <motion.div
               style={{ x: translateX, y: translateY }}
               className="relative"
             >
-              <div className="img-container aspect-[4/3] w-full max-w-3xl mx-auto lg:ml-auto relative z-10 overflow-hidden">
+              <div className="img-container aspect-[4/3] w-full max-w-3xl mx-auto lg:ml-auto lg:mr-0 relative z-10 overflow-hidden">
                 {slides.map((slide, i) => (
                   <motion.img
                     key={slide.src}
