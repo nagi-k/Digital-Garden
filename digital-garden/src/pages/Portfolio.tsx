@@ -1,8 +1,62 @@
 import { ArrowRight, ArrowUpRight, Monitor, Box, Smartphone, Upload } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 import PageTransition from '@/components/layout/PageTransition';
 import SectionTitle from '@/components/ui/SectionTitle';
 import FadeIn from '@/components/effects/FadeIn';
 import GlbViewer from '@/components/3d/GlbViewer';
+
+interface PhonePrototypeProps {
+  src: string
+  title: string
+  desc: string
+  fullHref: string
+}
+
+const PhonePrototype = ({ src, title, desc, fullHref }: PhonePrototypeProps) => {
+  const wrapRef = useRef<HTMLDivElement>(null)
+  const [scale, setScale] = useState(1)
+
+  useEffect(() => {
+    const update = () => {
+      if (wrapRef.current) setScale(wrapRef.current.clientWidth / 393)
+    }
+    update()
+    const ro = new ResizeObserver(update)
+    if (wrapRef.current) ro.observe(wrapRef.current)
+    return () => ro.disconnect()
+  }, [])
+
+  return (
+    <div className="card p-0 group overflow-hidden">
+      <div ref={wrapRef} className="relative w-full overflow-hidden bg-[#F1EFEA] aspect-[393/852]">
+        <iframe
+          src={src}
+          className="absolute top-0 left-0 border-0"
+          width={393}
+          height={852}
+          style={{ transform: `scale(${scale})`, transformOrigin: 'top left' }}
+          title={title}
+        />
+      </div>
+      <div className="p-5">
+        <h4 className="font-display-zh text-lg mb-1">{title}</h4>
+        <p className="text-sm text-text-secondary mb-3">{desc}</p>
+        <a
+          href={fullHref}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 text-xs text-text-muted hover:text-accent-terracotta transition-colors"
+        >
+          <span>全屏查看原型</span>
+          <ArrowUpRight
+            size={12}
+            className="opacity-0 group-hover:opacity-100 group-hover:translate-x-1 group-hover:-translate-y-1 transition-all"
+          />
+        </a>
+      </div>
+    </div>
+  )
+}
 
 const Portfolio = () => {
   return (
@@ -139,31 +193,37 @@ const Portfolio = () => {
                   <h3 className="font-display-zh text-h3">UI 原型</h3>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {/* 第一行：两个竖版手机 APP 原型占位符 */}
-                  {[1, 2].map((i) => (
-                    <div key={i} className="card p-0 group overflow-hidden">
-                      <div className="aspect-[9/16] md:aspect-[3/4] bg-bg-secondary border-b border-border flex items-center justify-center">
-                        <div className="text-center text-text-muted">
-                          <Smartphone size={40} className="mx-auto mb-3 opacity-50" />
-                          <p className="text-xs">可交互原型占位符</p>
-                          <p className="text-xs mt-1">等待导入交互式 APP 原型</p>
-                        </div>
-                      </div>
-                      <div className="p-5">
-                        <h4 className="font-display-zh text-lg mb-1">APP 原型名称</h4>
-                        <p className="text-sm text-text-secondary mb-3">
-                          高保真交互原型，支持页面跳转与操作反馈
-                        </p>
-                        <div className="flex items-center gap-2 text-xs text-text-muted">
-                          <span>查看原型</span>
-                          <ArrowRight
-                            size={12}
-                            className="opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all"
-                          />
-                        </div>
+                  {/* 第一行：竖版手机 APP 原型 */}
+                  <PhonePrototype
+                    src="prototypes/mood-garden/index.html?embed=1"
+                    title="Mood Garden 情绪花园"
+                    desc="iOS 情绪记录与心理健康陪伴 App · 高保真交互原型"
+                    fullHref="prototypes/mood-garden/index.html"
+                  />
+
+                  {/* 占位：第二个 APP 原型 */}
+                  <div className="card p-0 group overflow-hidden">
+                    <div className="aspect-[393/852] bg-bg-secondary border-b border-border flex items-center justify-center">
+                      <div className="text-center text-text-muted">
+                        <Smartphone size={40} className="mx-auto mb-3 opacity-50" />
+                        <p className="text-xs">可交互原型占位符</p>
+                        <p className="text-xs mt-1">等待导入交互式 APP 原型</p>
                       </div>
                     </div>
-                  ))}
+                    <div className="p-5">
+                      <h4 className="font-display-zh text-lg mb-1">APP 原型名称</h4>
+                      <p className="text-sm text-text-secondary mb-3">
+                        高保真交互原型，支持页面跳转与操作反馈
+                      </p>
+                      <div className="flex items-center gap-2 text-xs text-text-muted">
+                        <span>查看原型</span>
+                        <ArrowRight
+                          size={12}
+                          className="opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all"
+                        />
+                      </div>
+                    </div>
+                  </div>
 
                   {/* 第二行：单列横版网页原型占位符 */}
                   <div className="card p-0 group overflow-hidden md:col-span-2">
