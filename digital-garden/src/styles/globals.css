@@ -235,11 +235,11 @@ body {
 
 /* ============ Hero 英文标题 · 黑白灰渐变高级设计感 ============ */
 .hero-title-en {
-  font-family: 'Archivo Black', 'Anton', 'Impact', 'Arial Black', sans-serif;
-  font-weight: 900;
+  font-family: 'Inter', 'Helvetica Neue', 'Suisse Int\'l', 'Arial', sans-serif;
+  font-weight: 300;
   font-style: italic;
-  font-size: clamp(3.5rem, 9vw, 8rem);
-  letter-spacing: 0.02em;
+  font-size: clamp(4.5rem, 12vw, 11rem);
+  letter-spacing: 0.03em;
   text-transform: uppercase;
   background: linear-gradient(
     135deg,
@@ -254,14 +254,7 @@ body {
   -webkit-text-fill-color: transparent;
   background-clip: text;
   animation: heroShimmer 6s ease-in-out infinite;
-  filter: drop-shadow(0 6px 18px rgba(0, 0, 0, 0.12));
-}
-
-@supports ((-webkit-text-stroke: 1px #fff)) {
-  .hero-title-en {
-    -webkit-text-stroke: 1.5px rgba(10, 10, 10, 0.12);
-    paint-order: stroke fill;
-  }
+  filter: drop-shadow(0 4px 14px rgba(0, 0, 0, 0.1));
 }
 
 @keyframes heroShimmer {
