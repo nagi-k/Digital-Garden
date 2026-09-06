@@ -81,12 +81,12 @@ const libraryItems: LibraryItem[] = [
 const Library = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTag, setActiveTag] = useState<string | null>(null);
-  const [activeType, setActiveType] = useState<'all' | 'image' | 'link'>('all');
+  const [activeType, setActiveType] = useState<'image' | 'link'>('image');
 
   const allTags = Array.from(new Set(libraryItems.flatMap((i) => i.tags)));
 
   const filteredItems = libraryItems.filter((item) => {
-    const matchesType = activeType === 'all' || item.type === activeType;
+    const matchesType = item.type === activeType;
     const matchesTag = !activeTag || item.tags.includes(activeTag);
     const matchesSearch =
       !searchQuery ||
@@ -152,11 +152,6 @@ const Library = () => {
               {/* Type Filter */}
               <div className="flex flex-wrap gap-2">
                 <Tag
-                  label="全部"
-                  active={activeType === 'all'}
-                  onClick={() => setActiveType('all')}
-                />
-                <Tag
                   label="图片"
                   active={activeType === 'image'}
                   onClick={() => setActiveType('image')}
@@ -187,31 +182,31 @@ const Library = () => {
             </div>
           </FadeIn>
 
-          {/* Items Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* Items Masonry */}
+          <div className="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6">
             {filteredItems.map((item, index) => (
               <FadeIn key={item.id} delay={index * 0.08}>
                 {item.type === 'image' ? (
-                  <article className="card p-0 group overflow-hidden h-full flex flex-col">
-                    <div className="aspect-[4/3] overflow-hidden relative">
+                  <article className="card p-0 group overflow-hidden break-inside-avoid">
+                    <div className="overflow-hidden relative">
                       <img
                         src={item.src}
                         alt={item.title}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                        className="w-full h-auto object-cover group-hover:scale-110 transition-transform duration-500"
                       />
                       <div className="absolute top-3 left-3 bg-bg-primary/80 backdrop-blur-sm px-2 py-1 text-xs text-text-secondary">
                         <Image size={12} className="inline mr-1" />
                         图片
                       </div>
                     </div>
-                    <div className="p-5 flex-1 flex flex-col">
+                    <div className="p-5">
                       <h3 className="font-display-zh text-lg mb-1 group-hover:text-accent-terracotta transition-colors">
                         {item.title}
                       </h3>
                       {item.note && (
-                        <p className="text-sm text-text-secondary mb-3 line-clamp-2">{item.note}</p>
+                        <p className="text-sm text-text-secondary mb-3">{item.note}</p>
                       )}
-                      <div className="flex flex-wrap gap-2 mt-auto">
+                      <div className="flex flex-wrap gap-2">
                         {item.tags.map((tag) => (
                           <span key={tag} className="text-xs text-text-muted">
                             #{tag}
@@ -225,7 +220,7 @@ const Library = () => {
                     href={item.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="card p-5 group h-full flex flex-col hover:border-accent-terracotta transition-colors"
+                    className="card p-5 group break-inside-avoid block hover:border-accent-terracotta transition-colors"
                   >
                     <div className="flex items-center gap-2 mb-3">
                       <div className="w-8 h-8 bg-accent-clay/10 flex items-center justify-center">
@@ -236,10 +231,10 @@ const Library = () => {
                     <h3 className="font-display-zh text-lg mb-2 group-hover:text-accent-terracotta transition-colors">
                       {item.title}
                     </h3>
-                    <p className="text-sm text-text-secondary mb-4 line-clamp-2 flex-1">
+                    <p className="text-sm text-text-secondary mb-4">
                       {item.description}
                     </p>
-                    <div className="flex items-center justify-between mt-auto">
+                    <div className="flex items-center justify-between">
                       <div className="flex flex-wrap gap-2">
                         {item.tags.map((tag) => (
                           <span key={tag} className="text-xs text-text-muted">
