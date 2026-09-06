@@ -65,8 +65,12 @@ const RidingMap = () => {
     .filter((r) => r.ridden)
     .reduce((acc, r) => acc + parseInt(r.length.replace(/\D/g, '')), 0);
 
-  const handleZoomIn = useCallback(() => setZoom((prev) => Math.min(prev + 0.25, 4)), []);
-  const handleZoomOut = useCallback(() => setZoom((prev) => Math.max(prev - 0.25, 0.5)), []);
+  // 图标/文字尺寸：按 1/√zoom 反向缩放
+  // 放大时图标适度变大（不会被地图甩得太小），缩小时也不会过大遮挡
+  const zs = (v: number) => v / Math.sqrt(zoom);
+
+  const handleZoomIn = useCallback(() => setZoom((prev) => Math.min(prev + 0.5, 8)), []);
+  const handleZoomOut = useCallback(() => setZoom((prev) => Math.max(prev - 0.5, 0.5)), []);
   const handleReset = useCallback(() => {
     setZoom(DEFAULT_ZOOM);
     setPan(DEFAULT_PAN);
@@ -262,7 +266,7 @@ const RidingMap = () => {
                         x={district.labelX}
                         y={district.labelY}
                         textAnchor="middle"
-                        fontSize={(mainCityDistricts.has(district.id) ? 12 : 14) / zoom}
+                        fontSize={zs(mainCityDistricts.has(district.id) ? 12 : 14)}
                         fill="#999"
                         fontFamily="'Noto Sans SC', sans-serif"
                         style={{ pointerEvents: 'none' }}
@@ -312,13 +316,13 @@ const RidingMap = () => {
                     const Icon = landmarkIcons[landmark.type as keyof typeof landmarkIcons] || MapPin;
                     return (
                       <g key={landmark.id} style={{ pointerEvents: 'none' }}>
-                        <circle cx={landmark.x} cy={landmark.y} r={16 / zoom} fill="#fff" stroke="#ddd" strokeWidth={1 / zoom} />
-                        <Icon x={landmark.x - 8 / zoom} y={landmark.y - 8 / zoom} size={16 / zoom} color="#666" />
+                        <circle cx={landmark.x} cy={landmark.y} r={zs(16)} fill="#fff" stroke="#ddd" strokeWidth={zs(1)} />
+                        <Icon x={landmark.x - zs(8)} y={landmark.y - zs(8)} size={zs(16)} color="#666" />
                         <text
                           x={landmark.x}
-                          y={landmark.y + 32 / zoom}
+                          y={landmark.y + zs(32)}
                           textAnchor="middle"
-                          fontSize={11 / zoom}
+                          fontSize={zs(11)}
                           fill="#666"
                           fontFamily="'Noto Sans SC', sans-serif"
                         >
@@ -338,19 +342,19 @@ const RidingMap = () => {
                     return (
                       <g key={`tooltip-${route.id}`} style={{ pointerEvents: 'none' }}>
                         <rect
-                          x={center.x - 75 / zoom}
-                          y={center.y - 38 / zoom}
-                          width={150 / zoom}
-                          height={48 / zoom}
+                          x={center.x - zs(75)}
+                          y={center.y - zs(38)}
+                          width={zs(150)}
+                          height={zs(48)}
                           fill="#0a0a0a"
                           opacity="0.9"
                         />
                         <text
                           x={center.x}
-                          y={center.y - 14 / zoom}
+                          y={center.y - zs(14)}
                           textAnchor="middle"
                           fill="#fff"
-                          fontSize={14 / zoom}
+                          fontSize={zs(14)}
                           fontWeight="500"
                           fontFamily="'Noto Sans SC', sans-serif"
                         >
@@ -358,10 +362,10 @@ const RidingMap = () => {
                         </text>
                         <text
                           x={center.x}
-                          y={center.y + 6 / zoom}
+                          y={center.y + zs(6)}
                           textAnchor="middle"
                           fill="#aaa"
-                          fontSize={11 / zoom}
+                          fontSize={zs(11)}
                           fontFamily="'Inter', sans-serif"
                         >
                           {route.length} · {route.ridden ? '已骑行' : '待骑行'}
