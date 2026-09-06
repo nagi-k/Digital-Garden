@@ -15,7 +15,8 @@ import {
 } from 'lucide-react';
 import SectionTitle from '@/components/ui/SectionTitle';
 import FadeIn from '@/components/effects/FadeIn';
-import { districts, waterBodies, roads, landmarks, ridingRoutes, RidingRoute } from '@/data/nanjingMap';
+import { waterBodies, roads, landmarks, ridingRoutes, RidingRoute } from '@/data/nanjingMap';
+import { realDistricts, MAP_VIEW_W, MAP_VIEW_H } from '@/data/realDistricts';
 
 const landmarkIcons = {
   mountain: Mountain,
@@ -27,11 +28,33 @@ const landmarkIcons = {
   cbd: Building2,
 };
 
+// 主城六区用不同色调，远郊区更浅
+const districtFills: Record<string, string> = {
+  '320102': '#ececec', // 玄武区
+  '320104': '#e6e6e6', // 秦淮区
+  '320105': '#ececec', // 建邺区
+  '320106': '#e6e6e6', // 鼓楼区
+  '320113': '#ececec', // 栖霞区
+  '320114': '#e6e6e6', // 雨花台区
+  '320115': '#ececec', // 江宁区
+  '320111': '#f4f4f4', // 浦口区
+  '320116': '#f4f4f4', // 六合区
+  '320117': '#f4f4f4', // 溧水区
+  '320118': '#f4f4f4', // 高淳区
+};
+
+// 主城六区（标签在小比例尺下隐藏，避免拥挤；放大后显示）
+const mainCityDistricts = new Set(['320102', '320104', '320105', '320106', '320113', '320114']);
+// 默认视野：主城区（新街口附近）
+const DEFAULT_ZOOM = 2;
+const DEFAULT_PAN = { x: 4, y: 200 };
+const DETAIL_ZOOM = 1.6; // 超过该缩放级别显示主城标签与地标
+
 const RidingMap = () => {
   const [selectedRoute, setSelectedRoute] = useState<RidingRoute | null>(null);
   const [hoveredRoute, setHoveredRoute] = useState<string | null>(null);
-  const [zoom, setZoom] = useState(1);
-  const [pan, setPan] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(DEFAULT_ZOOM);
+  const [pan, setPan] = useState(DEFAULT_PAN);
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const svgRef = useRef<SVGSVGElement>(null);
@@ -41,11 +64,11 @@ const RidingMap = () => {
     .filter((r) => r.ridden)
     .reduce((acc, r) => acc + parseInt(r.length.replace(/\D/g, '')), 0);
 
-  const handleZoomIn = useCallback(() => setZoom((prev) => Math.min(prev + 0.25, 3)), []);
+  const handleZoomIn = useCallback(() => setZoom((prev) => Math.min(prev + 0.25, 4)), []);
   const handleZoomOut = useCallback(() => setZoom((prev) => Math.max(prev - 0.25, 0.5)), []);
   const handleReset = useCallback(() => {
-    setZoom(1);
-    setPan({ x: 0, y: 0 });
+    setZoom(DEFAULT_ZOOM);
+    setPan(DEFAULT_PAN);
   }, []);
 
   const handleMouseDown = (e: React.MouseEvent) => {
@@ -144,7 +167,7 @@ const RidingMap = () => {
               >
                 <svg
                   ref={svgRef}
-                  viewBox="0 0 1200 1200"
+                  viewBox={`0 0 ${MAP_VIEW_W} ${MAP_VIEW_H}`}
                   className="w-full h-full"
                   style={{
                     transform: `scale(${zoom}) translate(${pan.x / zoom}px, ${pan.y / zoom}px)`,
@@ -164,17 +187,21 @@ const RidingMap = () => {
                   </defs>
 
                   {/* 背景 */}
-                  <rect width="1200" height="1200" fill="#f8f8f8" />
+                  <rect width={MAP_VIEW_W} height={MAP_VIEW_H} fill="#f8f8f8" />
 
-                  {/* 城市网格 */}
-                  {Array.from({ length: 30 }).map((_, i) => (
-                    <line key={`h-${i}`} x1="0" y1={i * 40} x2="1200" y2={i * 40} stroke="#e8e8e8" strokeWidth="0.5" />
-                  ))}
-                  {Array.from({ length: 30 }).map((_, i) => (
-                    <line key={`v-${i}`} x1={i * 40} y1="0" x2={i * 40} y2="1200" stroke="#e8e8e8" strokeWidth="0.5" />
+                  {/* 行政区划（真实边界，全市 11 区） */}
+                  {realDistricts.map((district) => (
+                    <path
+                      key={district.id}
+                      d={district.path}
+                      fill={districtFills[district.id] || '#eee'}
+                      stroke="#c8c8c8"
+                      strokeWidth="1"
+                      strokeLinejoin="round"
+                    />
                   ))}
 
-                  {/* 长江 */}
+                  {/* 长江（面状） */}
                   {waterBodies
                     .filter((w) => w.id === 'yangtze')
                     .map((river) => (
@@ -183,11 +210,37 @@ const RidingMap = () => {
                         d={river.path}
                         fill="url(#waterGrad)"
                         stroke="#a8c8e8"
-                        strokeWidth="2"
+                        strokeWidth="1"
                       />
                     ))}
 
-                  {/* 秦淮河 */}
+                  {/* 江中岛屿（江心洲、八卦洲，陆色盖在江面上） */}
+                  {waterBodies
+                    .filter((w) => w.type === 'island')
+                    .map((island) => (
+                      <path
+                        key={island.id}
+                        d={island.path}
+                        fill="#ececec"
+                        stroke="#c8c8c8"
+                        strokeWidth="0.8"
+                      />
+                    ))}
+
+                  {/* 湖泊（玄武湖、莫愁湖、石臼湖、固城湖） */}
+                  {waterBodies
+                    .filter((w) => w.type === 'lake')
+                    .map((lake) => (
+                      <path
+                        key={lake.id}
+                        d={lake.path}
+                        fill="url(#lakeGrad)"
+                        stroke="#a8c8e8"
+                        strokeWidth="0.8"
+                      />
+                    ))}
+
+                  {/* 秦淮河（线状，向西汇入长江） */}
                   {waterBodies
                     .filter((w) => w.id === 'qinhuai-river')
                     .map((river) => (
@@ -196,63 +249,28 @@ const RidingMap = () => {
                         d={river.path}
                         fill="none"
                         stroke="#b8d4f0"
-                        strokeWidth="6"
+                        strokeWidth="3"
                         strokeLinecap="round"
                       />
                     ))}
 
-                  {/* 玄武湖 */}
-                  {waterBodies
-                    .filter((w) => w.id === 'xuanwu-lake')
-                    .map((lake) => (
-                      <path
-                        key={lake.id}
-                        d={lake.path}
-                        fill="url(#lakeGrad)"
-                        stroke="#a8c8e8"
-                        strokeWidth="1.5"
-                      />
+                  {/* 区域标签（远郊区常显，主城六区放大后显示） */}
+                  {realDistricts
+                    .filter((d) => !mainCityDistricts.has(d.id) || zoom >= DETAIL_ZOOM)
+                    .map((district) => (
+                      <text
+                        key={`label-${district.id}`}
+                        x={district.labelX}
+                        y={district.labelY}
+                        textAnchor="middle"
+                        fontSize={mainCityDistricts.has(district.id) ? '12' : '14'}
+                        fill="#999"
+                        fontFamily="'Noto Sans SC', sans-serif"
+                        style={{ pointerEvents: 'none' }}
+                      >
+                        {district.name}
+                      </text>
                     ))}
-
-                  {/* 莫愁湖 */}
-                  {waterBodies
-                    .filter((w) => w.id === 'mochou-lake')
-                    .map((lake) => (
-                      <path
-                        key={lake.id}
-                        d={lake.path}
-                        fill="url(#lakeGrad)"
-                        stroke="#a8c8e8"
-                        strokeWidth="1"
-                      />
-                    ))}
-
-                  {/* 行政区划 */}
-                  {districts.map((district) => (
-                    <path
-                      key={district.id}
-                      d={district.path}
-                      fill={district.fill}
-                      stroke="#d0d0d0"
-                      strokeWidth="1"
-                    />
-                  ))}
-
-                  {/* 区域标签 */}
-                  {districts.map((district) => (
-                    <text
-                      key={`label-${district.id}`}
-                      x={district.labelX}
-                      y={district.labelY}
-                      textAnchor="middle"
-                      fontSize="12"
-                      fill="#888"
-                      fontFamily="'Noto Sans SC', sans-serif"
-                      style={{ pointerEvents: 'none' }}
-                    >
-                      {district.name}
-                    </text>
-                  ))}
 
                   {/* 主要道路 */}
                   {roads.map((road) => (
@@ -310,8 +328,8 @@ const RidingMap = () => {
                     );
                   })}
 
-                  {/* 地标 */}
-                  {landmarks.map((landmark) => {
+                  {/* 地标（放大后显示，避免小比例尺拥挤） */}
+                  {zoom >= DETAIL_ZOOM && landmarks.map((landmark) => {
                     const Icon = landmarkIcons[landmark.type as keyof typeof landmarkIcons] || MapPin;
                     return (
                       <g key={landmark.id} style={{ pointerEvents: 'none' }}>
