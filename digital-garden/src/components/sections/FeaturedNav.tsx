@@ -66,20 +66,13 @@ const FeaturedNav = () => {
                     <div className="relative z-10">
                       <div className="flex justify-between items-start mb-6">
                         <div className="flex items-center gap-3">
-                          <div
-                            className="w-10 h-10 flex items-center justify-center transition-colors duration-500 group-hover:bg-white/10"
-                            style={{ backgroundColor: `${item.color}20` }}
-                          >
+                          <div className="w-10 h-10 flex items-center justify-center transition-colors duration-500 group-hover:bg-white/20 bg-text-primary/5">
                             <Icon
                               size={18}
-                              style={{ color: item.color }}
-                              className="transition-colors duration-500 group-hover:text-white"
+                              className="transition-colors duration-500 text-text-primary group-hover:text-white"
                             />
                           </div>
-                          <span
-                            className="font-display-en text-xs tracking-wider transition-colors duration-500 group-hover:text-white/80"
-                            style={{ color: item.color }}
-                          >
+                          <span className="font-display-en text-xs tracking-wider transition-colors duration-500 text-text-primary group-hover:text-white/80">
                             {item.en}
                           </span>
                         </div>
@@ -97,10 +90,8 @@ const FeaturedNav = () => {
                         {item.description}
                       </p>
 
-                      {/* 底部装饰线 */}
-                      <div
-                        className="absolute bottom-0 left-0 h-1 w-0 group-hover:w-full transition-all duration-500 bg-white"
-                      />
+                      {/* 底部装饰线 - 低调渐变灰 */}
+                      <div className="absolute bottom-0 left-0 h-[2px] w-0 group-hover:w-full transition-all duration-500 bg-gradient-to-r from-transparent via-white/40 to-transparent" />
                     </div>
                   </Link>
                 </TiltCard>
