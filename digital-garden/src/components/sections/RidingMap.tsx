@@ -1,12 +1,34 @@
-import { useState, useRef, useEffect } from 'react';
-import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
-import { Bike, MapPin, ZoomIn, ZoomOut, RotateCcw, Calendar, Navigation } from 'lucide-react';
+import { useState, useRef, useEffect, useCallback } from 'react';
+import { motion } from 'framer-motion';
+import {
+  Bike,
+  ZoomIn,
+  ZoomOut,
+  RotateCcw,
+  Calendar,
+  Navigation,
+  MapPin,
+  Mountain,
+  Droplets,
+  Building2,
+  Train,
+} from 'lucide-react';
 import SectionTitle from '@/components/ui/SectionTitle';
 import FadeIn from '@/components/effects/FadeIn';
-import { ridingRoutes, RidingRoute } from '@/data/ridingRoutes';
+import { nanjingDistricts, yangtzeRiver, qinhuaiRiver, mainRoads, landmarks, ridingRoutesDetailed } from '@/data/nanjingMap';
+
+const landmarkIcons = {
+  mountain: Mountain,
+  lake: Droplets,
+  river: Droplets,
+  scenic: MapPin,
+  historic: Building2,
+  transport: Train,
+  cbd: Building2,
+};
 
 const RidingMap = () => {
-  const [selectedRoute, setSelectedRoute] = useState<RidingRoute | null>(null);
+  const [selectedRoute, setSelectedRoute] = useState<typeof ridingRoutesDetailed[0] | null>(null);
   const [hoveredRoute, setHoveredRoute] = useState<string | null>(null);
   const [zoom, setZoom] = useState(1);
   const [pan, setPan] = useState({ x: 0, y: 0 });
@@ -14,17 +36,17 @@ const RidingMap = () => {
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const svgRef = useRef<SVGSVGElement>(null);
 
-  const riddenCount = ridingRoutes.filter((r) => r.ridden).length;
-  const totalLength = ridingRoutes
+  const riddenCount = ridingRoutesDetailed.filter((r) => r.ridden).length;
+  const totalLength = ridingRoutesDetailed
     .filter((r) => r.ridden)
     .reduce((acc, r) => acc + parseInt(r.length.replace(/\D/g, '')), 0);
 
-  const handleZoomIn = () => setZoom((prev) => Math.min(prev + 0.25, 3));
-  const handleZoomOut = () => setZoom((prev) => Math.max(prev - 0.25, 0.5));
-  const handleReset = () => {
+  const handleZoomIn = useCallback(() => setZoom((prev) => Math.min(prev + 0.25, 3)), []);
+  const handleZoomOut = useCallback(() => setZoom((prev) => Math.max(prev - 0.25, 0.5)), []);
+  const handleReset = useCallback(() => {
     setZoom(1);
     setPan({ x: 0, y: 0 });
-  };
+  }, []);
 
   const handleMouseDown = (e: React.MouseEvent) => {
     setIsDragging(true);
@@ -39,17 +61,12 @@ const RidingMap = () => {
     });
   };
 
-  const handleMouseUp = () => {
-    setIsDragging(false);
-  };
+  const handleMouseUp = () => setIsDragging(false);
 
   const handleWheel = (e: React.WheelEvent) => {
     e.preventDefault();
-    if (e.deltaY < 0) {
-      handleZoomIn();
-    } else {
-      handleZoomOut();
-    }
+    if (e.deltaY < 0) handleZoomIn();
+    else handleZoomOut();
   };
 
   return (
@@ -68,35 +85,57 @@ const RidingMap = () => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           {/* 地图区域 */}
           <FadeIn className="lg:col-span-8">
-            <div className="card p-6 relative">
-              {/* 地图控制按钮 */}
-              <div className="absolute top-4 right-4 z-20 flex flex-col gap-2">
+            <div className="card p-0 relative overflow-hidden bg-[#f8f8f8]">
+              {/* 高德风格工具栏 */}
+              <div className="absolute top-4 right-4 z-20 flex flex-col gap-1">
                 <button
                   onClick={handleZoomIn}
-                  className="w-10 h-10 bg-bg-card border border-border flex items-center justify-center hover:bg-text-primary hover:text-text-inverse transition-colors"
+                  className="w-9 h-9 bg-white border border-[#e0e0e0] flex items-center justify-center hover:bg-[#f5f5f5] transition-colors shadow-sm"
                   aria-label="放大"
                 >
-                  <ZoomIn size={18} />
+                  <ZoomIn size={16} className="text-[#333]" />
                 </button>
                 <button
                   onClick={handleZoomOut}
-                  className="w-10 h-10 bg-bg-card border border-border flex items-center justify-center hover:bg-text-primary hover:text-text-inverse transition-colors"
+                  className="w-9 h-9 bg-white border border-[#e0e0e0] flex items-center justify-center hover:bg-[#f5f5f5] transition-colors shadow-sm"
                   aria-label="缩小"
                 >
-                  <ZoomOut size={18} />
+                  <ZoomOut size={16} className="text-[#333]" />
                 </button>
                 <button
                   onClick={handleReset}
-                  className="w-10 h-10 bg-bg-card border border-border flex items-center justify-center hover:bg-text-primary hover:text-text-inverse transition-colors"
+                  className="w-9 h-9 bg-white border border-[#e0e0e0] flex items-center justify-center hover:bg-[#f5f5f5] transition-colors shadow-sm"
                   aria-label="重置"
                 >
-                  <RotateCcw size={18} />
+                  <RotateCcw size={16} className="text-[#333]" />
                 </button>
+              </div>
+
+              {/* 比例尺 */}
+              <div className="absolute bottom-4 right-4 z-20 bg-white border border-[#e0e0e0] px-3 py-1.5 shadow-sm">
+                <div className="flex items-center gap-2">
+                  <div className="w-16 h-0.5 bg-[#333]" />
+                  <span className="text-xs text-[#666]">2km</span>
+                </div>
+              </div>
+
+              {/* 图例 */}
+              <div className="absolute bottom-4 left-4 z-20 bg-white border border-[#e0e0e0] p-3 shadow-sm">
+                <div className="flex flex-col gap-2 text-xs">
+                  <div className="flex items-center gap-2">
+                    <div className="w-5 h-0.5 bg-[#0a0a0a]" />
+                    <span className="text-[#666]">已骑行</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-5 h-0.5 border-t-2 border-dashed border-[#999]" />
+                    <span className="text-[#666]">待骑行</span>
+                  </div>
+                </div>
               </div>
 
               {/* 地图容器 */}
               <div
-                className="relative w-full aspect-[4/3] bg-bg-secondary overflow-hidden cursor-grab active:cursor-grabbing"
+                className="relative w-full aspect-[4/3] overflow-hidden cursor-grab active:cursor-grabbing"
                 onMouseDown={handleMouseDown}
                 onMouseMove={handleMouseMove}
                 onMouseUp={handleMouseUp}
@@ -110,40 +149,91 @@ const RidingMap = () => {
                   style={{
                     transform: `scale(${zoom}) translate(${pan.x / zoom}px, ${pan.y / zoom}px)`,
                     transformOrigin: 'center',
-                    transition: isDragging ? 'none' : 'transform 0.3s ease',
+                    transition: isDragging ? 'none' : 'transform 0.2s ease',
                   }}
                 >
-                  {/* 城市背景装饰 */}
                   <defs>
-                    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-                      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="var(--border)" strokeWidth="0.5" />
-                    </pattern>
+                    {/* 水域渐变 */}
+                    <linearGradient id="waterGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                      <stop offset="0%" stopColor="#d4e5f7" />
+                      <stop offset="100%" stopColor="#c8ddf5" />
+                    </linearGradient>
+                    {/* 绿地渐变 */}
+                    <linearGradient id="greenGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                      <stop offset="0%" stopColor="#e8f5e9" />
+                      <stop offset="100%" stopColor="#c8e6c9" />
+                    </linearGradient>
                   </defs>
-                  <rect width="100%" height="100%" fill="url(#grid)" />
 
-                  {/* 城市轮廓装饰 */}
-                  <rect x="50" y="50" width="500" height="500" fill="none" stroke="var(--border)" strokeWidth="1" strokeDasharray="4 4" />
+                  {/* 背景 */}
+                  <rect width="100%" height="100%" fill="#f8f8f8" />
+
+                  {/* 城市网格 */}
+                  {Array.from({ length: 15 }).map((_, i) => (
+                    <line key={`h-${i}`} x1="0" y1={i * 40} x2="600" y2={i * 40} stroke="#e8e8e8" strokeWidth="0.5" />
+                  ))}
+                  {Array.from({ length: 15 }).map((_, i) => (
+                    <line key={`v-${i}`} x1={i * 40} y1="0" x2={i * 40} y2="600" stroke="#e8e8e8" strokeWidth="0.5" />
+                  ))}
 
                   {/* 长江 */}
-                  <path
-                    d="M 0 150 Q 100 130 200 160 T 400 170 T 600 200"
-                    fill="none"
-                    stroke="var(--border-strong)"
-                    strokeWidth="8"
-                    opacity="0.3"
-                  />
+                  <path d={yangtzeRiver} fill="url(#waterGrad)" stroke="#b8d4f0" strokeWidth="1" />
 
                   {/* 秦淮河 */}
-                  <path
-                    d="M 200 350 Q 250 330 300 350 T 360 380"
-                    fill="none"
-                    stroke="var(--border-strong)"
-                    strokeWidth="4"
-                    opacity="0.3"
-                  />
+                  <path d={qinhuaiRiver} fill="none" stroke="#b8d4f0" strokeWidth="4" strokeLinecap="round" />
+
+                  {/* 区域 */}
+                  {nanjingDistricts.map((district) => (
+                    <path
+                      key={district.id}
+                      d={district.path}
+                      fill={district.color}
+                      stroke="#d0d0d0"
+                      strokeWidth="1"
+                    />
+                  ))}
+
+                  {/* 区域标签 */}
+                  {nanjingDistricts.map((district) => {
+                    const center = getPathCenter(district.path);
+                    return (
+                      <text
+                        key={`label-${district.id}`}
+                        x={center.x}
+                        y={center.y}
+                        textAnchor="middle"
+                        fontSize="11"
+                        fill="#888"
+                        fontFamily="'Noto Sans SC', sans-serif"
+                        style={{ pointerEvents: 'none' }}
+                      >
+                        {district.name}
+                      </text>
+                    );
+                  })}
+
+                  {/* 主要道路 */}
+                  {mainRoads.map((road) => (
+                    <g key={road.id}>
+                      <path
+                        d={road.path}
+                        fill="none"
+                        stroke="#fff"
+                        strokeWidth={road.width + 2}
+                        strokeLinecap="round"
+                      />
+                      <path
+                        d={road.path}
+                        fill="none"
+                        stroke="#e0e0e0"
+                        strokeWidth={road.width}
+                        strokeLinecap="round"
+                      />
+                    </g>
+                  ))}
 
                   {/* 骑行路线 */}
-                  {ridingRoutes.map((route) => {
+                  {ridingRoutesDetailed.map((route) => {
                     const isHovered = hoveredRoute === route.id;
                     const isSelected = selectedRoute?.id === route.id;
 
@@ -151,21 +241,21 @@ const RidingMap = () => {
                       <g key={route.id}>
                         {/* 路线光晕 */}
                         <path
-                          d={route.points}
+                          d={route.path}
                           fill="none"
-                          stroke={route.ridden ? 'var(--accent-terracotta)' : 'var(--border-strong)'}
-                          strokeWidth={isHovered || isSelected ? 12 : route.ridden ? 8 : 4}
-                          opacity={isHovered || isSelected ? 0.3 : route.ridden ? 0.15 : 0.1}
+                          stroke={route.ridden ? '#0a0a0a' : '#999'}
+                          strokeWidth={isHovered || isSelected ? 10 : route.ridden ? 6 : 3}
+                          opacity={isHovered || isSelected ? 0.15 : route.ridden ? 0.08 : 0.05}
                           strokeLinecap="round"
                           strokeLinejoin="round"
                         />
                         {/* 主路线 */}
                         <path
-                          d={route.points}
+                          d={route.path}
                           fill="none"
-                          stroke={route.ridden ? 'var(--accent-terracotta)' : 'var(--border-strong)'}
-                          strokeWidth={isHovered || isSelected ? 4 : route.ridden ? 3 : 2}
-                          opacity={route.ridden ? 1 : 0.5}
+                          stroke={route.ridden ? '#0a0a0a' : '#999'}
+                          strokeWidth={isHovered || isSelected ? 3.5 : route.ridden ? 2.5 : 1.5}
+                          opacity={route.ridden ? 1 : 0.6}
                           strokeLinecap="round"
                           strokeLinejoin="round"
                           className="cursor-pointer transition-all duration-300"
@@ -173,72 +263,76 @@ const RidingMap = () => {
                           onMouseLeave={() => setHoveredRoute(null)}
                           onClick={() => setSelectedRoute(route)}
                           style={{
-                            strokeDasharray: route.ridden ? 'none' : '8 4',
+                            strokeDasharray: route.ridden ? 'none' : '6 3',
                           }}
                         />
                       </g>
                     );
                   })}
 
-                  {/* 路线标签 */}
-                  {ridingRoutes.map((route) => {
+                  {/* 地标 */}
+                  {landmarks.map((landmark) => {
+                    const Icon = landmarkIcons[landmark.type as keyof typeof landmarkIcons] || MapPin;
+                    return (
+                      <g key={landmark.id} style={{ pointerEvents: 'none' }}>
+                        <circle cx={landmark.x} cy={landmark.y} r="14" fill="#fff" stroke="#ddd" strokeWidth="1" />
+                        <Icon x={landmark.x - 7} y={landmark.y - 7} size={14} color="#666" />
+                        <text
+                          x={landmark.x}
+                          y={landmark.y + 28}
+                          textAnchor="middle"
+                          fontSize="10"
+                          fill="#666"
+                          fontFamily="'Noto Sans SC', sans-serif"
+                        >
+                          {landmark.name}
+                        </text>
+                      </g>
+                    );
+                  })}
+
+                  {/* 路线 hover 标签 */}
+                  {ridingRoutesDetailed.map((route) => {
                     const isHovered = hoveredRoute === route.id;
                     if (!isHovered) return null;
 
-                    // 计算路径中点
-                    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-                    path.setAttribute('d', route.points);
-                    const length = path.getTotalLength();
-                    const point = path.getPointAtLength(length / 2);
+                    const center = getPathCenter(route.path);
 
                     return (
-                      <g key={`label-${route.id}`}>
+                      <g key={`tooltip-${route.id}`} style={{ pointerEvents: 'none' }}>
                         <rect
-                          x={point.x - 60}
-                          y={point.y - 30}
-                          width="120"
-                          height="40"
-                          fill="var(--text-primary)"
+                          x={center.x - 70}
+                          y={center.y - 35}
+                          width="140"
+                          height="45"
+                          fill="#0a0a0a"
                           opacity="0.9"
-                          rx="0"
                         />
                         <text
-                          x={point.x}
-                          y={point.y - 5}
+                          x={center.x}
+                          y={center.y - 12}
                           textAnchor="middle"
-                          fill="var(--text-inverse)"
-                          fontSize="12"
+                          fill="#fff"
+                          fontSize="13"
+                          fontWeight="500"
                           fontFamily="'Noto Sans SC', sans-serif"
                         >
                           {route.name}
                         </text>
                         <text
-                          x={point.x}
-                          y={point.y + 10}
+                          x={center.x}
+                          y={center.y + 5}
                           textAnchor="middle"
-                          fill="var(--text-inverse)"
+                          fill="#aaa"
                           fontSize="10"
-                          opacity="0.7"
                           fontFamily="'Inter', sans-serif"
                         >
-                          {route.length}
+                          {route.length} · {route.ridden ? '已骑行' : '待骑行'}
                         </text>
                       </g>
                     );
                   })}
                 </svg>
-
-                {/* 图例 */}
-                <div className="absolute bottom-4 left-4 flex flex-col gap-2 text-xs">
-                  <div className="flex items-center gap-2">
-                    <div className="w-6 h-0.5 bg-accent-terracotta" />
-                    <span className="text-text-secondary">已骑行</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-6 h-0.5 bg-border-strong border-dashed border-t" style={{ borderTopWidth: '2px' }} />
-                    <span className="text-text-secondary">待骑行</span>
-                  </div>
-                </div>
               </div>
             </div>
           </FadeIn>
@@ -247,17 +341,19 @@ const RidingMap = () => {
           <div className="lg:col-span-4 space-y-6">
             {/* 统计卡片 */}
             <FadeIn delay={0.1}>
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-3 gap-3">
                 <div className="card p-4 text-center">
-                  <div className="text-2xl font-display-zh text-accent-terracotta">{riddenCount}</div>
+                  <div className="text-2xl font-display-zh text-text-primary">{riddenCount}</div>
                   <div className="text-xs text-text-muted mt-1">已骑行路线</div>
                 </div>
                 <div className="card p-4 text-center">
-                  <div className="text-2xl font-display-zh text-accent-terracotta">{totalLength}km</div>
+                  <div className="text-2xl font-display-zh text-text-primary">{totalLength}km</div>
                   <div className="text-xs text-text-muted mt-1">总里程</div>
                 </div>
                 <div className="card p-4 text-center">
-                  <div className="text-2xl font-display-zh text-accent-terracotta">{ridingRoutes.length - riddenCount}</div>
+                  <div className="text-2xl font-display-zh text-text-primary">
+                    {ridingRoutesDetailed.length - riddenCount}
+                  </div>
                   <div className="text-xs text-text-muted mt-1">待探索</div>
                 </div>
               </div>
@@ -265,13 +361,13 @@ const RidingMap = () => {
 
             {/* 路线列表 */}
             <FadeIn delay={0.2}>
-              <div className="card p-6 max-h-[500px] overflow-y-auto">
+              <div className="card p-5 max-h-[480px] overflow-y-auto">
                 <h3 className="font-display-zh text-lg mb-4 flex items-center gap-2">
-                  <Navigation size={18} className="text-accent-terracotta" />
+                  <Navigation size={18} className="text-text-primary" />
                   路线列表
                 </h3>
-                <div className="space-y-3">
-                  {ridingRoutes.map((route) => (
+                <div className="space-y-2">
+                  {ridingRoutesDetailed.map((route) => (
                     <button
                       key={route.id}
                       onClick={() => setSelectedRoute(route)}
@@ -279,14 +375,14 @@ const RidingMap = () => {
                       onMouseLeave={() => setHoveredRoute(null)}
                       className={`w-full text-left p-3 border transition-all duration-300 ${
                         selectedRoute?.id === route.id
-                          ? 'border-accent-terracotta bg-accent-terracotta/5'
+                          ? 'border-text-primary bg-text-primary/5'
                           : 'border-border hover:border-text-secondary'
                       }`}
                     >
                       <div className="flex items-center justify-between mb-1">
                         <span className="font-medium text-sm">{route.name}</span>
                         {route.ridden ? (
-                          <span className="text-xs px-2 py-0.5 bg-accent-terracotta/10 text-accent-terracotta">
+                          <span className="text-xs px-2 py-0.5 bg-text-primary text-text-inverse">
                             已骑行
                           </span>
                         ) : (
@@ -319,7 +415,7 @@ const RidingMap = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
-                className="card p-6 border-l-4 border-l-accent-terracotta"
+                className="card p-5 border-l-4 border-l-text-primary"
               >
                 <div className="flex items-start justify-between mb-4">
                   <div>
@@ -336,12 +432,12 @@ const RidingMap = () => {
 
                 <div className="space-y-3 text-sm">
                   <div className="flex items-center gap-2 text-text-secondary">
-                    <Bike size={14} className="text-accent-terracotta" />
+                    <Bike size={14} />
                     <span>长度：{selectedRoute.length}</span>
                   </div>
                   {selectedRoute.date && (
                     <div className="flex items-center gap-2 text-text-secondary">
-                      <Calendar size={14} className="text-accent-terracotta" />
+                      <Calendar size={14} />
                       <span>骑行日期：{selectedRoute.date}</span>
                     </div>
                   )}
@@ -353,7 +449,7 @@ const RidingMap = () => {
                 </div>
 
                 {!selectedRoute.ridden && (
-                  <button className="mt-4 w-full py-2 border border-accent-terracotta text-accent-terracotta text-sm hover:bg-accent-terracotta hover:text-text-inverse transition-colors">
+                  <button className="mt-4 w-full py-2 border border-text-primary text-text-primary text-sm hover:bg-text-primary hover:text-text-inverse transition-colors">
                     标记为已骑行
                   </button>
                 )}
@@ -365,5 +461,14 @@ const RidingMap = () => {
     </section>
   );
 };
+
+// 辅助函数：计算路径中心点
+function getPathCenter(pathData: string) {
+  const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  path.setAttribute('d', pathData);
+  const length = path.getTotalLength();
+  const point = path.getPointAtLength(length / 2);
+  return { x: point.x, y: point.y };
+}
 
 export default RidingMap;
