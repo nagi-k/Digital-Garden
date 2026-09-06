@@ -88,7 +88,7 @@ const Portfolio = () => {
                   <Box size={20} className="text-accent-sage" />
                   <h3 className="font-display-zh text-h3">3D 建模</h3>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {/* 占位符：后续替换为 Three.js 模型 */}
                   <div className="card p-6 group">
                     <div className="aspect-[4/3] bg-bg-secondary border border-border mb-4 flex items-center justify-center">
@@ -134,7 +134,7 @@ const Portfolio = () => {
                   <Smartphone size={20} className="text-accent-terracotta" />
                   <h3 className="font-display-zh text-h3">UI 原型</h3>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {/* 占位符：后续替换为可交互原型 */}
                   <div className="card p-0 group overflow-hidden">
                     <div className="aspect-[9/16] md:aspect-[3/4] bg-bg-secondary border-b border-border flex items-center justify-center">
