@@ -4,6 +4,7 @@ import PageTransition from '@/components/layout/PageTransition';
 import SectionTitle from '@/components/ui/SectionTitle';
 import Tag from '@/components/ui/Tag';
 import FadeIn from '@/components/effects/FadeIn';
+import RidingMap from '@/components/sections/RidingMap';
 import { recentLoves, tenThingsILove, moodBoardItems } from '@/data/interests';
 
 const categoryIcons = {
@@ -172,7 +173,7 @@ const Interests = () => {
 
           {/* 10 Things I Love */}
           <FadeIn delay={0.3}>
-            <div>
+            <div className="mb-24">
               <div className="flex items-center gap-3 mb-8">
                 <Heart size={20} className="text-accent-clay" />
                 <h3 className="font-display-zh text-h3">10 things I love</h3>
@@ -194,6 +195,9 @@ const Interests = () => {
               </div>
             </div>
           </FadeIn>
+
+          {/* 骑行日志 */}
+          <RidingMap />
         </div>
       </section>
     </PageTransition>
