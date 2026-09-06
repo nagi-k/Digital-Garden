@@ -5,26 +5,26 @@ export default {
     extend: {
       colors: {
         bg: {
-          primary: '#faf9f6',
-          secondary: '#f2f0eb',
+          primary: '#ffffff',
+          secondary: '#f5f5f5',
           card: '#ffffff',
-          dark: '#1a1a1a',
+          dark: '#0a0a0a',
         },
         text: {
-          primary: '#1a1a1a',
-          secondary: '#6b6b6b',
-          muted: '#9a9a9a',
-          inverse: '#faf9f6',
+          primary: '#0a0a0a',
+          secondary: '#525252',
+          muted: '#a3a3a3',
+          inverse: '#ffffff',
         },
         accent: {
-          terracotta: '#c4a484',
-          sage: '#a8b5a0',
-          lavender: '#b8b3d3',
-          clay: '#c78d7b',
+          terracotta: '#0a0a0a',
+          sage: '#525252',
+          lavender: '#737373',
+          clay: '#404040',
         },
         border: {
-          DEFAULT: 'rgba(26, 26, 26, 0.08)',
-          strong: 'rgba(26, 26, 26, 0.2)',
+          DEFAULT: 'rgba(10, 10, 10, 0.08)',
+          strong: 'rgba(10, 10, 10, 0.2)',
         },
       },
       fontFamily: {
@@ -52,6 +52,17 @@ export default {
       },
       padding: {
         container: 'clamp(1.5rem, 5vw, 4rem)',
+      },
+      borderRadius: {
+        none: '0',
+        sm: '0',
+        DEFAULT: '0',
+        md: '0',
+        lg: '0',
+        xl: '0',
+        '2xl': '0',
+        '3xl': '0',
+        full: '0',
       },
       transitionTimingFunction: {
         'ease-out-expo': 'cubic-bezier(0.16, 1, 0.3, 1)',

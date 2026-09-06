@@ -34,7 +34,7 @@ const About = () => {
                   {siteData.keywords.map((keyword, index) => (
                     <div
                       key={keyword}
-                      className="p-6 border border-border rounded-lg text-center"
+                      className="p-6 border border-border  text-center"
                     >
                       <span className="font-display-en text-xs text-text-muted block mb-2">
                         {String(index + 1).padStart(2, '0')}
@@ -100,7 +100,7 @@ const About = () => {
 
           {/* Contact */}
           <FadeIn delay={0.5}>
-            <div className="mt-24 p-8 md:p-12 bg-bg-secondary rounded-lg text-center">
+            <div className="mt-24 p-8 md:p-12 bg-bg-secondary  text-center">
               <h3 className="font-display-zh text-h3 mb-4">想聊聊？</h3>
               <p className="text-text-secondary mb-6">
                 无论是项目合作、设计交流，还是单纯打个招呼，都欢迎写信给我。

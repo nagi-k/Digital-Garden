@@ -49,8 +49,8 @@ const Notes = () => {
     <PageTransition>
       <section className="pt-32 pb-section px-container relative overflow-hidden">
         {/* 背景装饰 */}
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-accent-sage/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-accent-terracotta/5 rounded-full blur-3xl" />
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-accent-sage/5  blur-3xl" />
+        <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-accent-terracotta/5  blur-3xl" />
 
         <div className="max-w-container mx-auto relative z-10">
           <SectionTitle en="LEARNING GARDEN" zh="学习记录">
@@ -73,7 +73,7 @@ const Notes = () => {
                   placeholder="搜索笔记..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-12 pr-4 py-3 bg-bg-card border border-border rounded-full text-sm focus:outline-none focus:border-accent-terracotta transition-colors"
+                  className="w-full pl-12 pr-4 py-3 bg-bg-card border border-border  text-sm focus:outline-none focus:border-accent-terracotta transition-colors"
                 />
               </div>
 
@@ -110,14 +110,14 @@ const Notes = () => {
                     >
                       {/* 状态背景装饰 */}
                       <div
-                        className={`absolute top-0 right-0 w-32 h-32 rounded-full blur-2xl ${status.bgColor}`}
+                        className={`absolute top-0 right-0 w-32 h-32  blur-2xl ${status.bgColor}`}
                       />
 
                       <div className="relative z-10">
                         <div className="flex items-center justify-between mb-4">
                           <div className="flex items-center gap-2">
                             <div
-                              className={`w-8 h-8 rounded-full ${status.bgColor} flex items-center justify-center`}
+                              className={`w-8 h-8  ${status.bgColor} flex items-center justify-center`}
                             >
                               <StatusIcon size={14} style={{ color: status.color }} />
                             </div>

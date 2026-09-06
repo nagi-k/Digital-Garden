@@ -22,7 +22,7 @@ const Portfolio = () => {
         {/* 背景装饰 */}
         <motion.div
           style={{ y: backgroundY }}
-          className="absolute top-0 right-0 w-[600px] h-[600px] bg-accent-lavender/5 rounded-full blur-3xl"
+          className="absolute top-0 right-0 w-[600px] h-[600px] bg-accent-lavender/5  blur-3xl"
         />
 
         <section className="pt-32 pb-section px-container relative z-10">
@@ -50,7 +50,7 @@ const Portfolio = () => {
                           className="block relative"
                           data-cursor-text="查看"
                         >
-                          <div className="img-container aspect-[4/3] relative overflow-hidden rounded-2xl">
+                          <div className="img-container aspect-[4/3] relative overflow-hidden">
                             <img
                               src={project.cover}
                               alt={project.title}
@@ -67,7 +67,7 @@ const Portfolio = () => {
 
                           {/* 悬浮装饰 */}
                           <div
-                            className="absolute -bottom-4 -right-4 w-20 h-20 rounded-full border-2 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                            className="absolute -bottom-4 -right-4 w-20 h-20  border-2 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
                             style={{ borderColor: project.color }}
                           />
                         </Link>
@@ -103,7 +103,7 @@ const Portfolio = () => {
                           {project.tags.map((tag) => (
                             <span
                               key={tag}
-                              className="text-xs px-3 py-1.5 border border-border rounded-full text-text-secondary hover:border-accent-terracotta hover:text-accent-terracotta transition-colors"
+                              className="text-xs px-3 py-1.5 border border-border  text-text-secondary hover:border-accent-terracotta hover:text-accent-terracotta transition-colors"
                             >
                               {tag}
                             </span>

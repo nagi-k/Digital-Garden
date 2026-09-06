@@ -32,7 +32,7 @@ const Footer = () => {
           <div className="flex flex-col items-end gap-2">
             <button
               onClick={scrollToTop}
-              className="p-2 border border-border rounded-full hover:border-accent-terracotta hover:text-accent-terracotta transition-colors"
+              className="p-2 border border-border  hover:border-accent-terracotta hover:text-accent-terracotta transition-colors"
               aria-label="Back to top"
             >
               <ArrowUp size={16} />

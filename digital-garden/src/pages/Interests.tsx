@@ -37,8 +37,8 @@ const Interests = () => {
     <PageTransition>
       <section className="pt-32 pb-section px-container relative overflow-hidden">
         {/* 背景装饰 */}
-        <div className="absolute top-0 right-0 w-96 h-96 bg-accent-lavender/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 left-0 w-80 h-80 bg-accent-clay/5 rounded-full blur-3xl" />
+        <div className="absolute top-0 right-0 w-96 h-96 bg-accent-lavender/5  blur-3xl" />
+        <div className="absolute bottom-0 left-0 w-80 h-80 bg-accent-clay/5  blur-3xl" />
 
         <div className="max-w-container mx-auto relative z-10">
           <SectionTitle en="LIFE & INTERESTS" zh="兴趣爱好">
@@ -65,14 +65,14 @@ const Interests = () => {
                     >
                       {/* 内部装饰 */}
                       <div
-                        className="absolute top-0 right-0 w-32 h-32 rounded-full blur-2xl opacity-50"
+                        className="absolute top-0 right-0 w-32 h-32  blur-2xl opacity-50"
                         style={{ backgroundColor: `${categoryColors[item.category]}15` }}
                       />
 
                       <div className="relative z-10">
                         <div className="flex items-center gap-2 mb-4">
                           <div
-                            className="w-8 h-8 rounded-full flex items-center justify-center"
+                            className="w-8 h-8  flex items-center justify-center"
                             style={{ backgroundColor: `${categoryColors[item.category]}20` }}
                           >
                             <Icon size={14} style={{ color: categoryColors[item.category] }} />
@@ -85,7 +85,7 @@ const Interests = () => {
                           </span>
                         </div>
 
-                        <div className="img-container aspect-[2/3] mb-4 rounded-xl overflow-hidden">
+                        <div className="img-container aspect-[2/3] mb-4  overflow-hidden">
                           <img
                             src={item.cover}
                             alt={item.title}
@@ -153,7 +153,7 @@ const Interests = () => {
                 {filteredMoodBoard.map((item) => (
                   <div
                     key={item.id}
-                    className="group relative overflow-hidden rounded-xl aspect-square"
+                    className="group relative overflow-hidden  aspect-square"
                     data-cursor-text="喜欢"
                   >
                     <img

@@ -46,7 +46,7 @@ const Now = () => {
                         key={i}
                         className="flex items-center gap-3 text-text-secondary"
                       >
-                        <span className="w-1.5 h-1.5 rounded-full bg-border" />
+                        <span className="w-1.5 h-1.5  bg-border" />
                         {item}
                       </li>
                     ))}
@@ -56,7 +56,7 @@ const Now = () => {
             ))}
 
             <FadeIn delay={0.4}>
-              <div className="p-8 bg-bg-secondary rounded-lg">
+              <div className="p-8 bg-bg-secondary ">
                 <h3 className="font-display-zh text-lg mb-4">本月学习进度</h3>
                 <div className="space-y-4">
                   <div>
@@ -64,9 +64,9 @@ const Now = () => {
                       <span>Figma 高级技巧</span>
                       <span className="text-text-muted">75%</span>
                     </div>
-                    <div className="h-1 bg-border rounded-full overflow-hidden">
+                    <div className="h-1 bg-border  overflow-hidden">
                       <div
-                        className="h-full bg-accent-sage rounded-full"
+                        className="h-full bg-accent-sage "
                         style={{ width: '75%' }}
                       />
                     </div>
@@ -76,9 +76,9 @@ const Now = () => {
                       <span>React 动画</span>
                       <span className="text-text-muted">40%</span>
                     </div>
-                    <div className="h-1 bg-border rounded-full overflow-hidden">
+                    <div className="h-1 bg-border  overflow-hidden">
                       <div
-                        className="h-full bg-accent-terracotta rounded-full"
+                        className="h-full bg-accent-terracotta "
                         style={{ width: '40%' }}
                       />
                     </div>

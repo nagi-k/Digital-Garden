@@ -123,7 +123,7 @@ const PortfolioDetail = () => {
               {prevProject ? (
                 <Link
                   to={`/ui/${prevProject.slug}`}
-                  className="group flex items-center gap-4 p-6 border border-border rounded-lg hover:border-accent-terracotta transition-colors"
+                  className="group flex items-center gap-4 p-6 border border-border  hover:border-accent-terracotta transition-colors"
                 >
                   <ArrowLeft size={20} className="text-text-muted group-hover:text-accent-terracotta" />
                   <div>
@@ -137,7 +137,7 @@ const PortfolioDetail = () => {
               {nextProject ? (
                 <Link
                   to={`/ui/${nextProject.slug}`}
-                  className="group flex items-center justify-end gap-4 p-6 border border-border rounded-lg hover:border-accent-terracotta transition-colors text-right"
+                  className="group flex items-center justify-end gap-4 p-6 border border-border  hover:border-accent-terracotta transition-colors text-right"
                 >
                   <div>
                     <span className="text-xs font-display-en text-text-muted">NEXT</span>

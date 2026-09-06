@@ -53,7 +53,7 @@ const NoteDetail = () => {
                 </span>
                 <div className="flex gap-2">
                   {note.tags.map((tag) => (
-                    <span key={tag} className="text-xs px-2 py-1 border border-border rounded-full">
+                    <span key={tag} className="text-xs px-2 py-1 border border-border ">
                       #{tag}
                     </span>
                   ))}
@@ -79,7 +79,7 @@ const NoteDetail = () => {
                     <Link
                       key={related.id}
                       to={`/notes/${related.slug}`}
-                      className="group block p-6 border border-border rounded-lg hover:border-accent-terracotta transition-colors"
+                      className="group block p-6 border border-border  hover:border-accent-terracotta transition-colors"
                     >
                       <h3 className="font-display-zh mb-2 group-hover:text-accent-terracotta transition-colors">
                         {related.title}

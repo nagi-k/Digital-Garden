@@ -142,12 +142,12 @@ const Hero = () => {
               </div>
 
               {/* 装饰元素 */}
-              <div className="absolute -bottom-6 -right-6 w-28 h-28 border border-accent-terracotta/30 rounded-full flex items-center justify-center bg-bg-primary/80 backdrop-blur-sm z-20">
+              <div className="absolute -bottom-6 -right-6 w-28 h-28 border border-accent-terracotta/30  flex items-center justify-center bg-bg-primary/80 backdrop-blur-sm z-20">
                 <span className="font-display-en text-xs text-accent-terracotta">EST. 2026</span>
               </div>
 
-              <div className="absolute -top-4 -left-4 w-16 h-16 border border-accent-lavender/30 rounded-lg rotate-12 z-0" />
-              <div className="absolute top-1/2 -right-8 w-20 h-20 border border-accent-sage/30 rounded-full z-0" />
+              <div className="absolute -top-4 -left-4 w-16 h-16 border border-accent-lavender/30  rotate-12 z-0" />
+              <div className="absolute top-1/2 -right-8 w-20 h-20 border border-accent-sage/30  z-0" />
             </motion.div>
           </motion.div>
         </motion.div>
@@ -160,8 +160,8 @@ const Hero = () => {
           className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-text-muted"
         >
           <span className="text-xs font-display-en tracking-widest">SCROLL</span>
-          <div className="w-6 h-10 border border-border rounded-full flex justify-center pt-2">
-            <div className="w-1 h-2 bg-accent-terracotta rounded-full animate-bounce" />
+          <div className="w-6 h-10 border border-border  flex justify-center pt-2">
+            <div className="w-1 h-2 bg-accent-terracotta  animate-bounce" />
           </div>
         </motion.div>
       </div>

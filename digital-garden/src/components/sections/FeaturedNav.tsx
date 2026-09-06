@@ -47,8 +47,8 @@ const FeaturedNav = () => {
   return (
     <section className="py-section px-container bg-bg-secondary/30 relative overflow-hidden">
       {/* 背景装饰 */}
-      <div className="absolute top-0 right-0 w-96 h-96 bg-accent-lavender/10 rounded-full blur-3xl" />
-      <div className="absolute bottom-0 left-0 w-80 h-80 bg-accent-sage/10 rounded-full blur-3xl" />
+      <div className="absolute top-0 right-0 w-96 h-96 bg-accent-lavender/10  blur-3xl" />
+      <div className="absolute bottom-0 left-0 w-80 h-80 bg-accent-sage/10  blur-3xl" />
 
       <div className="max-w-container mx-auto relative z-10">
         <SectionTitle en="EXPLORE" zh="探索花园" align="center" />
@@ -71,7 +71,7 @@ const FeaturedNav = () => {
                       <div className="flex justify-between items-start mb-6">
                         <div className="flex items-center gap-3">
                           <div
-                            className="w-10 h-10 rounded-full flex items-center justify-center"
+                            className="w-10 h-10  flex items-center justify-center"
                             style={{ backgroundColor: `${item.color}20` }}
                           >
                             <Icon size={18} style={{ color: item.color }} />

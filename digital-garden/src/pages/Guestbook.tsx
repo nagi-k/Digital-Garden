@@ -114,7 +114,7 @@ const Guestbook = () => {
                 {entries.map((entry, index) => (
                   <FadeIn key={entry.id} delay={index * 0.1}>
                     <article
-                      className="p-6 bg-bg-card border border-border rounded-lg shadow-soft"
+                      className="p-6 bg-bg-card border border-border  shadow-soft"
                       style={{
                         transform: `rotate(${entry.rotate}deg)`,
                         borderLeft: `3px solid ${entry.color}`,

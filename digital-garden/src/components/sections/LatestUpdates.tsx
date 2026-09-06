@@ -22,8 +22,8 @@ const LatestUpdates = () => {
   return (
     <section ref={containerRef} className="py-section px-container relative overflow-hidden">
       {/* 背景装饰 */}
-      <div className="absolute top-1/4 left-0 w-72 h-72 bg-accent-terracotta/5 rounded-full blur-3xl" />
-      <div className="absolute bottom-1/4 right-0 w-96 h-96 bg-accent-lavender/5 rounded-full blur-3xl" />
+      <div className="absolute top-1/4 left-0 w-72 h-72 bg-accent-terracotta/5  blur-3xl" />
+      <div className="absolute bottom-1/4 right-0 w-96 h-96 bg-accent-lavender/5  blur-3xl" />
 
       <div className="max-w-container mx-auto relative z-10">
         <SectionTitle en="GROWING" zh="最近在生长什么" />
@@ -35,11 +35,11 @@ const LatestUpdates = () => {
               <Link to={`/notes/${latestNote.slug}`} className="group block h-full">
                 <article className="card p-8 md:p-10 h-full relative overflow-hidden">
                   {/* 内部渐变装饰 */}
-                  <div className="absolute top-0 right-0 w-64 h-64 bg-accent-sage/10 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                  <div className="absolute top-0 right-0 w-64 h-64 bg-accent-sage/10  blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
                   <div className="relative z-10">
                     <div className="flex items-center gap-3 mb-6">
-                      <div className="w-8 h-8 rounded-full bg-accent-sage/20 flex items-center justify-center">
+                      <div className="w-8 h-8  bg-accent-sage/20 flex items-center justify-center">
                         <Sparkles size={14} className="text-accent-sage" />
                       </div>
                       <span className="text-xs font-display-en text-accent-sage tracking-wider">
@@ -63,7 +63,7 @@ const LatestUpdates = () => {
                       {latestNote.tags.map((tag) => (
                         <span
                           key={tag}
-                          className="text-xs px-3 py-1 border border-border rounded-full text-text-muted hover:border-accent-terracotta hover:text-accent-terracotta transition-colors"
+                          className="text-xs px-3 py-1 border border-border  text-text-muted hover:border-accent-terracotta hover:text-accent-terracotta transition-colors"
                         >
                           {tag}
                         </span>
@@ -86,7 +86,7 @@ const LatestUpdates = () => {
             <FadeIn delay={0.1}>
               <article className="card p-6 group" data-cursor-text="查看">
                 <div className="flex items-center gap-2 mb-4">
-                  <div className="w-8 h-8 rounded-full bg-accent-lavender/20 flex items-center justify-center">
+                  <div className="w-8 h-8  bg-accent-lavender/20 flex items-center justify-center">
                     <BookOpen size={14} className="text-accent-lavender" />
                   </div>
                   <span className="text-xs font-display-en text-accent-lavender tracking-wider">
@@ -94,7 +94,7 @@ const LatestUpdates = () => {
                   </span>
                 </div>
                 <div className="flex gap-4">
-                  <div className="w-24 h-32 flex-shrink-0 overflow-hidden rounded-lg img-container">
+                  <div className="w-24 h-32 flex-shrink-0 overflow-hidden  img-container">
                     <img
                       src={recentLove.cover}
                       alt={recentLove.title}
@@ -117,7 +117,7 @@ const LatestUpdates = () => {
             <FadeIn delay={0.2}>
               <Link to="/now" className="block group">
                 <article className="card p-6 border-l-4 border-l-accent-terracotta relative overflow-hidden">
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-accent-terracotta/10 rounded-full blur-2xl" />
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-accent-terracotta/10  blur-2xl" />
                   <div className="relative z-10">
                     <div className="flex items-center gap-2 mb-3">
                       <TrendingUp size={14} className="text-accent-terracotta" />
@@ -150,7 +150,7 @@ const LatestUpdates = () => {
                 ].map((stat) => (
                   <div
                     key={stat.label}
-                    className="text-center p-4 border border-border rounded-xl hover:border-accent-terracotta transition-colors group"
+                    className="text-center p-4 border border-border  hover:border-accent-terracotta transition-colors group"
                   >
                     <div className="text-2xl font-display-zh text-accent-terracotta group-hover:scale-110 transition-transform">
                       {stat.value}
