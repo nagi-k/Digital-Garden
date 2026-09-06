@@ -52,8 +52,7 @@ html.lenis {
 }
 
 body {
-  font-family: 'Inter', 'Source Han Sans CN', 'Noto Sans SC', 'PingFang SC', -apple-system,
-    BlinkMacSystemFont, sans-serif;
+  font-family: 'Inter', 'LXGW WenKai Screen', 'Noto Serif SC', 'Source Han Serif CN', 'Songti SC', 'SimSun', serif;
   background-color: var(--bg-primary);
   color: var(--text-primary);
   line-height: 1.7;
@@ -221,7 +220,7 @@ body {
 }
 
 .font-display-zh {
-  font-family: 'Source Han Serif CN', 'Noto Serif SC', '方正兰亭宋', 'SimSun', serif;
+  font-family: 'LXGW WenKai Screen', 'Noto Serif SC', 'Source Han Serif CN', 'Songti SC', 'SimSun', serif;
   letter-spacing: 0.05em;
 }
 
@@ -230,7 +229,7 @@ body {
 }
 
 .font-body-zh {
-  font-family: 'Source Han Sans CN', 'Noto Sans SC', 'PingFang SC', sans-serif;
+  font-family: 'LXGW WenKai Screen', 'Noto Serif SC', 'Source Han Serif CN', 'Songti SC', 'SimSun', serif;
 }
 
 /* ============ Hero 英文标题 · 黑白灰渐变高级设计感 ============ */
