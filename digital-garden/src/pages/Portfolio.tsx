@@ -1,5 +1,4 @@
-import { Link } from 'react-router-dom';
-import { ArrowRight, ArrowUpRight, Monitor, Box, Smartphone } from 'lucide-react';
+import { ArrowRight, ArrowUpRight, Monitor, Box, Smartphone, Upload } from 'lucide-react';
 import PageTransition from '@/components/layout/PageTransition';
 import SectionTitle from '@/components/ui/SectionTitle';
 import FadeIn from '@/components/effects/FadeIn';
@@ -89,18 +88,22 @@ const Portfolio = () => {
                   <h3 className="font-display-zh text-h3">3D 建模</h3>
                 </div>
                 <div className="grid grid-cols-1 gap-6">
-                  {/* 占位符：后续替换为 Three.js 模型 */}
-                  {[1, 2, 3].map((i) => (
+                  {/* 3D 模型查看器已集成；上传 .glb 文件后替换下方占位为 <GlbViewer glbUrl="/models/xxx.glb" /> */}
+                  {[
+                    { name: '模型一', desc: '工业设计模型展示' },
+                    { name: '模型二', desc: '产品造型与 CMF 细节' },
+                    { name: '模型三', desc: '结构与人机工程验证' },
+                  ].map((item, i) => (
                     <div key={i} className="card p-6 group">
-                      <div className="aspect-[16/9] md:aspect-[21/9] bg-bg-secondary border border-border mb-4 flex items-center justify-center">
+                      <div className="aspect-[16/9] md:aspect-[21/9] bg-bg-secondary border border-border border-dashed mb-4 flex flex-col items-center justify-center gap-3">
+                        <Upload size={32} className="text-text-muted opacity-50" />
                         <div className="text-center text-text-muted">
-                          <Box size={32} className="mx-auto mb-2 opacity-50" />
-                          <p className="text-xs">3D 模型占位符</p>
-                          <p className="text-xs mt-1">等待导入 Three.js 场景</p>
+                          <p className="text-xs">3D 查看器已就绪</p>
+                          <p className="text-xs mt-1">请上传 .glb 模型文件以替换此占位</p>
                         </div>
                       </div>
-                      <h4 className="font-display-zh text-lg mb-1">模型名称</h4>
-                      <p className="text-sm text-text-secondary">模型描述与细节说明</p>
+                      <h4 className="font-display-zh text-lg mb-1">{item.name}</h4>
+                      <p className="text-sm text-text-secondary">{item.desc}</p>
                     </div>
                   ))}
                 </div>
