@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { ArrowUpRight, Palette, BookOpen, Heart, User } from 'lucide-react';
+import { ArrowUpRight, Palette, BookOpen, Heart, Image } from 'lucide-react';
 import SectionTitle from '@/components/ui/SectionTitle';
 import TiltCard from '@/components/effects/TiltCard';
 import FadeIn from '@/components/effects/FadeIn';
@@ -30,12 +30,12 @@ const navItems = [
     icon: Heart,
   },
   {
-    path: '/about',
-    en: 'ABOUT ME',
-    zh: '关于',
-    description: '我的故事、设计理念与职业旅程。',
+    path: '/library',
+    en: 'LIBRARY',
+    zh: '素材库',
+    description: '收集设计灵感、视觉参考和优秀网站。',
     color: 'var(--accent-clay)',
-    icon: User,
+    icon: Image,
   },
 ];
 
