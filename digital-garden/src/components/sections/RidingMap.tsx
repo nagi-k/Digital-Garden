@@ -15,8 +15,9 @@ import {
 } from 'lucide-react';
 import SectionTitle from '@/components/ui/SectionTitle';
 import FadeIn from '@/components/effects/FadeIn';
-import { waterBodies, roads, landmarks, ridingRoutes, RidingRoute } from '@/data/nanjingMap';
+import { landmarks, ridingRoutes, RidingRoute } from '@/data/nanjingMap';
 import { realDistricts, MAP_VIEW_W, MAP_VIEW_H } from '@/data/realDistricts';
+import { yangtze, riverLines, lakeAreas } from '@/data/realWater';
 
 const landmarkIcons = {
   mountain: Mountain,
@@ -201,58 +202,56 @@ const RidingMap = () => {
                     />
                   ))}
 
-                  {/* 长江（面状） */}
-                  {waterBodies
-                    .filter((w) => w.id === 'yangtze')
-                    .map((river) => (
-                      <path
-                        key={river.id}
-                        d={river.path}
-                        fill="url(#waterGrad)"
-                        stroke="#a8c8e8"
-                        strokeWidth="1"
-                      />
-                    ))}
+                  {/* 湖泊水面（OSM 真实轮廓，含湖心岛） */}
+                  {lakeAreas.map((lake) => (
+                    <path
+                      key={lake.id}
+                      d={lake.path}
+                      fill="url(#lakeGrad)"
+                      fillRule="evenodd"
+                      stroke="#a8c8e8"
+                      strokeWidth="0.6"
+                    />
+                  ))}
 
-                  {/* 江中岛屿（江心洲、八卦洲，陆色盖在江面上） */}
-                  {waterBodies
-                    .filter((w) => w.type === 'island')
-                    .map((island) => (
-                      <path
-                        key={island.id}
-                        d={island.path}
-                        fill="#ececec"
-                        stroke="#c8c8c8"
-                        strokeWidth="0.8"
-                      />
-                    ))}
+                  {/* 长江（真实中心线，宽带状双层描边模拟江面与岸线） */}
+                  {yangtze.paths.map((p, i) => (
+                    <path
+                      key={`yj-bank-${i}`}
+                      d={p}
+                      fill="none"
+                      stroke="#a8c8e8"
+                      strokeWidth={yangtze.width}
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  ))}
+                  {yangtze.paths.map((p, i) => (
+                    <path
+                      key={`yj-surface-${i}`}
+                      d={p}
+                      fill="none"
+                      stroke="#cfe2f5"
+                      strokeWidth={yangtze.width - 3}
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  ))}
 
-                  {/* 湖泊（玄武湖、莫愁湖、石臼湖、固城湖） */}
-                  {waterBodies
-                    .filter((w) => w.type === 'lake')
-                    .map((lake) => (
+                  {/* 主要河流（秦淮河、滁河、金川河等真实走向） */}
+                  {riverLines.map((river) =>
+                    river.paths.map((p, i) => (
                       <path
-                        key={lake.id}
-                        d={lake.path}
-                        fill="url(#lakeGrad)"
-                        stroke="#a8c8e8"
-                        strokeWidth="0.8"
-                      />
-                    ))}
-
-                  {/* 秦淮河（线状，向西汇入长江） */}
-                  {waterBodies
-                    .filter((w) => w.id === 'qinhuai-river')
-                    .map((river) => (
-                      <path
-                        key={river.id}
-                        d={river.path}
+                        key={`${river.id}-${i}`}
+                        d={p}
                         fill="none"
-                        stroke="#b8d4f0"
-                        strokeWidth="3"
+                        stroke="#c2d9f2"
+                        strokeWidth={river.width}
                         strokeLinecap="round"
+                        strokeLinejoin="round"
                       />
-                    ))}
+                    ))
+                  )}
 
                   {/* 区域标签（远郊区常显，主城六区放大后显示） */}
                   {realDistricts
@@ -263,7 +262,7 @@ const RidingMap = () => {
                         x={district.labelX}
                         y={district.labelY}
                         textAnchor="middle"
-                        fontSize={mainCityDistricts.has(district.id) ? '12' : '14'}
+                        fontSize={(mainCityDistricts.has(district.id) ? 12 : 14) / zoom}
                         fill="#999"
                         fontFamily="'Noto Sans SC', sans-serif"
                         style={{ pointerEvents: 'none' }}
@@ -271,26 +270,6 @@ const RidingMap = () => {
                         {district.name}
                       </text>
                     ))}
-
-                  {/* 主要道路 */}
-                  {roads.map((road) => (
-                    <g key={road.id}>
-                      <path
-                        d={road.path}
-                        fill="none"
-                        stroke="#fff"
-                        strokeWidth={road.width + 2}
-                        strokeLinecap="round"
-                      />
-                      <path
-                        d={road.path}
-                        fill="none"
-                        stroke="#e0e0e0"
-                        strokeWidth={road.width}
-                        strokeLinecap="round"
-                      />
-                    </g>
-                  ))}
 
                   {/* 骑行路线 */}
                   {ridingRoutes.map((route) => {
@@ -328,18 +307,18 @@ const RidingMap = () => {
                     );
                   })}
 
-                  {/* 地标（放大后显示，避免小比例尺拥挤） */}
+                  {/* 地标（放大后显示；尺寸反向缩放，屏幕上保持恒定大小） */}
                   {zoom >= DETAIL_ZOOM && landmarks.map((landmark) => {
                     const Icon = landmarkIcons[landmark.type as keyof typeof landmarkIcons] || MapPin;
                     return (
                       <g key={landmark.id} style={{ pointerEvents: 'none' }}>
-                        <circle cx={landmark.x} cy={landmark.y} r="16" fill="#fff" stroke="#ddd" strokeWidth="1" />
-                        <Icon x={landmark.x - 8} y={landmark.y - 8} size={16} color="#666" />
+                        <circle cx={landmark.x} cy={landmark.y} r={16 / zoom} fill="#fff" stroke="#ddd" strokeWidth={1 / zoom} />
+                        <Icon x={landmark.x - 8 / zoom} y={landmark.y - 8 / zoom} size={16 / zoom} color="#666" />
                         <text
                           x={landmark.x}
-                          y={landmark.y + 32}
+                          y={landmark.y + 32 / zoom}
                           textAnchor="middle"
-                          fontSize="11"
+                          fontSize={11 / zoom}
                           fill="#666"
                           fontFamily="'Noto Sans SC', sans-serif"
                         >
@@ -359,19 +338,19 @@ const RidingMap = () => {
                     return (
                       <g key={`tooltip-${route.id}`} style={{ pointerEvents: 'none' }}>
                         <rect
-                          x={center.x - 75}
-                          y={center.y - 38}
-                          width="150"
-                          height="48"
+                          x={center.x - 75 / zoom}
+                          y={center.y - 38 / zoom}
+                          width={150 / zoom}
+                          height={48 / zoom}
                           fill="#0a0a0a"
                           opacity="0.9"
                         />
                         <text
                           x={center.x}
-                          y={center.y - 14}
+                          y={center.y - 14 / zoom}
                           textAnchor="middle"
                           fill="#fff"
-                          fontSize="14"
+                          fontSize={14 / zoom}
                           fontWeight="500"
                           fontFamily="'Noto Sans SC', sans-serif"
                         >
@@ -379,10 +358,10 @@ const RidingMap = () => {
                         </text>
                         <text
                           x={center.x}
-                          y={center.y + 6}
+                          y={center.y + 6 / zoom}
                           textAnchor="middle"
                           fill="#aaa"
-                          fontSize="11"
+                          fontSize={11 / zoom}
                           fontFamily="'Inter', sans-serif"
                         >
                           {route.length} · {route.ridden ? '已骑行' : '待骑行'}
