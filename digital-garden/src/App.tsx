@@ -10,8 +10,8 @@ import PortfolioDetail from '@/pages/PortfolioDetail';
 import Notes from '@/pages/Notes';
 import NoteDetail from '@/pages/NoteDetail';
 import Interests from '@/pages/Interests';
-import About from '@/pages/About';
 import Library from '@/pages/Library';
+import About from '@/pages/About';
 import Uses from '@/pages/Uses';
 import Guestbook from '@/pages/Guestbook';
 
