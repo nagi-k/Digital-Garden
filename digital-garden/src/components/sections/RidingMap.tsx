@@ -15,7 +15,8 @@ import {
 } from 'lucide-react';
 import SectionTitle from '@/components/ui/SectionTitle';
 import FadeIn from '@/components/effects/FadeIn';
-import { landmarks, ridingRoutes, RidingRoute } from '@/data/nanjingMap';
+import { landmarks } from '@/data/nanjingMap';
+import { ridingRoutes, RidingRoute } from '@/data/realRoutes';
 import { realDistricts, MAP_VIEW_W, MAP_VIEW_H } from '@/data/realDistricts';
 import { yangtze, riverLines, lakeAreas } from '@/data/realWater';
 
