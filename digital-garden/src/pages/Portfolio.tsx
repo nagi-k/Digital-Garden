@@ -102,23 +102,31 @@ const Portfolio = () => {
                     <p className="text-sm text-text-secondary">工业设计模型展示</p>
                   </div>
 
-                  {/* 占位卡位：等待更多 .glb 文件 */}
-                  {[
-                    { name: '模型二', desc: '产品造型与 CMF 细节' },
-                    { name: '模型三', desc: '结构与人机工程验证' },
-                  ].map((item, i) => (
-                    <div key={i} className="card p-6 group">
-                      <div className="aspect-[16/9] md:aspect-[21/9] bg-bg-secondary border border-border border-dashed mb-4 flex flex-col items-center justify-center gap-3">
-                        <Upload size={32} className="text-text-muted opacity-50" />
-                        <div className="text-center text-text-muted">
-                          <p className="text-xs">3D 查看器已就绪</p>
-                          <p className="text-xs mt-1">请上传 .glb 模型文件以替换此占位</p>
-                        </div>
-                      </div>
-                      <h4 className="font-display-zh text-lg mb-1">{item.name}</h4>
-                      <p className="text-sm text-text-secondary">{item.desc}</p>
+                  {/* 真实模型预览 */}
+                  <div className="card p-6 group">
+                    <div className="rounded-xl overflow-hidden mb-4">
+                      <GlbViewer
+                        glbUrl={`${import.meta.env.BASE_URL}models/aircraft.glb`}
+                        aspect="video"
+                        className="rounded-xl"
+                      />
                     </div>
-                  ))}
+                    <h4 className="font-display-zh text-lg mb-1">模型二</h4>
+                    <p className="text-sm text-text-secondary">产品造型与 CMF 细节</p>
+                  </div>
+
+                  {/* 占位卡位：等待更多 .glb 文件 */}
+                  <div className="card p-6 group">
+                    <div className="aspect-[16/9] md:aspect-[21/9] bg-bg-secondary border border-border border-dashed mb-4 flex flex-col items-center justify-center gap-3">
+                      <Upload size={32} className="text-text-muted opacity-50" />
+                      <div className="text-center text-text-muted">
+                        <p className="text-xs">3D 查看器已就绪</p>
+                        <p className="text-xs mt-1">请上传 .glb 模型文件以替换此占位</p>
+                      </div>
+                    </div>
+                    <h4 className="font-display-zh text-lg mb-1">模型三</h4>
+                    <p className="text-sm text-text-secondary">结构与人机工程验证</p>
+                  </div>
                 </div>
               </div>
             </FadeIn>
