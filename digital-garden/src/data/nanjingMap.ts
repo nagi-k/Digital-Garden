@@ -1,12 +1,12 @@
 /**
  * 南京市区地图数据
- * 基于真实地理坐标投影，经度 118.70-118.90，纬度 31.95-32.15
- * SVG 画布 1200x1200，x = (lon - 118.70) / 0.20 * 1200, y = 1200 - (lat - 31.95) / 0.20 * 1200
+ * 基于用户提供的真实地图截图绘制
+ * 坐标范围：经度 118.68-118.92，纬度 31.90-32.16
+ * SVG 画布 1200x1200
  */
 
-// 坐标转换辅助
-const lon2x = (lon: number) => ((lon - 118.7) / 0.2) * 1200;
-const lat2y = (lat: number) => 1200 - ((lat - 31.95) / 0.2) * 1200;
+const lon2x = (lon: number) => ((lon - 118.68) / 0.24) * 1200;
+const lat2y = (lat: number) => 1200 - ((lat - 31.90) / 0.26) * 1200;
 
 // ==================== 行政区划 ====================
 export interface District {
@@ -22,83 +22,58 @@ export const districts: District[] = [
   {
     id: 'gulou',
     name: '鼓楼区',
-    // 西北沿江，含原下关
-    path: `M ${lon2x(118.72)} ${lat2y(32.10)} L ${lon2x(118.74)} ${lat2y(32.12)} L ${lon2x(118.76)} ${lat2y(32.10)} L ${lon2x(118.78)} ${lat2y(32.08)} L ${lon2x(118.77)} ${lat2y(32.06)} L ${lon2x(118.76)} ${lat2y(32.04)} L ${lon2x(118.74)} ${lat2y(32.05)} L ${lon2x(118.72)} ${lat2y(32.06)} Z`,
+    path: `M ${lon2x(118.72)} ${lat2y(32.10)} L ${lon2x(118.74)} ${lat2y(32.12)} L ${lon2x(118.76)} ${lat2y(32.11)} L ${lon2x(118.77)} ${lat2y(32.08)} L ${lon2x(118.76)} ${lat2y(32.05)} L ${lon2x(118.74)} ${lat2y(32.04)} L ${lon2x(118.72)} ${lat2y(32.05)} L ${lon2x(118.71)} ${lat2y(32.08)} Z`,
     fill: '#e8e8e8',
-    labelX: lon2x(118.75),
-    labelY: lat2y(32.07),
+    labelX: lon2x(118.74),
+    labelY: lat2y(32.08),
   },
   {
     id: 'xuanwu',
     name: '玄武区',
-    // 中心偏东北，含玄武湖、紫金山北麓
-    path: `M ${lon2x(118.76)} ${lat2y(32.06)} L ${lon2x(118.77)} ${lat2y(32.08)} L ${lon2x(118.80)} ${lat2y(32.09)} L ${lon2x(118.83)} ${lat2y(32.08)} L ${lon2x(118.85)} ${lat2y(32.06)} L ${lon2x(118.84)} ${lat2y(32.03)} L ${lon2x(118.82)} ${lat2y(32.02)} L ${lon2x(118.80)} ${lat2y(32.03)} L ${lon2x(118.78)} ${lat2y(32.04)} L ${lon2x(118.77)} ${lat2y(32.06)} Z`,
+    path: `M ${lon2x(118.76)} ${lat2y(32.05)} L ${lon2x(118.77)} ${lat2y(32.08)} L ${lon2x(118.79)} ${lat2y(32.10)} L ${lon2x(118.82)} ${lat2y(32.09)} L ${lon2x(118.84)} ${lat2y(32.07)} L ${lon2x(118.83)} ${lat2y(32.03)} L ${lon2x(118.81)} ${lat2y(32.02)} L ${lon2x(118.79)} ${lat2y(32.03)} L ${lon2x(118.77)} ${lat2y(32.05)} Z`,
     fill: '#e5e5e5',
     labelX: lon2x(118.80),
-    labelY: lat2y(32.05),
+    labelY: lat2y(32.06),
   },
   {
     id: 'qinhuai',
     name: '秦淮区',
-    // 主城东南
-    path: `M ${lon2x(118.78)} ${lat2y(32.04)} L ${lon2x(118.80)} ${lat2y(32.03)} L ${lon2x(118.82)} ${lat2y(32.02)} L ${lon2x(118.83)} ${lat2y(32.00)} L ${lon2x(118.82)} ${lat2y(31.98)} L ${lon2x(118.80)} ${lat2y(31.97)} L ${lon2x(118.78)} ${lat2y(31.98)} L ${lon2x(118.77)} ${lat2y(32.00)} L ${lon2x(118.78)} ${lat2y(32.02)} Z`,
+    path: `M ${lon2x(118.77)} ${lat2y(32.05)} L ${lon2x(118.79)} ${lat2y(32.03)} L ${lon2x(118.81)} ${lat2y(32.02)} L ${lon2x(118.83)} ${lat2y(32.00)} L ${lon2x(118.82)} ${lat2y(31.98)} L ${lon2x(118.80)} ${lat2y(31.97)} L ${lon2x(118.78)} ${lat2y(31.98)} L ${lon2x(118.77)} ${lat2y(32.00)} L ${lon2x(118.76)} ${lat2y(32.02)} L ${lon2x(118.77)} ${lat2y(32.05)} Z`,
     fill: '#e8e8e8',
-    labelX: lon2x(118.80),
+    labelX: lon2x(118.79),
     labelY: lat2y(32.00),
   },
   {
     id: 'jianye',
     name: '建邺区',
-    // 西南滨江
-    path: `M ${lon2x(118.72)} ${lat2y(32.04)} L ${lon2x(118.74)} ${lat2y(32.05)} L ${lon2x(118.76)} ${lat2y(32.04)} L ${lon2x(118.78)} ${lat2y(32.02)} L ${lon2x(118.77)} ${lat2y(32.00)} L ${lon2x(118.75)} ${lat2y(31.98)} L ${lon2x(118.73)} ${lat2y(31.99)} L ${lon2x(118.72)} ${lat2y(32.01)} Z`,
+    path: `M ${lon2x(118.72)} ${lat2y(32.05)} L ${lon2x(118.74)} ${lat2y(32.04)} L ${lon2x(118.76)} ${lat2y(32.02)} L ${lon2x(118.77)} ${lat2y(32.00)} L ${lon2x(118.76)} ${lat2y(31.98)} L ${lon2x(118.74)} ${lat2y(31.97)} L ${lon2x(118.72)} ${lat2y(31.99)} L ${lon2x(118.71)} ${lat2y(32.02)} Z`,
     fill: '#e5e5e5',
-    labelX: lon2x(118.75),
+    labelX: lon2x(118.74),
     labelY: lat2y(32.01),
   },
   {
     id: 'qixia',
     name: '栖霞区',
-    // 东北沿江
-    path: `M ${lon2x(118.83)} ${lat2y(32.08)} L ${lon2x(118.86)} ${lat2y(32.10)} L ${lon2x(118.89)} ${lat2y(32.12)} L ${lon2x(118.90)} ${lat2y(32.09)} L ${lon2x(118.88)} ${lat2y(32.05)} L ${lon2x(118.85)} ${lat2y(32.04)} L ${lon2x(118.83)} ${lat2y(32.06)} Z`,
+    path: `M ${lon2x(118.82)} ${lat2y(32.09)} L ${lon2x(118.85)} ${lat2y(32.11)} L ${lon2x(118.89)} ${lat2y(32.12)} L ${lon2x(118.91)} ${lat2y(32.09)} L ${lon2x(118.90)} ${lat2y(32.05)} L ${lon2x(118.87)} ${lat2y(32.04)} L ${lon2x(118.84)} ${lat2y(32.07)} Z`,
     fill: '#e8e8e8',
-    labelX: lon2x(118.86),
+    labelX: lon2x(118.87),
     labelY: lat2y(32.07),
   },
   {
     id: 'yuhuatai',
     name: '雨花台区',
-    // 城南
-    path: `M ${lon2x(118.77)} ${lat2y(32.00)} L ${lon2x(118.78)} ${lat2y(31.98)} L ${lon2x(118.80)} ${lat2y(31.97)} L ${lon2x(118.82)} ${lat2y(31.96)} L ${lon2x(118.81)} ${lat2y(31.94)} L ${lon2x(118.79)} ${lat2y(31.93)} L ${lon2x(118.77)} ${lat2y(31.95)} L ${lon2x(118.76)} ${lat2y(31.97)} Z`,
+    path: `M ${lon2x(118.76)} ${lat2y(32.00)} L ${lon2x(118.78)} ${lat2y(31.98)} L ${lon2x(118.80)} ${lat2y(31.97)} L ${lon2x(118.82)} ${lat2y(31.96)} L ${lon2x(118.81)} ${lat2y(31.93)} L ${lon2x(118.78)} ${lat2y(31.92)} L ${lon2x(118.76)} ${lat2y(31.94)} L ${lon2x(118.75)} ${lat2y(31.97)} Z`,
     fill: '#e5e5e5',
-    labelX: lon2x(118.79),
-    labelY: lat2y(31.96),
+    labelX: lon2x(118.78),
+    labelY: lat2y(31.95),
   },
   {
     id: 'jiangning',
     name: '江宁区',
-    // 环抱城南，面积最大
-    path: `M ${lon2x(118.82)} ${lat2y(31.96)} L ${lon2x(118.85)} ${lat2y(31.95)} L ${lon2x(118.88)} ${lat2y(31.93)} L ${lon2x(118.89)} ${lat2y(31.90)} L ${lon2x(118.86)} ${lat2y(31.88)} L ${lon2x(118.83)} ${lat2y(31.89)} L ${lon2x(118.81)} ${lat2y(31.91)} L ${lon2x(118.82)} ${lat2y(31.94)} Z`,
+    path: `M ${lon2x(118.82)} ${lat2y(31.96)} L ${lon2x(118.85)} ${lat2y(31.95)} L ${lon2x(118.88)} ${lat2y(31.93)} L ${lon2x(118.90)} ${lat2y(31.90)} L ${lon2x(118.87)} ${lat2y(31.87)} L ${lon2x(118.84)} ${lat2y(31.88)} L ${lon2x(118.82)} ${lat2y(31.91)} L ${lon2x(118.83)} ${lat2y(31.94)} Z`,
     fill: '#e8e8e8',
-    labelX: lon2x(118.85),
+    labelX: lon2x(118.86),
     labelY: lat2y(31.91),
-  },
-  {
-    id: 'pukou',
-    name: '浦口区',
-    // 江北西北
-    path: `M ${lon2x(118.68)} ${lat2y(32.10)} L ${lon2x(118.70)} ${lat2y(32.12)} L ${lon2x(118.72)} ${lat2y(32.10)} L ${lon2x(118.71)} ${lat2y(32.07)} L ${lon2x(118.69)} ${lat2y(32.05)} L ${lon2x(118.68)} ${lat2y(32.08)} Z`,
-    fill: '#e5e5e5',
-    labelX: lon2x(118.70),
-    labelY: lat2y(32.08),
-  },
-  {
-    id: 'luhe',
-    name: '六合区',
-    // 江北东北
-    path: `M ${lon2x(118.72)} ${lat2y(32.12)} L ${lon2x(118.75)} ${lat2y(32.14)} L ${lon2x(118.78)} ${lat2y(32.13)} L ${lon2x(118.76)} ${lat2y(32.10)} L ${lon2x(118.73)} ${lat2y(32.11)} Z`,
-    fill: '#e8e8e8',
-    labelX: lon2x(118.75),
-    labelY: lat2y(32.12),
   },
 ];
 
@@ -107,25 +82,36 @@ export const waterBodies = [
   {
     id: 'yangtze',
     name: '长江',
-    path: `M 0 ${lat2y(32.08)} Q ${lon2x(118.71)} ${lat2y(32.06)} ${lon2x(118.73)} ${lat2y(32.08)} T ${lon2x(118.76)} ${lat2y(32.10)} T ${lon2x(118.80)} ${lat2y(32.12)} T ${lon2x(118.85)} ${lat2y(32.11)} T ${lon2x(118.90)} ${lat2y(32.09)} L ${lon2x(118.90)} ${lat2y(32.05)} Q ${lon2x(118.85)} ${lat2y(32.07)} ${lon2x(118.80)} ${lat2y(32.06)} T ${lon2x(118.76)} ${lat2y(32.04)} T ${lon2x(118.73)} ${lat2y(32.02)} T ${lon2x(118.71)} ${lat2y(32.00)} T 0 ${lat2y(31.98)} Z`,
+    // 从西南向东北，经过江心洲、下关、八卦洲
+    path: `M 0 ${lat2y(32.02)} Q ${lon2x(118.70)} ${lat2y(32.00)} ${lon2x(118.72)} ${lat2y(32.02)} T ${lon2x(118.74)} ${lat2y(32.04)} T ${lon2x(118.76)} ${lat2y(32.06)} T ${lon2x(118.78)} ${lat2y(32.08)} T ${lon2x(118.82)} ${lat2y(32.10)} T ${lon2x(118.86)} ${lat2y(32.11)} T ${lon2x(118.90)} ${lat2y(32.10)} T ${lon2x(118.92)} ${lat2y(32.08)} L ${lon2x(118.92)} ${lat2y(32.04)} Q ${lon2x(118.88)} ${lat2y(32.06)} ${lon2x(118.84)} ${lat2y(32.05)} T ${lon2x(118.80)} ${lat2y(32.04)} T ${lon2x(118.76)} ${lat2y(32.02)} T ${lon2x(118.72)} ${lat2y(31.98)} T ${lon2x(118.70)} ${lat2y(31.96)} T 0 ${lat2y(31.98)} Z`,
+    type: 'river' as const,
+  },
+  {
+    id: 'jiajiang',
+    name: '夹江',
+    // 江心洲与河西之间的夹江
+    path: `M ${lon2x(118.71)} ${lat2y(32.00)} Q ${lon2x(118.72)} ${lat2y(31.99)} ${lon2x(118.73)} ${lat2y(32.00)} T ${lon2x(118.72)} ${lat2y(32.02)} Z`,
     type: 'river' as const,
   },
   {
     id: 'xuanwu-lake',
     name: '玄武湖',
+    // 玄武区，近南京站
     path: `M ${lon2x(118.78)} ${lat2y(32.07)} Q ${lon2x(118.80)} ${lat2y(32.06)} ${lon2x(118.82)} ${lat2y(32.07)} T ${lon2x(118.83)} ${lat2y(32.09)} T ${lon2x(118.81)} ${lat2y(32.11)} T ${lon2x(118.79)} ${lat2y(32.10)} T ${lon2x(118.77)} ${lat2y(32.09)} Z`,
     type: 'lake' as const,
   },
   {
     id: 'mochou-lake',
     name: '莫愁湖',
+    // 建邺区，水西门外
     path: `M ${lon2x(118.75)} ${lat2y(32.03)} Q ${lon2x(118.76)} ${lat2y(32.02)} ${lon2x(118.77)} ${lat2y(32.03)} T ${lon2x(118.76)} ${lat2y(32.04)} Z`,
     type: 'lake' as const,
   },
   {
     id: 'qinhuai-river',
     name: '秦淮河',
-    path: `M ${lon2x(118.83)} ${lat2y(31.95)} Q ${lon2x(118.82)} ${lat2y(31.97)} ${lon2x(118.81)} ${lat2y(31.99)} T ${lon2x(118.80)} ${lat2y(32.01)} T ${lon2x(118.79)} ${lat2y(32.00)} T ${lon2x(118.78)} ${lat2y(32.02)} T ${lon2x(118.77)} ${lat2y(32.03)} T ${lon2x(118.76)} ${lat2y(32.05)}`,
+    // 从江宁方山向西北，经夫子庙、中华门，入长江
+    path: `M ${lon2x(118.85)} ${lat2y(31.92)} Q ${lon2x(118.84)} ${lat2y(31.94)} ${lon2x(118.83)} ${lat2y(31.96)} T ${lon2x(118.82)} ${lat2y(31.98)} T ${lon2x(118.81)} ${lat2y(32.00)} T ${lon2x(118.80)} ${lat2y(32.01)} T ${lon2x(118.79)} ${lat2y(32.02)} T ${lon2x(118.78)} ${lat2y(32.03)} T ${lon2x(118.77)} ${lat2y(32.04)} T ${lon2x(118.76)} ${lat2y(32.05)}`,
     type: 'river' as const,
   },
 ];
@@ -141,7 +127,7 @@ export interface Road {
 
 export const roads: Road[] = [
   // 中山大道轴线
-  { id: 'zhongshan-north', name: '中山北路', path: `M ${lon2x(118.73)} ${lat2y(32.09)} L ${lon2x(118.76)} ${lat2y(32.06)}`, width: 4, type: 'arterial' },
+  { id: 'zhongshan-north', name: '中山北路', path: `M ${lon2x(118.73)} ${lat2y(32.10)} L ${lon2x(118.76)} ${lat2y(32.06)}`, width: 4, type: 'arterial' },
   { id: 'zhongshan', name: '中山路', path: `M ${lon2x(118.76)} ${lat2y(32.06)} L ${lon2x(118.78)} ${lat2y(32.04)}`, width: 4, type: 'arterial' },
   { id: 'zhongshan-east', name: '中山东路', path: `M ${lon2x(118.78)} ${lat2y(32.04)} L ${lon2x(118.84)} ${lat2y(32.04)}`, width: 4, type: 'arterial' },
   { id: 'zhongshan-south', name: '中山南路', path: `M ${lon2x(118.78)} ${lat2y(32.04)} L ${lon2x(118.78)} ${lat2y(31.99)}`, width: 3.5, type: 'arterial' },
@@ -179,7 +165,7 @@ export const landmarks: Landmark[] = [
   { id: 'mochou', name: '莫愁湖', x: lon2x(118.76), y: lat2y(32.03), type: 'lake' },
 ];
 
-// ==================== 骑行路线（基于真实道路） ====================
+// ==================== 骑行路线 ====================
 export interface RidingRoute {
   id: string;
   name: string;
