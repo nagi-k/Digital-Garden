@@ -6,9 +6,9 @@ import { siteData } from '@/data/site';
 import { staggerContainer, staggerItem } from '@/utils/animations';
 
 const slides = [
-  { src: 'images/hero-1.jpg', label: 'MONO 01' },
-  { src: 'images/hero-2.jpg', label: 'MONO 02' },
-  { src: 'images/hero-3.jpg', label: 'MONO 03' },
+  { src: 'images/hero-1_1.jpg', label: 'MONO 01' },
+  { src: 'images/hero-2_1.jpg', label: 'MONO 02' },
+  { src: 'images/hero-3_1.jpg', label: 'MONO 03' },
 ];
 
 const Hero = () => {
@@ -148,7 +148,7 @@ const Hero = () => {
               style={{ x: translateX, y: translateY }}
               className="relative"
             >
-              <div className="img-container aspect-[3/4] max-w-sm mx-auto lg:ml-auto relative z-10 overflow-hidden">
+              <div className="img-container aspect-[4/3] w-full max-w-xl mx-auto lg:ml-auto relative z-10 overflow-hidden">
                 {slides.map((slide, i) => (
                   <motion.img
                     key={slide.src}
