@@ -135,7 +135,7 @@ export default function GlbViewer({
         const center = box.getCenter(new THREE.Vector3())
         const size = box.getSize(new THREE.Vector3())
         const maxDim = Math.max(size.x, size.y, size.z)
-        const scale = 2 / maxDim
+        const scale = 4 / maxDim
         model.scale.setScalar(scale)
         model.position.sub(center.multiplyScalar(scale))
 
@@ -143,7 +143,7 @@ export default function GlbViewer({
         scene.add(model)
         currentModel = model
 
-        const dist = maxDim * scale * 2.5
+        const dist = maxDim * scale * 1.6
         camera.position.set(dist * 0.8, dist * 0.5, dist)
         controls.target.set(0, 0, 0)
         controls.update()
