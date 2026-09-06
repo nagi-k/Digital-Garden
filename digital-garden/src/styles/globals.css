@@ -3,31 +3,23 @@
 @tailwind utilities;
 
 :root {
-  /* 背景 */
   --bg-primary: #faf9f6;
   --bg-secondary: #f2f0eb;
   --bg-card: #ffffff;
   --bg-dark: #1a1a1a;
-
-  /* 文字 */
   --text-primary: #1a1a1a;
   --text-secondary: #6b6b6b;
   --text-muted: #9a9a9a;
   --text-inverse: #faf9f6;
-
-  /* 强调色 - 低饱和、高级 */
   --accent-terracotta: #c4a484;
   --accent-sage: #a8b5a0;
   --accent-lavender: #b8b3d3;
   --accent-clay: #c78d7b;
-
-  /* 功能色 */
   --border: rgba(26, 26, 26, 0.08);
   --border-strong: rgba(26, 26, 26, 0.2);
   --shadow-soft: 0 4px 24px rgba(26, 26, 26, 0.05);
   --shadow-medium: 0 8px 40px rgba(26, 26, 26, 0.08);
-
-  /* 间距 */
+  --shadow-glow: 0 0 60px rgba(196, 164, 132, 0.3);
   --space-section: clamp(6rem, 15vh, 12rem);
   --container-max: 1400px;
   --container-padding: clamp(1.5rem, 5vw, 4rem);
@@ -67,6 +59,7 @@ body {
   line-height: 1.7;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
 }
 
 ::selection {
@@ -74,7 +67,95 @@ body {
   color: var(--text-inverse);
 }
 
-/* 自定义光标 */
+/* ============ 流体渐变背景 ============ */
+.blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.4;
+  animation: blobFloat 20s ease-in-out infinite;
+}
+
+.blob-1 {
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, var(--accent-lavender) 0%, transparent 70%);
+  top: -10%;
+  right: -10%;
+  animation-delay: 0s;
+}
+
+.blob-2 {
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, var(--accent-sage) 0%, transparent 70%);
+  bottom: -5%;
+  left: -5%;
+  animation-delay: -5s;
+}
+
+.blob-3 {
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, var(--accent-terracotta) 0%, transparent 70%);
+  top: 40%;
+  left: 30%;
+  animation-delay: -10s;
+}
+
+@keyframes blobFloat {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  25% {
+    transform: translate(30px, -50px) scale(1.1);
+  }
+  50% {
+    transform: translate(-20px, 30px) scale(0.95);
+  }
+  75% {
+    transform: translate(40px, 20px) scale(1.05);
+  }
+}
+
+/* ============ 噪点纹理 ============ */
+.noise::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  opacity: 0.03;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* ============ 渐变边框卡片 ============ */
+.gradient-border {
+  position: relative;
+  background: var(--bg-card);
+  border-radius: 16px;
+  z-index: 1;
+}
+
+.gradient-border::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, var(--accent-terracotta), var(--accent-lavender), var(--accent-sage));
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.gradient-border:hover::before {
+  opacity: 1;
+}
+
+/* ============ 自定义光标 ============ */
 .cursor-dot,
 .cursor-ring {
   position: fixed;
@@ -86,41 +167,53 @@ body {
 }
 
 .cursor-dot {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
   background-color: var(--text-primary);
   border-radius: 50%;
+  transition: transform 0.1s ease;
 }
 
 .cursor-ring {
-  width: 24px;
-  height: 24px;
-  border: 1px solid var(--text-primary);
+  width: 32px;
+  height: 32px;
+  border: 1.5px solid var(--text-primary);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: width 0.3s ease, height 0.3s ease, border-color 0.3s ease, background-color 0.3s ease;
+  transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1), height 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.3s ease, background-color 0.3s ease;
 }
 
 .cursor-ring.is-hover {
-  width: 48px;
-  height: 48px;
+  width: 56px;
+  height: 56px;
   border-color: var(--accent-terracotta);
   background-color: rgba(196, 164, 132, 0.1);
 }
 
 .cursor-ring.is-image-hover {
-  width: 64px;
-  height: 64px;
+  width: 80px;
+  height: 80px;
   border-color: transparent;
-  background-color: rgba(26, 26, 26, 0.8);
+  background-color: rgba(26, 26, 26, 0.85);
   color: var(--text-inverse);
   font-size: 11px;
   letter-spacing: 0.1em;
+  backdrop-filter: blur(4px);
 }
 
-/* 中英混排字体类 */
+.cursor-ring.is-view {
+  width: 72px;
+  height: 72px;
+  background: linear-gradient(135deg, var(--accent-terracotta), var(--accent-lavender));
+  border-color: transparent;
+  color: white;
+  font-size: 12px;
+}
+
+/* ============ 字体类 ============ */
 .font-display-en {
   font-family: 'Playfair Display', 'Canela', 'Tiempos Headline', Georgia, serif;
   letter-spacing: 0.15em;
@@ -140,7 +233,26 @@ body {
   font-family: 'Source Han Sans CN', 'Noto Sans SC', 'PingFang SC', sans-serif;
 }
 
-/* 链接下划线动画 */
+/* ============ 文字渐变 ============ */
+.text-gradient {
+  background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-terracotta) 50%, var(--text-primary) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  background-size: 200% auto;
+  animation: textShimmer 8s linear infinite;
+}
+
+@keyframes textShimmer {
+  0% {
+    background-position: 0% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+/* ============ 链接动画 ============ */
 .link-underline {
   position: relative;
   display: inline-block;
@@ -152,9 +264,9 @@ body {
   bottom: -2px;
   left: 50%;
   width: 0;
-  height: 1px;
-  background-color: currentColor;
-  transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1), left 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  height: 2px;
+  background: linear-gradient(90deg, var(--accent-terracotta), var(--accent-lavender));
+  transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1), left 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .link-underline:hover::after {
@@ -162,54 +274,88 @@ body {
   width: 100%;
 }
 
-/* 图片容器 */
+/* ============ 图片容器 ============ */
 .img-container {
   overflow: hidden;
-  border-radius: 8px;
-  background-color: var(--bg-secondary);
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--accent-sage) 100%);
+  position: relative;
+}
+
+.img-container::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 60%, rgba(26, 26, 26, 0.2) 100%);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.img-container:hover::after {
+  opacity: 1;
 }
 
 .img-container img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .img-container:hover img {
-  transform: scale(1.03);
+  transform: scale(1.05);
 }
 
-/* 卡片 */
+/* ============ 卡片 ============ */
 .card {
   background-color: var(--bg-card);
   border: 1px solid var(--border);
-  border-radius: 8px;
-  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1),
-    border-color 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  border-radius: 16px;
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent-terracotta), var(--accent-lavender), var(--accent-sage));
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .card:hover {
-  transform: translateY(-6px);
+  transform: translateY(-8px);
   box-shadow: var(--shadow-medium);
   border-color: var(--border-strong);
 }
 
-/* 磁吸按钮基础 */
+.card:hover::before {
+  transform: scaleX(1);
+}
+
+/* ============ 磁吸按钮 ============ */
 .magnetic-btn {
   position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0.875rem 2rem;
-  border: 1px solid var(--text-primary);
+  padding: 1rem 2.5rem;
+  border: 1.5px solid var(--text-primary);
   background-color: transparent;
   color: var(--text-primary);
   font-size: 0.875rem;
   letter-spacing: 0.05em;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   overflow: hidden;
+  border-radius: 999px;
 }
 
 .magnetic-btn::before {
@@ -219,19 +365,20 @@ body {
   left: 50%;
   width: 0;
   height: 0;
-  background-color: var(--text-primary);
+  background: linear-gradient(135deg, var(--text-primary), var(--accent-terracotta));
   border-radius: 50%;
   transform: translate(-50%, -50%);
-  transition: width 0.5s cubic-bezier(0.16, 1, 0.3, 1), height 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1), height 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .magnetic-btn:hover::before {
-  width: 300px;
-  height: 300px;
+  width: 400px;
+  height: 400px;
 }
 
 .magnetic-btn:hover {
   color: var(--text-inverse);
+  border-color: var(--text-primary);
 }
 
 .magnetic-btn span {
@@ -239,25 +386,25 @@ body {
   z-index: 1;
 }
 
-/* 滚动进度条 */
+/* ============ 滚动进度条 ============ */
 .scroll-progress {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
-  height: 2px;
+  height: 3px;
   background-color: transparent;
   z-index: 100;
 }
 
 .scroll-progress-bar {
   height: 100%;
-  background-color: var(--accent-terracotta);
+  background: linear-gradient(90deg, var(--accent-terracotta), var(--accent-lavender));
   width: 0%;
   transition: width 0.1s linear;
 }
 
-/* 遮罩 reveal 动画 */
+/* ============ 遮罩动画 ============ */
 .mask-reveal {
   overflow: hidden;
   display: inline-block;
@@ -274,7 +421,7 @@ body {
   }
 }
 
-/* 页面过渡 */
+/* ============ 页面过渡 ============ */
 .page-enter {
   opacity: 0;
   transform: translateY(40px);
@@ -295,7 +442,7 @@ body {
   transition: opacity 0.4s ease;
 }
 
-/* 生长状态标识 */
+/* ============ 生长状态 ============ */
 .status-seedling {
   color: var(--accent-sage);
 }
@@ -308,17 +455,84 @@ body {
   color: var(--accent-clay);
 }
 
-/* 打印隐藏 */
+/* ============ 装饰线条 ============ */
+.decor-line {
+  width: 60px;
+  height: 2px;
+  background: linear-gradient(90deg, var(--accent-terracotta), transparent);
+  margin-bottom: 1rem;
+}
+
+/* ============ 打印隐藏 ============ */
 @media print {
   .no-print {
     display: none;
   }
 }
 
-/* 移动端隐藏自定义光标 */
+/* ============ 移动端隐藏光标 ============ */
 @media (hover: none) and (pointer: coarse) {
   .cursor-dot,
   .cursor-ring {
     display: none;
   }
+}
+
+/* ============ 文字阴影（增加层次感） ============ */
+.text-shadow-soft {
+  text-shadow: 0 2px 20px rgba(26, 26, 26, 0.08);
+}
+
+/* ============ 玻璃拟态 ============ */
+.glass {
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+/* ============ 旋转动画 ============ */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin-slow {
+  animation: spin 20s linear infinite;
+}
+
+/* ============ 脉冲动画 ============ */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.animate-pulse {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+/* ============ 滚动条样式 ============ */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-terracotta);
 }

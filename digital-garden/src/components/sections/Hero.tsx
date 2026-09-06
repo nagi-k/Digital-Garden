@@ -1,6 +1,6 @@
-import { useEffect, useRef } from 'react';
-import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
-import { ArrowRight, ArrowDown } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { motion, useMotionValue, useSpring, useTransform, useScroll } from 'framer-motion';
+import { ArrowRight, ArrowDown, Sparkles } from 'lucide-react';
 import MagneticButton from '@/components/ui/MagneticButton';
 import { siteData } from '@/data/site';
 import { staggerContainer, staggerItem } from '@/utils/animations';
@@ -9,12 +9,22 @@ const Hero = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
+  const [typedText, setTypedText] = useState('');
+  const fullText = '用界面讲述故事，在数字空间里持续生长。';
+  const [typeIndex, setTypeIndex] = useState(0);
+
+  const { scrollY } = useScroll();
+  const y1 = useTransform(scrollY, [0, 500], [0, 100]);
+  const y2 = useTransform(scrollY, [0, 500], [0, -50]);
+  const opacity = useTransform(scrollY, [0, 300], [1, 0]);
 
   const springX = useSpring(mouseX, { stiffness: 50, damping: 20 });
   const springY = useSpring(mouseY, { stiffness: 50, damping: 20 });
 
-  const rotateX = useTransform(springY, [-0.5, 0.5], ['2deg', '-2deg']);
-  const rotateY = useTransform(springX, [-0.5, 0.5], ['-2deg', '2deg']);
+  const rotateX = useTransform(springY, [-0.5, 0.5], ['3deg', '-3deg']);
+  const rotateY = useTransform(springX, [-0.5, 0.5], ['-3deg', '3deg']);
+  const translateX = useTransform(springX, [-0.5, 0.5], ['-10px', '10px']);
+  const translateY = useTransform(springY, [-0.5, 0.5], ['-10px', '10px']);
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -31,12 +41,27 @@ const Hero = () => {
     return () => container?.removeEventListener('mousemove', handleMouseMove);
   }, [mouseX, mouseY]);
 
+  useEffect(() => {
+    if (typeIndex < fullText.length) {
+      const timeout = setTimeout(() => {
+        setTypedText((prev) => prev + fullText[typeIndex]);
+        setTypeIndex((prev) => prev + 1);
+      }, 80);
+      return () => clearTimeout(timeout);
+    }
+  }, [typeIndex]);
+
   return (
     <section
       ref={containerRef}
-      className="min-h-screen flex items-center justify-center px-container pt-24 pb-16"
+      className="relative min-h-screen flex items-center justify-center px-container pt-24 pb-16 overflow-hidden noise"
     >
-      <div className="max-w-container mx-auto w-full">
+      {/* 流体背景 */}
+      <div className="blob blob-1" />
+      <div className="blob blob-2" />
+      <div className="blob blob-3" />
+
+      <div className="max-w-container mx-auto w-full relative z-10">
         <motion.div
           variants={staggerContainer}
           initial="hidden"
@@ -44,14 +69,17 @@ const Hero = () => {
           className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center"
         >
           {/* Left: Text Content */}
-          <div className="lg:col-span-7 space-y-8">
+          <motion.div style={{ y: y1, opacity }} className="lg:col-span-7 space-y-8">
             <motion.div variants={staggerItem}>
-              <span className="font-display-en text-sm text-text-muted block mb-4">
-                DIGITAL GARDEN
-              </span>
+              <div className="flex items-center gap-3 mb-6">
+                <Sparkles size={16} className="text-accent-terracotta" />
+                <span className="font-display-en text-sm text-text-muted tracking-widest">
+                  DIGITAL GARDEN
+                </span>
+              </div>
               <motion.h1
                 style={{ rotateX, rotateY, transformStyle: 'preserve-3d' }}
-                className="font-display-zh text-hero-zh leading-tight"
+                className="font-display-zh text-hero-zh leading-tight text-gradient"
               >
                 数字花园
               </motion.h1>
@@ -66,9 +94,10 @@ const Hero = () => {
 
             <motion.p
               variants={staggerItem}
-              className="text-body text-text-secondary max-w-xl leading-relaxed"
+              className="text-body text-text-secondary max-w-xl leading-relaxed min-h-[3.5rem]"
             >
-              {siteData.bioLong}
+              {typedText}
+              <span className="inline-block w-0.5 h-5 bg-accent-terracotta ml-1 animate-pulse" />
             </motion.p>
 
             <motion.div variants={staggerItem} className="flex flex-wrap gap-4 pt-4">
@@ -85,17 +114,25 @@ const Hero = () => {
                 <a
                   href="/notes"
                   className="magnetic-btn inline-flex items-center gap-2"
+                  style={{ borderColor: 'var(--accent-terracotta)', color: 'var(--accent-terracotta)' }}
                 >
                   <span>阅读笔记</span>
                 </a>
               </MagneticButton>
             </motion.div>
-          </div>
+          </motion.div>
 
-          {/* Right: Portrait */}
-          <motion.div variants={staggerItem} className="lg:col-span-5">
-            <div className="relative">
-              <div className="img-container aspect-[3/4] max-w-sm mx-auto lg:ml-auto">
+          {/* Right: Portrait with decorative elements */}
+          <motion.div
+            style={{ y: y2, opacity }}
+            variants={staggerItem}
+            className="lg:col-span-5 relative"
+          >
+            <motion.div
+              style={{ x: translateX, y: translateY }}
+              className="relative"
+            >
+              <div className="img-container aspect-[3/4] max-w-sm mx-auto lg:ml-auto relative z-10">
                 <img
                   src="/images/portrait.jpg"
                   alt="王颖"
@@ -103,10 +140,15 @@ const Hero = () => {
                   loading="eager"
                 />
               </div>
-              <div className="absolute -bottom-4 -right-4 w-24 h-24 border border-border rounded-full flex items-center justify-center bg-bg-primary">
-                <span className="font-display-en text-xs text-text-muted">EST. 2026</span>
+
+              {/* 装饰元素 */}
+              <div className="absolute -bottom-6 -right-6 w-28 h-28 border border-accent-terracotta/30 rounded-full flex items-center justify-center bg-bg-primary/80 backdrop-blur-sm z-20">
+                <span className="font-display-en text-xs text-accent-terracotta">EST. 2026</span>
               </div>
-            </div>
+
+              <div className="absolute -top-4 -left-4 w-16 h-16 border border-accent-lavender/30 rounded-lg rotate-12 z-0" />
+              <div className="absolute top-1/2 -right-8 w-20 h-20 border border-accent-sage/30 rounded-full z-0" />
+            </motion.div>
           </motion.div>
         </motion.div>
 
@@ -114,11 +156,13 @@ const Hero = () => {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 1.5, duration: 1 }}
+          transition={{ delay: 2, duration: 1 }}
           className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-text-muted"
         >
-          <span className="text-xs font-display-en">SCROLL</span>
-          <ArrowDown size={16} className="animate-bounce" />
+          <span className="text-xs font-display-en tracking-widest">SCROLL</span>
+          <div className="w-6 h-10 border border-border rounded-full flex justify-center pt-2">
+            <div className="w-1 h-2 bg-accent-terracotta rounded-full animate-bounce" />
+          </div>
         </motion.div>
       </div>
     </section>
