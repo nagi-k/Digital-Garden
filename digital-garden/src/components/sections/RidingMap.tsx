@@ -12,9 +12,6 @@ import {
   Droplets,
   Building2,
   Train,
-  Upload,
-  X,
-  Image as ImageIcon,
 } from 'lucide-react';
 import SectionTitle from '@/components/ui/SectionTitle';
 import FadeIn from '@/components/effects/FadeIn';
@@ -51,21 +48,23 @@ const districtFills: Record<string, string> = {
 // 主城六区（标签在小比例尺下隐藏，避免拥挤；放大后显示）
 const mainCityDistricts = new Set(['320102', '320104', '320105', '320106', '320113', '320114']);
 // 默认视野：主城区（新街口附近）
-const DEFAULT_ZOOM = 3;
+const DEFAULT_ZOOM = 2;
 const DEFAULT_PAN = { x: 4, y: 200 };
 const DETAIL_ZOOM = 1.6; // 超过该缩放级别显示主城标签与地标
 
-const defaultRoute = ridingRoutes.find((r) => r.id === 'jiangxinzhou') || ridingRoutes[0];
-
 const RidingMap = () => {
-  const [selectedRoute, setSelectedRoute] = useState<RidingRoute>(defaultRoute);
+  const [selectedRoute, setSelectedRoute] = useState<RidingRoute | null>(null);
   const [hoveredRoute, setHoveredRoute] = useState<string | null>(null);
   const [zoom, setZoom] = useState(DEFAULT_ZOOM);
   const [pan, setPan] = useState(DEFAULT_PAN);
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
-  const [routePhotos, setRoutePhotos] = useState<Record<string, string[]>>({});
   const svgRef = useRef<SVGSVGElement>(null);
+
+  const riddenCount = ridingRoutes.filter((r) => r.ridden).length;
+  const totalLength = ridingRoutes
+    .filter((r) => r.ridden)
+    .reduce((acc, r) => acc + parseInt(r.length.replace(/\D/g, '')), 0);
 
   // 图标/文字尺寸：按 1/√zoom 反向缩放
   // 放大时图标适度变大（不会被地图甩得太小），缩小时也不会过大遮挡
@@ -114,7 +113,7 @@ const RidingMap = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           {/* 地图区域 */}
-          <FadeIn className="lg:col-span-7">
+          <FadeIn className="lg:col-span-8">
             <div className="card p-0 relative overflow-hidden bg-[#f8f8f8]">
               {/* 高德风格工具栏 */}
               <div className="absolute top-4 right-4 z-20 flex flex-col gap-1">
@@ -146,6 +145,20 @@ const RidingMap = () => {
                 <div className="flex items-center gap-2">
                   <div className="w-16 h-0.5 bg-[#333]" />
                   <span className="text-xs text-[#666]">2km</span>
+                </div>
+              </div>
+
+              {/* 图例 */}
+              <div className="absolute bottom-4 left-4 z-20 bg-white border border-[#e0e0e0] p-3 shadow-sm">
+                <div className="flex flex-col gap-2 text-xs">
+                  <div className="flex items-center gap-2">
+                    <div className="w-5 h-0.5 bg-[#0a0a0a]" />
+                    <span className="text-[#666]">已骑行</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-5 h-0.5 border-t-2 border-dashed border-[#999]" />
+                    <span className="text-[#666]">待骑行</span>
+                  </div>
                 </div>
               </div>
 
@@ -266,31 +279,34 @@ const RidingMap = () => {
                   {/* 骑行路线 */}
                   {ridingRoutes.map((route) => {
                     const isHovered = hoveredRoute === route.id;
-                    const isSelected = selectedRoute.id === route.id;
+                    const isSelected = selectedRoute?.id === route.id;
 
                     return (
                       <g key={route.id}>
                         <path
                           d={route.path}
                           fill="none"
-                          stroke={isSelected ? '#0a0a0a' : '#666'}
-                          strokeWidth={isHovered || isSelected ? 8 : 4}
-                          opacity={isHovered || isSelected ? 0.12 : 0.06}
+                          stroke={route.ridden ? '#0a0a0a' : '#999'}
+                          strokeWidth={isHovered || isSelected ? 8 : route.ridden ? 5 : 2.5}
+                          opacity={isHovered || isSelected ? 0.12 : route.ridden ? 0.06 : 0.04}
                           strokeLinecap="round"
                           strokeLinejoin="round"
                         />
                         <path
                           d={route.path}
                           fill="none"
-                          stroke={isSelected ? '#0a0a0a' : '#666'}
-                          strokeWidth={isHovered || isSelected ? 3 : 2}
-                          opacity={isHovered || isSelected ? 1 : 0.75}
+                          stroke={route.ridden ? '#0a0a0a' : '#999'}
+                          strokeWidth={isHovered || isSelected ? 3 : route.ridden ? 2 : 1.5}
+                          opacity={route.ridden ? 1 : 0.6}
                           strokeLinecap="round"
                           strokeLinejoin="round"
                           className="cursor-pointer transition-all duration-300"
                           onMouseEnter={() => setHoveredRoute(route.id)}
                           onMouseLeave={() => setHoveredRoute(null)}
                           onClick={() => setSelectedRoute(route)}
+                          style={{
+                            strokeDasharray: route.ridden ? 'none' : '6 3',
+                          }}
                         />
                       </g>
                     );
@@ -353,7 +369,7 @@ const RidingMap = () => {
                           fontSize={zs(11)}
                           fontFamily="'Inter', sans-serif"
                         >
-                          {route.length}
+                          {route.length} · {route.ridden ? '已骑行' : '待骑行'}
                         </text>
                       </g>
                     );
@@ -364,10 +380,30 @@ const RidingMap = () => {
           </FadeIn>
 
           {/* 侧边信息面板 */}
-          <div className="lg:col-span-5 space-y-6">
-            {/* 路线列表 */}
+          <div className="lg:col-span-4 space-y-6">
+            {/* 统计卡片 */}
             <FadeIn delay={0.1}>
-              <div className="card p-5 max-h-[520px] overflow-y-auto">
+              <div className="grid grid-cols-3 gap-3">
+                <div className="card p-4 text-center">
+                  <div className="text-2xl font-display-zh text-text-primary">{riddenCount}</div>
+                  <div className="text-xs text-text-muted mt-1">已骑行路线</div>
+                </div>
+                <div className="card p-4 text-center">
+                  <div className="text-2xl font-display-zh text-text-primary">{totalLength}km</div>
+                  <div className="text-xs text-text-muted mt-1">总里程</div>
+                </div>
+                <div className="card p-4 text-center">
+                  <div className="text-2xl font-display-zh text-text-primary">
+                    {ridingRoutes.length - riddenCount}
+                  </div>
+                  <div className="text-xs text-text-muted mt-1">待探索</div>
+                </div>
+              </div>
+            </FadeIn>
+
+            {/* 路线列表 */}
+            <FadeIn delay={0.2}>
+              <div className="card p-5 max-h-[480px] overflow-y-auto">
                 <h3 className="font-display-zh text-lg mb-4 flex items-center gap-2">
                   <Navigation size={18} className="text-text-primary" />
                   路线列表
@@ -380,16 +416,22 @@ const RidingMap = () => {
                       onMouseEnter={() => setHoveredRoute(route.id)}
                       onMouseLeave={() => setHoveredRoute(null)}
                       className={`w-full text-left p-3 border transition-all duration-300 ${
-                        selectedRoute.id === route.id
+                        selectedRoute?.id === route.id
                           ? 'border-text-primary bg-text-primary/5'
                           : 'border-border hover:border-text-secondary'
                       }`}
                     >
                       <div className="flex items-center justify-between mb-1">
                         <span className="font-medium text-sm">{route.name}</span>
-                        <span className="text-xs px-2 py-0.5 bg-text-primary/10 text-text-primary">
-                          {route.rideCount} 次
-                        </span>
+                        {route.ridden ? (
+                          <span className="text-xs px-2 py-0.5 bg-text-primary text-text-inverse">
+                            已骑行
+                          </span>
+                        ) : (
+                          <span className="text-xs px-2 py-0.5 bg-border text-text-muted">
+                            待骑行
+                          </span>
+                        )}
                       </div>
                       <div className="flex items-center gap-3 text-xs text-text-muted">
                         <span className="flex items-center gap-1">
@@ -410,98 +452,51 @@ const RidingMap = () => {
             </FadeIn>
 
             {/* 选中路线详情 */}
-            <motion.div
-              key={selectedRoute.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              className="card p-5 border-l-4 border-l-text-primary"
-            >
-              <div className="mb-4">
-                <h3 className="font-display-zh text-xl">{selectedRoute.name}</h3>
-                <p className="font-display-en text-xs text-text-muted mt-1">{selectedRoute.nameEn}</p>
-              </div>
-
-              <div className="space-y-3 text-sm">
-                <div className="flex items-center gap-2 text-text-secondary">
-                  <Bike size={14} />
-                  <span>长度：{selectedRoute.length}</span>
+            {selectedRoute && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                className="card p-5 border-l-4 border-l-text-primary"
+              >
+                <div className="flex items-start justify-between mb-4">
+                  <div>
+                    <h3 className="font-display-zh text-xl">{selectedRoute.name}</h3>
+                    <p className="font-display-en text-xs text-text-muted mt-1">{selectedRoute.nameEn}</p>
+                  </div>
+                  <button
+                    onClick={() => setSelectedRoute(null)}
+                    className="text-text-muted hover:text-text-primary text-sm"
+                  >
+                    关闭
+                  </button>
                 </div>
-                {selectedRoute.date && (
+
+                <div className="space-y-3 text-sm">
                   <div className="flex items-center gap-2 text-text-secondary">
-                    <Calendar size={14} />
-                    <span>最近骑行：{selectedRoute.date}</span>
+                    <Bike size={14} />
+                    <span>长度：{selectedRoute.length}</span>
                   </div>
-                )}
-                {selectedRoute.notes && (
-                  <div className="mt-4 p-4 bg-bg-secondary text-text-secondary">
-                    <p className="text-sm leading-relaxed">{selectedRoute.notes}</p>
-                  </div>
-                )}
-              </div>
-
-              {/* 骑行照片记录 */}
-              <div className="mt-6">
-                <div className="flex items-center justify-between mb-3">
-                  <h4 className="text-sm font-medium flex items-center gap-2">
-                    <ImageIcon size={14} className="text-text-muted" />
-                    骑行照片
-                  </h4>
-                  <label className="text-xs px-3 py-1.5 border border-text-primary text-text-primary hover:bg-text-primary hover:text-text-inverse transition-colors cursor-pointer">
-                    <span className="flex items-center gap-1">
-                      <Upload size={12} />
-                      上传照片
-                    </span>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      multiple
-                      className="hidden"
-                      onChange={(e) => {
-                        const files = Array.from(e.target.files || []);
-                        if (!files.length) return;
-                        const newPhotos = files.map((file) => URL.createObjectURL(file));
-                        setRoutePhotos((prev) => ({
-                          ...prev,
-                          [selectedRoute.id]: [...(prev[selectedRoute.id] || []), ...newPhotos],
-                        }));
-                        e.target.value = '';
-                      }}
-                    />
-                  </label>
+                  {selectedRoute.date && (
+                    <div className="flex items-center gap-2 text-text-secondary">
+                      <Calendar size={14} />
+                      <span>骑行日期：{selectedRoute.date}</span>
+                    </div>
+                  )}
+                  {selectedRoute.notes && (
+                    <div className="mt-4 p-4 bg-bg-secondary text-text-secondary">
+                      <p className="text-sm leading-relaxed">{selectedRoute.notes}</p>
+                    </div>
+                  )}
                 </div>
 
-                {(routePhotos[selectedRoute.id] || []).length > 0 ? (
-                  <div className="grid grid-cols-3 gap-2">
-                    {(routePhotos[selectedRoute.id] || []).map((photo, index) => (
-                      <div key={index} className="relative aspect-square group overflow-hidden bg-bg-secondary">
-                        <img
-                          src={photo}
-                          alt={`骑行照片 ${index + 1}`}
-                          className="w-full h-full object-cover"
-                        />
-                        <button
-                          onClick={() => {
-                            setRoutePhotos((prev) => ({
-                              ...prev,
-                              [selectedRoute.id]: prev[selectedRoute.id].filter((_, i) => i !== index),
-                            }));
-                            URL.revokeObjectURL(photo);
-                          }}
-                          className="absolute top-1 right-1 w-5 h-5 bg-text-primary/80 text-text-inverse flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                        >
-                          <X size={10} />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="border border-dashed border-border p-6 text-center text-text-muted text-xs">
-                    暂无照片，点击上方按钮上传本次骑行的记录
-                  </div>
+                {!selectedRoute.ridden && (
+                  <button className="mt-4 w-full py-2 border border-text-primary text-text-primary text-sm hover:bg-text-primary hover:text-text-inverse transition-colors">
+                    标记为已骑行
+                  </button>
                 )}
-              </div>
-            </motion.div>
+              </motion.div>
+            )}
           </div>
         </div>
       </div>

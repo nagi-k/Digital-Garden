@@ -25,7 +25,6 @@ input{font-family:var(--font);border:none;outline:none;background:none}
     radial-gradient(800px 400px at 15% 0%,rgba(91,166,138,.10),transparent 60%),
     radial-gradient(700px 380px at 90% 100%,rgba(251,191,36,.08),transparent 60%),
     #F1EFEA}
-body.embed .stage{padding:0;min-height:100vh;align-items:center;justify-content:center}
 .stage-head{width:100%;max-width:1060px;display:flex;align-items:center;gap:14px}
 .stage-logo{flex:none;width:52px;height:52px;border-radius:16px;background:#fff;display:grid;place-items:center;box-shadow:var(--shadow)}
 .stage-title h1{font-size:22px;font-weight:700;letter-spacing:.2px}
@@ -597,6 +596,7 @@ input[type=range]:active::-webkit-slider-thumb{transform:scale(1.25)}
 }
 
 /* ═══════════════ iframe 嵌入模式 ═══════════════ */
-/* 详细覆盖样式见 index.html 内联 <style>，此处保留默认适配 */
 body.embed{background:transparent}
+body.embed .stage{padding:0;min-height:auto;background:transparent}
 body.embed .stage-head,body.embed .annotations{display:none}
+body.embed .phone{box-shadow:0 0 0 11px #1c1917,0 0 0 13px #3a3633,0 24px 60px rgba(28,25,23,.28)}
