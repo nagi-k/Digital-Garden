@@ -21,7 +21,7 @@ const PhonePrototype = ({ src, title, desc, fullHref, frameWidth = 393, frameHei
   useEffect(() => {
     const update = () => {
       if (wrapRef.current) {
-        const availableWidth = Math.max(0, wrapRef.current.clientWidth - 16)
+        const availableWidth = Math.max(0, wrapRef.current.clientWidth)
         setScale(availableWidth / frameWidth)
       }
     }
@@ -35,7 +35,7 @@ const PhonePrototype = ({ src, title, desc, fullHref, frameWidth = 393, frameHei
     <div className="card p-0 group overflow-hidden">
       <div
         ref={wrapRef}
-        className="relative w-full overflow-hidden bg-transparent flex items-center justify-center p-2"
+        className="relative w-full overflow-hidden bg-transparent flex items-center justify-center"
         style={{ aspectRatio: frameWidth / frameHeight }}
       >
         <iframe
