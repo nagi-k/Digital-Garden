@@ -119,20 +119,13 @@ const Hero = () => {
             <motion.div variants={staggerItem} className="flex flex-wrap gap-4 pt-4">
               <MagneticButton>
                 <a
-                  href="/ui"
+                  href="https://ui-design-d5guvqrft29296773-1465022720.tcloudbaseapp.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="magnetic-btn inline-flex items-center gap-2"
                 >
                   <span>浏览作品</span>
                   <ArrowRight size={16} />
-                </a>
-              </MagneticButton>
-              <MagneticButton>
-                <a
-                  href="/notes"
-                  className="magnetic-btn inline-flex items-center gap-2"
-                  style={{ borderColor: 'var(--accent-terracotta)', color: 'var(--accent-terracotta)' }}
-                >
-                  <span>阅读笔记</span>
                 </a>
               </MagneticButton>
             </motion.div>
