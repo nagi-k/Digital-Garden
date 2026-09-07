@@ -35,15 +35,15 @@ const PhonePrototype = ({ src, title, desc, fullHref, frameWidth = 393, frameHei
     <div className="card p-0 group overflow-hidden">
       <div
         ref={wrapRef}
-        className="relative w-full overflow-hidden bg-transparent flex items-center justify-center"
-        style={{ aspectRatio: frameWidth / frameHeight }}
+        className="relative w-full overflow-hidden bg-transparent flex items-start justify-center"
+        style={{ aspectRatio: 0.7 }}
       >
         <iframe
           src={src}
           className="border-0"
           width={frameWidth}
           height={frameHeight}
-          style={{ transform: `scale(${scale})`, transformOrigin: 'center' }}
+          style={{ transform: `scale(${scale})`, transformOrigin: 'top center' }}
           title={title}
         />
       </div>
