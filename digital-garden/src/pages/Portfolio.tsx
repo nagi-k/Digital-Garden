@@ -12,9 +12,10 @@ interface PhonePrototypeProps {
   fullHref: string
   frameWidth?: number
   frameHeight?: number
+  previewScale?: number
 }
 
-const PhonePrototype = ({ src, title, desc, fullHref, frameWidth = 393, frameHeight = 852 }: PhonePrototypeProps) => {
+const PhonePrototype = ({ src, title, desc, fullHref, frameWidth = 393, frameHeight = 852, previewScale = 0.82 }: PhonePrototypeProps) => {
   const wrapRef = useRef<HTMLDivElement>(null)
   const [scale, setScale] = useState(1)
 
@@ -22,28 +23,28 @@ const PhonePrototype = ({ src, title, desc, fullHref, frameWidth = 393, frameHei
     const update = () => {
       if (wrapRef.current) {
         const availableWidth = Math.max(0, wrapRef.current.clientWidth)
-        setScale(availableWidth / frameWidth)
+        setScale((availableWidth / frameWidth) * previewScale)
       }
     }
     update()
     const ro = new ResizeObserver(update)
     if (wrapRef.current) ro.observe(wrapRef.current)
     return () => ro.disconnect()
-  }, [frameWidth])
+  }, [frameWidth, previewScale])
 
   return (
     <div className="card p-0 group overflow-hidden">
       <div
         ref={wrapRef}
-        className="relative w-full overflow-hidden bg-transparent flex items-start justify-center"
-        style={{ aspectRatio: 0.7 }}
+        className="relative w-full overflow-hidden bg-transparent flex items-center justify-center"
+        style={{ aspectRatio: frameWidth / frameHeight }}
       >
         <iframe
           src={src}
           className="border-0"
           width={frameWidth}
           height={frameHeight}
-          style={{ transform: `scale(${scale})`, transformOrigin: 'top center' }}
+          style={{ transform: `scale(${scale})`, transformOrigin: 'center' }}
           title={title}
         />
       </div>
