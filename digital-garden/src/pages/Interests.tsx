@@ -1,11 +1,9 @@
-import { useState } from 'react';
-import { Star, Heart, Film, Music, BookOpen, Camera, Palette, MapPin, Sparkles } from 'lucide-react';
+import { Star, Film, Music, BookOpen, Camera, Palette, MapPin, Sparkles } from 'lucide-react';
 import PageTransition from '@/components/layout/PageTransition';
 import SectionTitle from '@/components/ui/SectionTitle';
-import Tag from '@/components/ui/Tag';
 import FadeIn from '@/components/effects/FadeIn';
 import RidingMap from '@/components/sections/RidingMap';
-import { recentLoves, tenThingsILove, moodBoardItems } from '@/data/interests';
+import { recentLoves } from '@/data/interests';
 
 const categoryIcons = {
   movie: Film,
@@ -28,12 +26,6 @@ const categoryColors = {
 };
 
 const Interests = () => {
-  const [activeCategory, setActiveCategory] = useState<string | null>(null);
-  const categories = Array.from(new Set(moodBoardItems.map((i) => i.category)));
-  const filteredMoodBoard = activeCategory
-    ? moodBoardItems.filter((i) => i.category === activeCategory)
-    : moodBoardItems;
-
   return (
     <PageTransition>
       <section className="pt-32 pb-section px-container relative overflow-hidden">
@@ -124,74 +116,6 @@ const Interests = () => {
                     </article>
                   );
                 })}
-              </div>
-            </div>
-          </FadeIn>
-
-          {/* Mood Board */}
-          <FadeIn delay={0.2}>
-            <div className="mb-24">
-              <div className="flex items-center gap-3 mb-8">
-                <Heart size={20} className="text-accent-lavender" />
-                <h3 className="font-display-zh text-h3">视觉灵感板</h3>
-              </div>
-              <div className="flex flex-wrap gap-2 mb-8">
-                <Tag
-                  label="全部"
-                  active={!activeCategory}
-                  onClick={() => setActiveCategory(null)}
-                />
-                {categories.map((cat) => (
-                  <Tag
-                    key={cat}
-                    label={cat}
-                    active={activeCategory === cat}
-                    onClick={() => setActiveCategory(cat)}
-                  />
-                ))}
-              </div>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {filteredMoodBoard.map((item) => (
-                  <div
-                    key={item.id}
-                    className="group relative overflow-hidden  aspect-square"
-                    data-cursor-text="喜欢"
-                  >
-                    <img
-                      src={item.image}
-                      alt={item.category}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-text-primary/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
-                      <p className="text-text-inverse text-sm">{item.note}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </FadeIn>
-
-          {/* 10 Things I Love */}
-          <FadeIn delay={0.3}>
-            <div className="mb-24">
-              <div className="flex items-center gap-3 mb-8">
-                <Heart size={20} className="text-accent-clay" />
-                <h3 className="font-display-zh text-h3">10 things I love</h3>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {tenThingsILove.map((thing, index) => (
-                  <div
-                    key={index}
-                    className="flex items-start gap-4 p-4 border-b border-border group hover:border-accent-terracotta transition-colors"
-                  >
-                    <span className="font-display-en text-xs text-text-muted mt-1 group-hover:text-accent-terracotta transition-colors">
-                      {String(index + 1).padStart(2, '0')}
-                    </span>
-                    <p className="text-text-secondary group-hover:text-text-primary transition-colors">
-                      {thing}
-                    </p>
-                  </div>
-                ))}
               </div>
             </div>
           </FadeIn>
