@@ -599,6 +599,6 @@ input[type=range]:active::-webkit-slider-thumb{transform:scale(1.25)}
 body.embed{background:transparent}
 body.embed .stage{padding:0;min-height:auto;background:transparent}
 body.embed .stage-head,body.embed .annotations{display:none}
-body.embed .phone{box-shadow:none;border-radius:0;background:transparent;overflow:hidden}
-body.embed .viewport{border-radius:44px;overflow:hidden}
+body.embed .phone{box-shadow:none;border-radius:0;background:transparent;overflow:hidden;transform:none !important}
+body.embed .viewport{border-radius:36px;overflow:hidden}
 body.embed .notch,body.embed .home-indicator{display:none}
