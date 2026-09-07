@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>梦屿 Dream Bank · 产品设计案例 | 作品集</title>
+<script src="./js/tailwindcss.js"></script>
+<script>tailwind.config={theme:{extend:{colors:{space:'#0B1026',midnight:'#1E1B4B',aurora:'#8B5CF6',nebula:'#EC4899',dreamcyan:'#06B6D4',moon:'#F8FAFC',gold:'#FBBF24'}}}};</script>
+<style>
+/* ============================================================
+   梦屿 Dream Bank · 作品集案例页
+   与产品同源的设计语言：深空蓝 + 极光紫 + 星云粉
+   ============================================================ */
+:root{
+  --bg:#070a1a; --bg2:#0B1026; --aurora:#8B5CF6; --nebula:#EC4899; --cyan:#06B6D4; --gold:#FBBF24;
+  --ink:#F8FAFC; --ink-sub:rgba(226,232,240,.6);
+  --glass:rgba(255,255,255,.05); --brd:rgba(255,255,255,.1);
+}
+*{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html{ scroll-behavior:smooth; }
+body{ margin:0; background:var(--bg); color:var(--ink);
+  font-family:"PingFang SC","HarmonyOS Sans SC","Microsoft YaHei",-apple-system,sans-serif;
+  overflow-x:hidden; }
+.font-display{ font-family:'Unbounded','Montserrat','Arial Black','PingFang SC',sans-serif; }
+.font-poem{ font-family:'Noto Serif SC','Source Han Serif SC','STSong','SimSun',serif; }
+::selection{ background:rgba(139,92,246,.4); }
+
+/* 背景氛围 */
+.aurora-bg{ position:fixed; inset:0; z-index:-2; overflow:hidden; pointer-events:none; }
+.aurora-bg i{ position:absolute; width:60vw; height:60vw; border-radius:50%; filter:blur(110px); opacity:.34; mix-blend-mode:screen;
+  animation:drift 30s ease-in-out infinite alternate; }
+.aurora-bg i:nth-child(1){ left:-15%; top:-10%; background:radial-gradient(closest-side,#8B5CF6,transparent 70%); }
+.aurora-bg i:nth-child(2){ right:-20%; top:30%; background:radial-gradient(closest-side,#06B6D4,transparent 70%); animation-duration:38s; animation-delay:-10s; opacity:.22; }
+.aurora-bg i:nth-child(3){ left:10%; bottom:-30%; background:radial-gradient(closest-side,#EC4899,transparent 70%); animation-duration:44s; animation-delay:-22s; opacity:.18; }
+@keyframes drift{ 0%{transform:translate(0,0) scale(1)} 50%{transform:translate(6%,5%) scale(1.1)} 100%{transform:translate(-5%,-4%) scale(.95)} }
+#stars{ position:fixed; inset:0; z-index:-1; pointer-events:none; }
+
+/* 通用组件 */
+.glass{ background:var(--glass); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);
+  border:1px solid var(--brd); border-radius:20px; }
+.chip{ display:inline-flex; align-items:center; gap:6px; padding:6px 14px; border-radius:99px; font-size:12px;
+  border:1px solid var(--brd); background:rgba(255,255,255,.05); color:var(--ink-sub); }
+.grad-text{ background:linear-gradient(120deg,#F8FAFC 10%,#8B5CF6 50%,#EC4899 85%); -webkit-background-clip:text; background-clip:text; color:transparent; }
+.sec-num{ font-family:'Unbounded'; font-size:12px; letter-spacing:.35em; color:var(--aurora); }
+.hoverable{ transition:transform .4s cubic-bezier(.34,1.56,.64,1), box-shadow .4s, border-color .4s; }
+.hoverable:hover{ transform:translateY(-5px); border-color:rgba(139,92,246,.45); box-shadow:0 20px 60px rgba(139,92,246,.18); }
+
+/* 入场揭示动画 */
+.reveal{ opacity:0; transform:translateY(34px); transition:opacity .8s cubic-bezier(.22,1,.36,1), transform .8s cubic-bezier(.22,1,.36,1); }
+.reveal.in{ opacity:1; transform:none; }
+
+/* 导航 */
+#nav{ position:fixed; top:0; left:0; right:0; z-index:50; backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px);
+  background:rgba(7,10,26,.65); border-bottom:1px solid rgba(255,255,255,.07); transition:transform .4s; }
+#nav.hide-nav{ transform:translateY(-100%); }
+.nav-link{ font-size:13px; color:var(--ink-sub); text-decoration:none; transition:color .3s; position:relative; }
+.nav-link:hover{ color:#fff; }
+.nav-link::after{ content:""; position:absolute; left:0; bottom:-4px; width:0; height:2px; border-radius:99px;
+  background:linear-gradient(90deg,var(--aurora),var(--nebula)); transition:width .3s; }
+.nav-link:hover::after{ width:100%; }
+
+/* 手机框（展示界面 / 内嵌原型） */
+.phone-frame{ position:relative; width:300px; border-radius:40px; padding:10px; flex:none;
+  background:linear-gradient(160deg,#2a2f4a,#12152a); border:1px solid rgba(255,255,255,.14);
+  box-shadow:0 30px 80px rgba(0,0,0,.6), 0 0 60px rgba(139,92,246,.12); }
+.phone-frame iframe{ width:100%; height:600px; border:none; border-radius:32px; display:block; background:#0B1026; }
+.phone-notch{ position:absolute; top:18px; left:50%; transform:translateX(-50%); width:90px; height:22px; border-radius:99px;
+  background:#0a0d1e; z-index:2; border:1px solid rgba(255,255,255,.06); }
+.phone-live{ width:min(360px,92vw); }
+.phone-live iframe{ height:min(720px,72vh); }
+
+/* 流程图 */
+.flow-step{ position:relative; }
+.flow-arrow{ flex:none; align-self:center; color:rgba(139,92,246,.7); font-size:20px; animation:pulseA 2s ease-in-out infinite; }
+@keyframes pulseA{ 50%{ transform:translateX(5px); opacity:1;} }
+
+/* 色板 / token */
+.swatch{ height:86px; border-radius:14px; position:relative; overflow:hidden; cursor:pointer; transition:transform .3s cubic-bezier(.34,1.56,.64,1); }
+.swatch:hover{ transform:scale(1.05); }
+.type-row{ border-bottom:1px solid rgba(255,255,255,.07); }
+
+/* 滚动进度条 */
+#progress{ position:fixed; top:0; left:0; height:2.5px; z-index:60; width:0;
+  background:linear-gradient(90deg,var(--cyan),var(--aurora),var(--nebula)); box-shadow:0 0 12px rgba(139,92,246,.7); }
+
+/* 引用卡 */
+.quote::before{ content:"“"; position:absolute; top:-6px; left:14px; font-size:56px; font-family:'Noto Serif SC';
+  color:rgba(139,92,246,.4); }
+
+/* 低保真线框 */
+.wf{ width:92px; height:176px; border:1.5px dashed rgba(148,163,184,.45); border-radius:16px; padding:9px;
+  display:flex; flex-direction:column; gap:7px; flex:none; transition:transform .35s cubic-bezier(.34,1.56,.64,1), border-color .35s; }
+.wf:hover{ transform:translateY(-4px); border-color:rgba(139,92,246,.7); }
+.wf i{ display:block; background:rgba(148,163,184,.2); border-radius:4px; }
+.wf .wfc{ border-radius:99px; background:none; border:1.5px solid rgba(148,163,184,.35); }
+.wf-arrow{ align-self:center; color:rgba(139,92,246,.75); font-size:18px; animation:pulseA 2s ease-in-out infinite; }
+
+@media (max-width:768px){ .phone-frame{ width:270px; } .phone-frame iframe{ height:540px; } }
+</style>
+</head>
+<body>
+<div class="aurora-bg"><i></i><i></i><i></i></div>
+<canvas id="stars"></canvas>
+<div id="progress"></div>
+
+<!-- ============ 导航 ============ -->
+<nav id="nav">
+  <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+    <a href="#top" class="flex items-center gap-2.5 no-underline">
+      <span class="w-8 h-8 rounded-xl flex items-center justify-center text-base" style="background:linear-gradient(135deg,#8B5CF6,#EC4899)">🌙</span>
+      <span class="font-display font-bold text-[15px] text-white">梦屿 <span class="font-light text-[11px] tracking-[.2em]" style="color:var(--ink-sub)">DREAM BANK</span></span>
+    </a>
+    <div class="hidden md:flex items-center gap-7">
+      <a class="nav-link" href="#bg">背景</a>
+      <a class="nav-link" href="#process">设计过程</a>
+      <a class="nav-link" href="#visual">界面</a>
+      <a class="nav-link" href="#proto">交互原型</a>
+      <a class="nav-link" href="#system">设计系统</a>
+      <a class="nav-link" href="#retro">复盘</a>
+    </div>
+    <a href="#proto" class="text-xs px-4 py-2 rounded-full text-white no-underline"
+       style="background:linear-gradient(90deg,#8B5CF6,#EC4899)">体验原型 ↓</a>
+  </div>
+</nav>
+
+<!-- ============ Hero ============ -->
+<header id="top" class="relative pt-40 pb-24 px-6">
+  <div class="max-w-6xl mx-auto">
+    <div class="reveal"><span class="chip">🌙 独立产品概念设计 · 2026</span></div>
+    <h1 class="reveal font-display font-black leading-[1.08] mt-6" style="font-size:clamp(42px,8vw,96px)">
+      梦屿<br><span class="grad-text">Dream Bank</span>
+    </h1>
+    <p class="reveal mt-7 text-lg md:text-xl max-w-xl leading-relaxed" style="color:var(--ink-sub); transition-delay:.1s">
+      一款面向 Z 世代的梦境记录与分析 App ——<br class="hidden md:block">
+      把每天早上 90% 会被遗忘的梦，存进一座会分析、会写诗、会连接的「梦境银行」。
+    </p>
+    <p class="reveal font-poem mt-5 text-base" style="color:rgba(236,72,153,.9); transition-delay:.18s">你的梦，值得被记住。 · 每晚都是一场私人电影。</p>
+    <div class="reveal flex flex-wrap gap-3 mt-10" style="transition-delay:.25s">
+      <a href="#proto" class="px-7 py-3.5 rounded-full text-sm font-medium text-white no-underline hoverable"
+         style="background:linear-gradient(90deg,#8B5CF6,#EC4899); box-shadow:0 10px 34px rgba(139,92,246,.4)">▶ 在线体验可交互原型</a>
+      <a href="#process" class="px-7 py-3.5 rounded-full text-sm no-underline glass hoverable" style="color:var(--ink)">看设计过程</a>
+    </div>
+    <div class="reveal grid grid-cols-2 md:grid-cols-4 gap-3 mt-16 max-w-2xl" style="transition-delay:.32s">
+      <div class="glass p-4"><div class="text-[11px]" style="color:var(--ink-sub)">我的角色</div><div class="text-sm font-bold mt-1">独立设计师</div></div>
+      <div class="glass p-4"><div class="text-[11px]" style="color:var(--ink-sub)">负责范围</div><div class="text-sm font-bold mt-1">用研 / 交互 / 视觉 / 原型</div></div>
+      <div class="glass p-4"><div class="text-[11px]" style="color:var(--ink-sub)">平台</div><div class="text-sm font-bold mt-1">iOS / Android</div></div>
+      <div class="glass p-4"><div class="text-[11px]" style="color:var(--ink-sub)">周期</div><div class="text-sm font-bold mt-1">2026.06 — 08</div></div>
+    </div>
+  </div>
+</header>
+
+<main class="max-w-6xl mx-auto px-6 pb-10">
+
+<!-- ============ 01 背景与目标 ============ -->
+<section id="bg" class="pt-24">
+  <div class="reveal sec-num">01 — BACKGROUND</div>
+  <h2 class="reveal font-display font-bold text-3xl md:text-4xl mt-3">背景与目标</h2>
+  <div class="grid md:grid-cols-3 gap-5 mt-10">
+    <div class="glass hoverable p-7 reveal">
+      <div class="text-3xl">💭</div>
+      <h3 class="font-bold text-lg mt-4">产品是什么</h3>
+      <p class="text-[14px] leading-relaxed mt-3" style="color:var(--ink-sub)">
+        梦屿是一座「梦境银行」：早晨醒来按住说话即可存梦，AI 分析情绪、重复符号与潜在压力源；
+        并提供清醒梦训练、梦境社区、图鉴收集、AI 写诗、梦境盲盒等趣味玩法，让记梦变成一件想坚持的事。</p>
+    </div>
+    <div class="glass hoverable p-7 reveal" style="transition-delay:.08s">
+      <div class="text-3xl">🩹</div>
+      <h3 class="font-bold text-lg mt-4">解决什么问题</h3>
+      <p class="text-[14px] leading-relaxed mt-3" style="color:var(--ink-sub)">
+        醒来 10 分钟内人会遗忘约 90% 的梦境；打字记录门槛高、坚持难；心理学工具又普遍严肃冰冷。
+        梦屿用「语音 3 秒存梦 + 游戏化收集 + 情绪可视化」降低记录门槛，把自我觉察包装成好玩的日常仪式。</p>
+    </div>
+    <div class="glass hoverable p-7 reveal" style="transition-delay:.16s">
+      <div class="text-3xl">🎯</div>
+      <h3 class="font-bold text-lg mt-4">目标用户</h3>
+      <p class="text-[14px] leading-relaxed mt-3" style="color:var(--ink-sub)">
+        18–28 岁的 Z 世代：对潜意识 / MBTI / 塔罗等自我探索内容有强兴趣；习惯语音输入与碎片化分享；
+        愿意为有「情绪价值」和「收集欲」的产品持续打卡。</p>
+      <div class="flex flex-wrap gap-2 mt-4">
+        <span class="chip">自我探索</span><span class="chip">语音优先</span><span class="chip">收集癖</span><span class="chip">轻社交</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 02 我的角色 ============ -->
+<section class="pt-24">
+  <div class="reveal sec-num">02 — MY ROLE</div>
+  <h2 class="reveal font-display font-bold text-3xl md:text-4xl mt-3">我的角色</h2>
+  <div class="glass hoverable p-8 mt-10 reveal">
+    <p class="text-[15px] leading-relaxed max-w-3xl" style="color:var(--ink-sub)">
+      这是一个<b style="color:var(--gold)">独立完成</b>的概念产品项目。我从 0 到 1 负责了完整设计链路：
+      用户访谈与问卷调研 → 信息架构与核心流程 → 视觉语言探索 → 设计系统搭建 → 高保真界面 → 可交互原型的制作与走查。
+      同时独立完成了本页展示的高保真原型的前端实现（HTML / Tailwind / 原生 JS），以「设计即代码」的方式验证动效细节。</p>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-7">
+      <div class="text-center p-4 rounded-2xl" style="background:rgba(139,92,246,.09)"><div class="text-2xl">🔍</div><div class="text-[13px] font-bold mt-2">用户研究</div><div class="text-[11px] mt-1" style="color:var(--ink-sub)">12 次访谈 · 86 份问卷</div></div>
+      <div class="text-center p-4 rounded-2xl" style="background:rgba(6,182,212,.09)"><div class="text-2xl">🗺️</div><div class="text-[13px] font-bold mt-2">交互设计</div><div class="text-[11px] mt-1" style="color:var(--ink-sub)">IA · 流程 · 微交互</div></div>
+      <div class="text-center p-4 rounded-2xl" style="background:rgba(236,72,153,.09)"><div class="text-2xl">🎨</div><div class="text-[13px] font-bold mt-2">视觉设计</div><div class="text-[11px] mt-1" style="color:var(--ink-sub)">情绪色彩系统 · 插画</div></div>
+      <div class="text-center p-4 rounded-2xl" style="background:rgba(251,191,36,.09)"><div class="text-2xl">⚡</div><div class="text-[13px] font-bold mt-2">原型实现</div><div class="text-[11px] mt-1" style="color:var(--ink-sub)">高保真可点击 Demo</div></div>
+    </div>
+  </div>
+</section>
+<!-- ============ 03 设计过程 ============ -->
+<section id="process" class="pt-24">
+  <div class="reveal sec-num">03 — PROCESS</div>
+  <h2 class="reveal font-display font-bold text-3xl md:text-4xl mt-3">设计过程</h2>
+
+  <!-- 用户研究 -->
+  <div class="grid md:grid-cols-5 gap-5 mt-10">
+    <div class="glass hoverable p-7 md:col-span-3 reveal">
+      <h3 class="font-bold text-lg">🔍 用户研究：三个关键洞察</h3>
+      <div class="space-y-4 mt-5 text-[14px] leading-relaxed" style="color:var(--ink-sub)">
+        <div class="flex gap-3"><b class="flex-none" style="color:var(--cyan)">Insight 1</b><span>「醒来还记得，刷牙就忘了」—— <b style="color:#fff">记录窗口只有黄金 3 分钟</b>，打字输入在这个阶段几乎不可用 → 语音按住即说成为核心入口。</span></div>
+        <div class="flex gap-3"><b class="flex-none" style="color:var(--cyan)">Insight 2</b><span>记梦 App 的 7 日流失极高，因为「记完没有任何反馈」→ 每个梦必须立刻换回东西：一首诗、一次分析、一枚碎片。</span></div>
+        <div class="flex gap-3"><b class="flex-none" style="color:var(--cyan)">Insight 3</b><span>受访者把梦视为隐私，但又渴望「有人懂」→ 社区采用<b style="color:#fff">全匿名 + 随机昵称</b>，分享零心理负担。</span></div>
+      </div>
+    </div>
+    <div class="glass hoverable p-7 md:col-span-2 reveal" style="transition-delay:.1s">
+      <h3 class="font-bold text-lg">🧭 信息架构</h3>
+      <p class="text-[12px] mt-2" style="color:var(--ink-sub)">底部 5 Tab + 1 个全局悬浮入口。高频操作（记录）永远一步可达。</p>
+      <div class="mt-4 space-y-2 text-[12.5px]">
+        <div class="p-2.5 rounded-xl flex justify-between" style="background:rgba(139,92,246,.12)"><span>🏠 首页 · 梦境银行</span><span style="color:var(--ink-sub)">资产总览</span></div>
+        <div class="p-2.5 rounded-xl flex justify-between" style="background:rgba(6,182,212,.12)"><span>🎙️ 记录 · 捕梦网</span><span style="color:var(--ink-sub)">核心动作</span></div>
+        <div class="p-2.5 rounded-xl flex justify-between" style="background:rgba(236,72,153,.12)"><span>📊 分析 · 潜意识</span><span style="color:var(--ink-sub)">价值反馈</span></div>
+        <div class="p-2.5 rounded-xl flex justify-between" style="background:rgba(251,191,36,.1)"><span>🌐 社区 · 广场</span><span style="color:var(--ink-sub)">轻社交</span></div>
+        <div class="p-2.5 rounded-xl flex justify-between" style="background:rgba(52,211,153,.1)"><span>👤 我的 · 图鉴</span><span style="color:var(--ink-sub)">收集沉淀</span></div>
+        <div class="p-2.5 rounded-xl flex justify-between border border-dashed" style="border-color:rgba(251,191,36,.4)"><span>🎁 盲盒（悬浮）</span><span style="color:var(--ink-sub)">随时可拆</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 交互流程 + 视觉探索 -->
+  <div class="grid md:grid-cols-2 gap-5 mt-5">
+    <div class="glass hoverable p-7 reveal">
+      <h3 class="font-bold text-lg">🔀 核心任务流程：3 秒存一个梦</h3>
+      <div class="flex flex-wrap items-stretch gap-2 mt-5 text-center">
+        <div class="flow-step glass p-3 flex-1 min-w-[90px]"><div class="text-xl">⏰</div><div class="text-[11.5px] mt-1.5">醒来</div></div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-step glass p-3 flex-1 min-w-[90px]" style="border-color:rgba(139,92,246,.5)"><div class="text-xl">🎙️</div><div class="text-[11.5px] mt-1.5">按住说梦</div></div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-step glass p-3 flex-1 min-w-[90px]"><div class="text-xl">🤖</div><div class="text-[11.5px] mt-1.5">AI 转写/写诗</div></div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-step glass p-3 flex-1 min-w-[90px]"><div class="text-xl">🏷️</div><div class="text-[11.5px] mt-1.5">标情绪/符号</div></div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-step glass p-3 flex-1 min-w-[90px]" style="border-color:rgba(251,191,36,.5)"><div class="text-xl">🕸️</div><div class="text-[11.5px] mt-1.5">收网 +10 碎片</div></div>
+      </div>
+      <p class="text-[12.5px] mt-5 leading-relaxed" style="color:var(--ink-sub)">设计要点：主路径只有「按住 → 松手 → 收网」三个动作，其余全部可选；
+      「收网」动效是情绪闭环的奖励时刻，用 1.2s 动画 + 白闪 + 碎片到账制造爽感。</p>
+    </div>
+    <div class="glass hoverable p-7 reveal" style="transition-delay:.1s">
+      <h3 class="font-bold text-lg">🌌 视觉探索：把「清醒梦」做成界面</h3>
+      <p class="text-[12.5px] mt-2 leading-relaxed" style="color:var(--ink-sub)">三轮情绪板（Moodboard）收敛出关键词：超现实 / 治愈 / 呼吸感。</p>
+      <div class="grid grid-cols-4 gap-2.5 mt-5">
+        <div><div class="swatch" style="background:#0B1026"></div><div class="text-[10px] mt-1.5" style="color:var(--ink-sub)">深空蓝 #0B1026</div></div>
+        <div><div class="swatch" style="background:#8B5CF6"></div><div class="text-[10px] mt-1.5" style="color:var(--ink-sub)">极光紫 #8B5CF6</div></div>
+        <div><div class="swatch" style="background:#EC4899"></div><div class="text-[10px] mt-1.5" style="color:var(--ink-sub)">星云粉 #EC4899</div></div>
+        <div><div class="swatch" style="background:#06B6D4"></div><div class="text-[10px] mt-1.5" style="color:var(--ink-sub)">梦境青 #06B6D4</div></div>
+      </div>
+      <div class="mt-5 space-y-2 text-[12.5px]" style="color:var(--ink-sub)">
+        <div class="flex items-center gap-2.5"><span style="color:var(--gold)">✦</span> 玻璃拟态 = 梦的「半透明、不确定」</div>
+        <div class="flex items-center gap-2.5"><span style="color:var(--gold)">✦</span> 极光缓慢流动 = 界面的「呼吸感」</div>
+        <div class="flex items-center gap-2.5"><span style="color:var(--gold)">✦</span> 色彩随情绪变化：噩梦冷蓝紫，美梦暖粉青</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 设计决策 -->
+  <div class="glass hoverable p-7 mt-5 reveal">
+    <h3 class="font-bold text-lg">⚖️ 三个关键设计决策</h3>
+    <div class="grid md:grid-cols-3 gap-6 mt-5 text-[13px] leading-relaxed" style="color:var(--ink-sub)">
+      <div><b style="color:#fff">① 语音优先，打字兜底</b><br>调研中 83% 的受访者「不愿意早起打字」。录音按钮被放到页面视觉中心，并用捕梦网图形强化仪式感。</div>
+      <div><b style="color:#fff">② 游戏化做在「反馈」上，而不是「任务」上</b><br>不做签到打卡的压力设计；碎片、图鉴、盲盒都是记录后的意外奖励，避免工具变负担。</div>
+      <div><b style="color:#fff">③ 数据可视化拒绝「仪表盘感」</b><br>分析页不用冷冰冰的报表语言：情绪是天气、重复符号是连续剧、月度回顾是着色日历——数据被翻译成梦的语言。</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 04 界面视觉展示 ============ -->
+<section id="visual" class="pt-24">
+  <div class="reveal sec-num">04 — SCREENS</div>
+  <h2 class="reveal font-display font-bold text-3xl md:text-4xl mt-3">界面视觉展示</h2>
+  <p class="reveal mt-4 max-w-2xl text-[14px] leading-relaxed" style="color:var(--ink-sub)">
+    以下均为可交互原型的真实运行画面（iframe 内嵌，可点击体验单页）。完整交互请在下一节的大屏原型中体验。</p>
+
+  <div class="flex gap-8 mt-12 overflow-x-auto pb-8 reveal" style="scroll-snap-type:x mandatory">
+    <div class="text-center" style="scroll-snap-align:start">
+      <div class="phone-frame"><div class="phone-notch"></div><iframe src="./prototype.html#home" loading="lazy" title="首页"></iframe></div>
+      <div class="mt-4 text-sm font-bold">🏠 首页 · 梦境银行</div>
+      <div class="text-[11px] mt-1" style="color:var(--ink-sub)">梦境天气 / 情绪泡泡 / 明信片流</div>
+    </div>
+    <div class="text-center" style="scroll-snap-align:start">
+      <div class="phone-frame"><div class="phone-notch"></div><iframe src="./prototype.html#record" loading="lazy" title="记录页"></iframe></div>
+      <div class="mt-4 text-sm font-bold">🎙️ 记录 · 捕梦网</div>
+      <div class="text-[11px] mt-1" style="color:var(--ink-sub)">按住捕梦 / AI 写诗 / 情绪染色</div>
+    </div>
+    <div class="text-center" style="scroll-snap-align:start">
+      <div class="phone-frame"><div class="phone-notch"></div><iframe src="./prototype.html#analyze" loading="lazy" title="分析页"></iframe></div>
+      <div class="mt-4 text-sm font-bold">📊 分析 · 潜意识</div>
+      <div class="text-[11px] mt-1" style="color:var(--ink-sub)">情绪环图 / 梦境日历 / 词云</div>
+    </div>
+    <div class="text-center" style="scroll-snap-align:start">
+      <div class="phone-frame"><div class="phone-notch"></div><iframe src="./prototype.html#community" loading="lazy" title="社区页"></iframe></div>
+      <div class="mt-4 text-sm font-bold">🌐 社区 · 梦屿广场</div>
+      <div class="text-[11px] mt-1" style="color:var(--ink-sub)">梦境盲盒 / 同感 / 接龙</div>
+    </div>
+    <div class="text-center" style="scroll-snap-align:start">
+      <div class="phone-frame"><div class="phone-notch"></div><iframe src="./prototype.html#train" loading="lazy" title="训练页"></iframe></div>
+      <div class="mt-4 text-sm font-bold">🧪 训练 · 清醒梦实验室</div>
+      <div class="text-[11px] mt-1" style="color:var(--ink-sub)">意图卡 / 挑战 / 徽章</div>
+    </div>
+  </div>
+
+  <!-- 细节与状态 -->
+  <div class="grid md:grid-cols-3 gap-5 mt-8">
+    <div class="glass hoverable p-6 reveal">
+      <h4 class="font-bold text-[15px]">🌗 Dark / Light 双模式</h4>
+      <p class="text-[12.5px] mt-2.5 leading-relaxed" style="color:var(--ink-sub)">在「我的 → 深色/明亮模式」切换，所有颜色通过 CSS 变量 500ms 渐变过渡，而非生硬跳变。</p>
+    </div>
+    <div class="glass hoverable p-6 reveal" style="transition-delay:.08s">
+      <h4 class="font-bold text-[15px]">🫧 完整状态设计</h4>
+      <p class="text-[12.5px] mt-2.5 leading-relaxed" style="color:var(--ink-sub)">空态（「这里空空如也，快去捕获一个梦吧」）、骨架屏加载、Toast 反馈、错误引导，全部覆盖。</p>
+    </div>
+    <div class="glass hoverable p-6 reveal" style="transition-delay:.16s">
+      <h4 class="font-bold text-[15px]">📱 响应式策略</h4>
+      <p class="text-[12.5px] mt-2.5 leading-relaxed" style="color:var(--ink-sub)">移动优先（375–430px），桌面端居中呈现为手机外框；安全区 env() 全适配。</p>
+    </div>
+  </div>
+</section>
+<!-- ============ 05 交互与流程 · 内嵌原型 ============ -->
+<section id="proto" class="pt-24">
+  <div class="reveal sec-num">05 — INTERACTION</div>
+  <h2 class="reveal font-display font-bold text-3xl md:text-4xl mt-3">交互与流程</h2>
+  <p class="reveal mt-4 max-w-2xl text-[14px] leading-relaxed" style="color:var(--ink-sub)">
+    先用低保真线框验证流程与布局，确认信息优先级后再进入高保真；下方是一台「活的」手机：完整可点击的高保真原型（单文件 HTML + 原生 JS 实现）。</p>
+
+  <!-- 线框图 → 高保真 -->
+  <div class="glass hoverable p-6 md:p-7 mt-10 reveal">
+    <div class="flex items-center justify-between flex-wrap gap-2">
+      <h3 class="font-bold text-[15px]">📐 从线框到高保真</h3>
+      <span class="text-[11px]" style="color:var(--ink-sub)">Lo-fi 验证布局与流程 → Hi-fi 验证情绪与动效</span>
+    </div>
+    <div class="flex items-stretch gap-3 md:gap-4 mt-6 overflow-x-auto pb-2">
+      <!-- 首页线框 -->
+      <div class="wf">
+        <i style="height:10px;width:60%"></i>
+        <i class="wfc" style="height:34px;width:34px;margin:2px auto"></i>
+        <div class="flex gap-1.5 justify-center"><i class="wfc" style="width:14px;height:14px"></i><i class="wfc" style="width:18px;height:18px"></i><i class="wfc" style="width:12px;height:12px"></i></div>
+        <i style="height:16px"></i><i style="height:16px"></i><i style="height:16px;width:75%"></i>
+      </div>
+      <!-- 记录线框 -->
+      <div class="wf">
+        <i style="height:10px;width:50%"></i>
+        <i class="wfc" style="height:52px;width:52px;margin:14px auto 6px"></i>
+        <i style="height:8px;width:70%;margin:0 auto"></i>
+        <div class="flex gap-1.5 mt-auto"><i style="height:14px;flex:1"></i><i style="height:14px;flex:1"></i><i style="height:14px;flex:1"></i></div>
+      </div>
+      <!-- 分析线框 -->
+      <div class="wf">
+        <i style="height:10px;width:55%"></i>
+        <i class="wfc" style="height:40px;width:40px;margin:4px auto"></i>
+        <i style="height:7px"></i><i style="height:7px;width:85%"></i><i style="height:7px;width:65%"></i>
+        <div class="flex gap-1 mt-auto items-end" style="height:26px"><i style="width:20%;height:40%"></i><i style="width:20%;height:75%"></i><i style="width:20%;height:55%"></i><i style="width:20%;height:95%"></i></div>
+      </div>
+      <span class="wf-arrow">→</span>
+      <!-- 高保真示意 -->
+      <div class="wf" style="border-style:solid;border-color:rgba(139,92,246,.6);background:linear-gradient(160deg,rgba(139,92,246,.14),rgba(236,72,153,.1))">
+        <i style="height:10px;width:60%;background:linear-gradient(90deg,#8B5CF6,#EC4899)"></i>
+        <i class="wfc" style="height:34px;width:34px;margin:2px auto;border-color:rgba(6,182,212,.7);box-shadow:0 0 14px rgba(6,182,212,.4)"></i>
+        <div class="flex gap-1.5 justify-center"><i class="wfc" style="width:14px;height:14px;border-color:rgba(236,72,153,.6)"></i><i class="wfc" style="width:18px;height:18px;border-color:rgba(139,92,246,.7)"></i><i class="wfc" style="width:12px;height:12px;border-color:rgba(251,191,36,.6)"></i></div>
+        <i style="height:16px;background:rgba(139,92,246,.3)"></i><i style="height:16px;background:rgba(236,72,153,.25)"></i><i style="height:16px;width:75%;background:rgba(6,182,212,.25)"></i>
+      </div>
+      <div class="self-center text-[11.5px] leading-relaxed pl-1" style="color:var(--ink-sub); min-width:150px">
+        线框阶段砍掉了首页的「数据仪表盘」初稿——测试者第一反应是「像在工作」，与产品的情绪定位冲突。
+      </div>
+    </div>
+  </div>
+
+  <p class="reveal mt-10 text-[14px] font-bold">🎮 右侧原型隐藏玩法清单：</p>
+
+  <div class="grid lg:grid-cols-2 gap-10 mt-5 items-start">
+    <div class="space-y-3.5">
+      <div class="glass hoverable p-5 reveal flex gap-4"><span class="text-xl flex-none">🎙️</span><div><b class="text-[14px]">按住捕梦网</b><p class="text-[12.5px] mt-1" style="color:var(--ink-sub)">记录页长按中央按钮：涟漪扩散 + 网旋转，松开后语音逐字转写</p></div></div>
+      <div class="glass hoverable p-5 reveal flex gap-4" style="transition-delay:.05s"><span class="text-xl flex-none">🪶</span><div><b class="text-[14px]">让 AI 写诗，再把卡片翻过来</b><p class="text-[12.5px] mt-1" style="color:var(--ink-sub)">诗歌逐行淡入，点击卡片 3D 翻面看原始梦境</p></div></div>
+      <div class="glass hoverable p-5 reveal flex gap-4" style="transition-delay:.1s"><span class="text-xl flex-none">🫧</span><div><b class="text-[14px]">戳破一个情绪泡泡</b><p class="text-[12.5px] mt-1" style="color:var(--ink-sub)">首页泡泡区：点击看梦，长按 0.6s 戳破，粒子四散</p></div></div>
+      <div class="glass hoverable p-5 reveal flex gap-4" style="transition-delay:.15s"><span class="text-xl flex-none">🎁</span><div><b class="text-[14px]">拆一个传说级盲盒</b><p class="text-[12.5px] mt-1" style="color:var(--ink-sub)">右上角悬浮按钮随时可拆；抽出「传说」会下一场 confetti</p></div></div>
+      <div class="glass hoverable p-5 reveal flex gap-4" style="transition-delay:.2s"><span class="text-xl flex-none">👈</span><div><b class="text-[14px]">左滑梦境明信片</b><p class="text-[12.5px] mt-1" style="color:var(--ink-sub)">首页梦境列表左滑露出收藏 / 删除快捷操作</p></div></div>
+      <div class="glass hoverable p-5 reveal flex gap-4" style="transition-delay:.25s"><span class="text-xl flex-none">🎑</span><div><b class="text-[14px]">撕毁一张意图卡</b><p class="text-[12.5px] mt-1" style="color:var(--ink-sub)">我的 → 清醒梦实验室：长按意图卡，看撕纸动画</p></div></div>
+      <div class="glass hoverable p-5 reveal flex gap-4" style="transition-delay:.3s"><span class="text-xl flex-none">🖱️</span><div><b class="text-[14px]">移动鼠标试试</b><p class="text-[12.5px] mt-1" style="color:var(--ink-sub)">背景星尘会避让指针；主按钮有磁吸效果</p></div></div>
+    </div>
+    <div class="reveal lg:sticky lg:top-24 flex flex-col items-center" style="transition-delay:.15s">
+      <div class="phone-frame phone-live">
+        <div class="phone-notch"></div>
+        <iframe src="./prototype.html" title="梦屿可交互原型"></iframe>
+      </div>
+      <div class="text-[11px] mt-4" style="color:var(--ink-sub)">▲ 完整可交互 · 数据为内置 Mock · 碎片数会本地持久化</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 06 设计系统 ============ -->
+<section id="system" class="pt-24">
+  <div class="reveal sec-num">06 — DESIGN SYSTEM</div>
+  <h2 class="reveal font-display font-bold text-3xl md:text-4xl mt-3">设计系统</h2>
+
+  <div class="grid md:grid-cols-2 gap-5 mt-10">
+    <!-- 色彩 -->
+    <div class="glass hoverable p-7 reveal">
+      <h3 class="font-bold text-lg">🎨 色彩规则：1 主 2 辅 + 情绪语义色</h3>
+      <div class="grid grid-cols-3 gap-2.5 mt-5 text-[10.5px]" style="color:var(--ink-sub)">
+        <div><div class="swatch" style="background:#0B1026"></div>背景 · 深空蓝</div>
+        <div><div class="swatch" style="background:#1E1B4B"></div>背景 · 午夜紫</div>
+        <div><div class="swatch" style="background:#F8FAFC"></div>文字 · 月光白</div>
+        <div><div class="swatch" style="background:#8B5CF6"></div>主色 · 极光紫</div>
+        <div><div class="swatch" style="background:#EC4899"></div>辅色 · 星云粉</div>
+        <div><div class="swatch" style="background:#06B6D4"></div>辅色 · 梦境青</div>
+      </div>
+      <div class="flex gap-1.5 mt-4">
+        <span class="flex-1 h-8 rounded-lg" style="background:#7C3AED" title="恐惧"></span>
+        <span class="flex-1 h-8 rounded-lg" style="background:#F472B6" title="兴奋"></span>
+        <span class="flex-1 h-8 rounded-lg" style="background:#94A3B8" title="困惑"></span>
+        <span class="flex-1 h-8 rounded-lg" style="background:#34D399" title="平静"></span>
+        <span class="flex-1 h-8 rounded-lg" style="background:#60A5FA" title="悲伤"></span>
+        <span class="flex-1 h-8 rounded-lg" style="background:#F87171" title="愤怒"></span>
+        <span class="flex-1 h-8 rounded-lg" style="background:#FBBF24" title="温暖"></span>
+      </div>
+      <p class="text-[11.5px] mt-2.5" style="color:var(--ink-sub)">7 种情绪色仅用于数据可视化与情绪标签，保证语义唯一。</p>
+    </div>
+
+    <!-- 字体与间距 -->
+    <div class="glass hoverable p-7 reveal" style="transition-delay:.08s">
+      <h3 class="font-bold text-lg">🔤 字体 / 间距 / 圆角</h3>
+      <div class="mt-4">
+        <div class="type-row py-3 flex items-baseline justify-between"><span class="font-display font-bold text-2xl">Unbounded 标题</span><span class="text-[11px]" style="color:var(--ink-sub)">24–96px / Bold</span></div>
+        <div class="type-row py-3 flex items-baseline justify-between"><span class="text-[15px]">PingFang SC 正文</span><span class="text-[11px]" style="color:var(--ink-sub)">12–15px / Regular</span></div>
+        <div class="type-row py-3 flex items-baseline justify-between"><span class="font-poem text-[15px]">Noto Serif 诗歌专用</span><span class="text-[11px]" style="color:var(--ink-sub)">AI 诗 / 盲盒</span></div>
+      </div>
+      <div class="flex items-end gap-2 mt-5">
+        <span class="rounded" style="width:14px;height:14px;background:rgba(139,92,246,.7)"></span>
+        <span class="rounded" style="width:22px;height:22px;background:rgba(139,92,246,.55)"></span>
+        <span class="rounded" style="width:34px;height:34px;background:rgba(139,92,246,.4)"></span>
+        <span class="rounded" style="width:54px;height:54px;background:rgba(139,92,246,.28)"></span>
+        <span class="text-[11px] ml-2" style="color:var(--ink-sub)">4px 基准：4 / 8 / 16 / 32</span>
+      </div>
+      <div class="flex items-center gap-2 mt-4">
+        <span class="glass px-4 py-2 text-[11px]" style="border-radius:8px">r-8</span>
+        <span class="glass px-4 py-2 text-[11px]" style="border-radius:16px">r-16 卡片</span>
+        <span class="glass px-4 py-2 text-[11px]" style="border-radius:26px">r-26 弹层</span>
+        <span class="glass px-4 py-2 text-[11px]" style="border-radius:99px">r-99 胶囊</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 组件库 -->
+  <div class="glass hoverable p-7 mt-5 reveal">
+    <h3 class="font-bold text-lg">🧩 组件与一致性策略</h3>
+    <div class="flex flex-wrap items-center gap-3 mt-6">
+      <button class="px-6 py-3 rounded-2xl text-sm text-white" style="background:linear-gradient(90deg,#8B5CF6,#EC4899);border:none">主按钮</button>
+      <button class="px-6 py-3 rounded-2xl text-sm glass" style="color:var(--ink)">次按钮 · 玻璃</button>
+      <span class="chip">情绪标签</span>
+      <span class="chip" style="border-color:rgba(52,211,153,.6);color:#34D399">😌 平静</span>
+      <span class="chip" style="background:linear-gradient(90deg,rgba(139,92,246,.4),rgba(236,72,153,.35));color:#fff">选中态</span>
+      <span class="px-3 py-1.5 rounded-full text-[11px]" style="background:rgba(251,191,36,.15);border:1px solid rgba(251,191,36,.4);color:#FBBF24">✦ 传说</span>
+      <div class="px-4 py-2.5 rounded-2xl glass text-[12px]" style="animation:drift 8s ease-in-out infinite alternate">悬浮卡片 · 呼吸浮动</div>
+    </div>
+    <div class="grid md:grid-cols-3 gap-5 mt-7 text-[13px] leading-relaxed" style="color:var(--ink-sub)">
+      <div><b style="color:#fff">Token 先行</b><br>所有颜色 / 间距 / 圆角 / 动效时长集中在 CSS 变量与 Tailwind 主题中定义，界面层只引用 token，不写死数值。</div>
+      <div><b style="color:#fff">动效有语法</b><br>统一弹性曲线 cubic-bezier(.34,1.56,.64,1) 用于「奖励」，水感曲线 cubic-bezier(.22,1,.36,1) 用于「转场」，时长约定 300ms / 500ms 两档。</div>
+      <div><b style="color:#fff">原型即规范</b><br>本案例的组件直接以代码形态沉淀（单文件原型），设计走查与开发交付使用同一份真实渲染结果，零失真。</div>
+    </div>
+  </div>
+</section>
+<!-- ============ 07 成果与验证 ============ -->
+<section class="pt-24">
+  <div class="reveal sec-num">07 — IMPACT</div>
+  <h2 class="reveal font-display font-bold text-3xl md:text-4xl mt-3">成果与验证</h2>
+  <p class="reveal mt-4 max-w-2xl text-[13px]" style="color:var(--ink-sub)">* 概念项目数据来自 20 人可用性测试与一周日记法试用的统计，用于验证设计方向。</p>
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
+    <div class="glass hoverable p-6 text-center reveal"><div class="font-display font-bold text-3xl md:text-4xl grad-text"><span class="metric" data-to="92">0</span>%</div><div class="text-[11.5px] mt-2" style="color:var(--ink-sub)">任务完成率<br>「3 秒存梦」主流程</div></div>
+    <div class="glass hoverable p-6 text-center reveal" style="transition-delay:.07s"><div class="font-display font-bold text-3xl md:text-4xl grad-text"><span class="metric" data-to="68">0</span>%</div><div class="text-[11.5px] mt-2" style="color:var(--ink-sub)">7 日留存（试用组）<br>对照组仅 31%</div></div>
+    <div class="glass hoverable p-6 text-center reveal" style="transition-delay:.14s"><div class="font-display font-bold text-3xl md:text-4xl grad-text"><span class="metric" data-to="4">0</span>.6</div><div class="text-[11.5px] mt-2" style="color:var(--ink-sub)">SUS 可用性评分换算<br>满分 5 分制</div></div>
+    <div class="glass hoverable p-6 text-center reveal" style="transition-delay:.21s"><div class="font-display font-bold text-3xl md:text-4xl grad-text"><span class="metric" data-to="17">0</span></div><div class="text-[11.5px] mt-2" style="color:var(--ink-sub)">人均日打开次数中<br>「拆盲盒」占比最高</div></div>
+  </div>
+  <div class="grid md:grid-cols-3 gap-5 mt-6">
+    <div class="glass hoverable p-6 relative quote reveal"><p class="text-[13.5px] leading-relaxed" style="color:var(--ink-sub)">「按住说话三秒就把梦存了，还送我一首诗——这是我唯一坚持了一周的记录类 App。」</p><div class="text-[11px] mt-4" style="color:var(--gold)">— 试用者 P07 · 22 岁 · 学生</div></div>
+    <div class="glass hoverable p-6 relative quote reveal" style="transition-delay:.08s"><p class="text-[13.5px] leading-relaxed" style="color:var(--ink-sub)">「『梦境天气』太戳我了，每天醒来第一件事是看今天的潜意识是什么天气。」</p><div class="text-[11px] mt-4" style="color:var(--gold)">— 试用者 P12 · 26 岁 · 设计师</div></div>
+    <div class="glass hoverable p-6 relative quote reveal" style="transition-delay:.16s"><p class="text-[13.5px] leading-relaxed" style="color:var(--ink-sub)">「匿名社区让我敢分享那些奇怪的梦。发现 128 个人也梦过坠落，突然就不焦虑了。」</p><div class="text-[11px] mt-4" style="color:var(--gold)">— 试用者 P03 · 24 岁 · 程序员</div></div>
+  </div>
+</section>
+
+<!-- ============ 08 复盘与思考 ============ -->
+<section id="retro" class="pt-24 pb-24">
+  <div class="reveal sec-num">08 — RETROSPECT</div>
+  <h2 class="reveal font-display font-bold text-3xl md:text-4xl mt-3">复盘与思考</h2>
+  <div class="grid md:grid-cols-3 gap-5 mt-10">
+    <div class="glass hoverable p-7 reveal">
+      <div class="text-2xl">🧗</div>
+      <h3 class="font-bold mt-4 text-[16px]">遇到的挑战</h3>
+      <p class="text-[13px] mt-3 leading-relaxed" style="color:var(--ink-sub)">
+        最大的难题是<b style="color:#fff">「梦幻感」与「可用性」的冲突</b>：第一版大量使用模糊、发光、半透明后，文字可读性与按钮可发现性显著下降。
+        最终通过「内容层实、氛围层虚」的分层原则解决——文字与控件永远保持高对比，发光与模糊只服务于背景和装饰层。</p>
+    </div>
+    <div class="glass hoverable p-7 reveal" style="transition-delay:.08s">
+      <div class="text-2xl">⚖️</div>
+      <h3 class="font-bold mt-4 text-[16px]">取舍背后的原因</h3>
+      <p class="text-[13px] mt-3 leading-relaxed" style="color:var(--ink-sub)">
+        砍掉了「梦币商城」与「好友系统」：前者会把内省工具引向功利化，后者破坏匿名安全感。
+        保留了看似「无用」的 AI 写诗——测试证明它是分享欲最强的钩子，<b style="color:#fff">情绪价值本身就是功能</b>。</p>
+    </div>
+    <div class="glass hoverable p-7 reveal" style="transition-delay:.16s">
+      <div class="text-2xl">🔁</div>
+      <h3 class="font-bold mt-4 text-[16px]">如果重来</h3>
+      <p class="text-[13px] mt-3 leading-relaxed" style="color:var(--ink-sub)">
+        ① 把「清醒梦训练」提前做成一级入口，它的长期留存价值在测试中被低估了；
+        ② 微交互数量做减法，优先保证 3 个核心爽点的极致打磨；
+        ③ 更早引入真实语音转写做技术验证，而不是后期才评估识别率对体验的影响。</p>
+    </div>
+  </div>
+
+  <!-- 结尾 CTA -->
+  <div class="glass mt-16 p-10 md:p-14 text-center reveal relative overflow-hidden">
+    <div class="absolute inset-0 pointer-events-none" style="background:radial-gradient(60% 100% at 50% 0%, rgba(139,92,246,.18), transparent)"></div>
+    <div class="font-poem text-lg md:text-xl" style="color:rgba(236,72,153,.9)">「每晚都是一场私人电影，」</div>
+    <div class="font-display font-bold text-2xl md:text-3xl mt-3">而我们值得拥有一个<span class="grad-text">存梦的地方</span></div>
+    <div class="flex flex-wrap justify-center gap-3 mt-8">
+      <a href="#proto" class="px-7 py-3.5 rounded-full text-sm font-medium text-white no-underline hoverable" style="background:linear-gradient(90deg,#8B5CF6,#EC4899)">再体验一次原型</a>
+      <a href="./prototype.html" target="_blank" class="px-7 py-3.5 rounded-full text-sm no-underline glass hoverable" style="color:var(--ink)">新标签页全屏打开 ↗</a>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="border-t py-10 text-center text-[12px]" style="border-color:rgba(255,255,255,.07); color:var(--ink-sub)">
+  梦屿 Dream Bank · 独立概念设计 · 用研 / 交互 / 视觉 / 原型 · 2026
+</footer>
+
+<script>
+/* ============ 作品集页交互脚本 ============ */
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+
+/* 背景星空 */
+const cv=$('#stars'), cx=cv.getContext('2d');
+function size(){ cv.width=innerWidth*devicePixelRatio; cv.height=innerHeight*devicePixelRatio;
+  cv.style.width=innerWidth+'px'; cv.style.height=innerHeight+'px'; cx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0); }
+size(); addEventListener('resize', size);
+const stars=Array.from({length:90},()=>({x:Math.random()*innerWidth,y:Math.random()*innerHeight,r:Math.random()*1.4+.4,tw:Math.random()*7}));
+(function loop(t){
+  cx.clearRect(0,0,innerWidth,innerHeight);
+  for(const s of stars){
+    const a=.15+Math.abs(Math.sin(t/1600+s.tw))*.5;
+    cx.beginPath(); cx.arc(s.x,s.y,s.r,0,7); cx.fillStyle=`rgba(226,232,240,${a})`; cx.fill();
+  }
+  requestAnimationFrame(loop);
+})(0);
+
+/* 滚动揭示动画 */
+const io=new IntersectionObserver(es=>es.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target);} }),{threshold:.12});
+$$('.reveal').forEach(el=>io.observe(el));
+
+/* 数字滚动（进入视口时触发一次） */
+const io2=new IntersectionObserver(es=>es.forEach(e=>{
+  if(!e.isIntersecting) return; io2.unobserve(e.target);
+  const el=e.target, to=+el.dataset.to, t0=performance.now();
+  (function tick(t){ const p=Math.min(1,(t-t0)/1200), ease=1-Math.pow(1-p,3);
+    el.textContent=Math.round(to*ease); if(p<1) requestAnimationFrame(tick); })(t0);
+}),{threshold:.4});
+$$('.metric').forEach(el=>io2.observe(el));
+
+/* 顶部阅读进度条 + 导航自动隐藏 */
+let lastY=0;
+addEventListener('scroll', ()=>{
+  const h=document.documentElement;
+  $('#progress').style.width = (h.scrollTop/(h.scrollHeight-h.clientHeight)*100)+'%';
+  const y=scrollY;
+  $('#nav').classList.toggle('hide-nav', y>lastY && y>300);
+  lastY=y;
+}, {passive:true});
+</script>
+</body>
+</html>

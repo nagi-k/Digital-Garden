@@ -10,9 +10,11 @@ interface PhonePrototypeProps {
   title: string
   desc: string
   fullHref: string
+  frameWidth?: number
+  frameHeight?: number
 }
 
-const PhonePrototype = ({ src, title, desc, fullHref }: PhonePrototypeProps) => {
+const PhonePrototype = ({ src, title, desc, fullHref, frameWidth = 393, frameHeight = 852 }: PhonePrototypeProps) => {
   const wrapRef = useRef<HTMLDivElement>(null)
   const [scale, setScale] = useState(1)
 
@@ -20,23 +22,27 @@ const PhonePrototype = ({ src, title, desc, fullHref }: PhonePrototypeProps) => 
     const update = () => {
       if (wrapRef.current) {
         const availableWidth = Math.max(0, wrapRef.current.clientWidth - 32)
-        setScale(availableWidth / 393)
+        setScale(availableWidth / frameWidth)
       }
     }
     update()
     const ro = new ResizeObserver(update)
     if (wrapRef.current) ro.observe(wrapRef.current)
     return () => ro.disconnect()
-  }, [])
+  }, [frameWidth])
 
   return (
     <div className="card p-0 group overflow-hidden">
-      <div ref={wrapRef} className="relative w-full overflow-hidden bg-[#F1EFEA] aspect-[393/852] flex items-center justify-center p-4">
+      <div
+        ref={wrapRef}
+        className="relative w-full overflow-hidden bg-transparent flex items-center justify-center p-4"
+        style={{ aspectRatio: frameWidth / frameHeight }}
+      >
         <iframe
           src={src}
           className="border-0"
-          width={393}
-          height={852}
+          width={frameWidth}
+          height={frameHeight}
           style={{ transform: `scale(${scale})`, transformOrigin: 'center' }}
           title={title}
         />
@@ -204,53 +210,23 @@ const Portfolio = () => {
                     fullHref="prototypes/mood-garden/index.html"
                   />
 
-                  {/* 占位：第二个 APP 原型 */}
-                  <div className="card p-0 group overflow-hidden">
-                    <div className="aspect-[393/852] bg-bg-secondary border-b border-border flex items-center justify-center">
-                      <div className="text-center text-text-muted">
-                        <Smartphone size={40} className="mx-auto mb-3 opacity-50" />
-                        <p className="text-xs">可交互原型占位符</p>
-                        <p className="text-xs mt-1">等待导入交互式 APP 原型</p>
-                      </div>
-                    </div>
-                    <div className="p-5">
-                      <h4 className="font-display-zh text-lg mb-1">APP 原型名称</h4>
-                      <p className="text-sm text-text-secondary mb-3">
-                        高保真交互原型，支持页面跳转与操作反馈
-                      </p>
-                      <div className="flex items-center gap-2 text-xs text-text-muted">
-                        <span>查看原型</span>
-                        <ArrowRight
-                          size={12}
-                          className="opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all"
-                        />
-                      </div>
-                    </div>
-                  </div>
+                  <PhonePrototype
+                    src="prototypes/wandermap/index.html"
+                    title="WanderMap 城市慢游"
+                    desc="城市探索与慢游路线规划 App · 可交互高保真原型"
+                    fullHref="prototypes/wandermap/index.html"
+                    frameWidth={417}
+                    frameHeight={876}
+                  />
 
-                  {/* 占位：第三个 APP 原型 */}
-                  <div className="card p-0 group overflow-hidden">
-                    <div className="aspect-[393/852] bg-bg-secondary border-b border-border flex items-center justify-center">
-                      <div className="text-center text-text-muted">
-                        <Smartphone size={40} className="mx-auto mb-3 opacity-50" />
-                        <p className="text-xs">可交互原型占位符</p>
-                        <p className="text-xs mt-1">等待导入交互式 APP 原型</p>
-                      </div>
-                    </div>
-                    <div className="p-5">
-                      <h4 className="font-display-zh text-lg mb-1">APP 原型名称</h4>
-                      <p className="text-sm text-text-secondary mb-3">
-                        高保真交互原型，支持页面跳转与操作反馈
-                      </p>
-                      <div className="flex items-center gap-2 text-xs text-text-muted">
-                        <span>查看原型</span>
-                        <ArrowRight
-                          size={12}
-                          className="opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all"
-                        />
-                      </div>
-                    </div>
-                  </div>
+                  <PhonePrototype
+                    src="prototypes/case-3/prototype.html"
+                    title="梦屿 Dream Bank"
+                    desc="梦境记录与 AI 解梦陪伴 App · 可交互高保真原型"
+                    fullHref="prototypes/case-3/prototype.html"
+                    frameWidth={430}
+                    frameHeight={932}
+                  />
 
                   {/* 第二行：单列横版网页原型占位符 */}
                   <div className="card p-0 group overflow-hidden md:col-span-3">
