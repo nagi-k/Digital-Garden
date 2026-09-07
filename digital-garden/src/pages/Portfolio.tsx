@@ -201,7 +201,7 @@ const Portfolio = () => {
                   <Smartphone size={20} className="text-accent-terracotta" />
                   <h3 className="font-display-zh text-h3">UI 原型</h3>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
                   {/* 第一行：竖版手机 APP 原型 */}
                   <PhonePrototype
                     src="prototypes/mood-garden/index.html?embed=1"
@@ -227,9 +227,10 @@ const Portfolio = () => {
                     frameWidth={430}
                     frameHeight={932}
                   />
+                </div>
 
-                  {/* 第二行：单列横版网页原型占位符 */}
-                  <div className="card p-0 group overflow-hidden md:col-span-3">
+                {/* 第二行：单列横版网页原型占位符 */}
+                <div className="card p-0 group overflow-hidden mt-8">
                     <div className="aspect-[16/9] bg-bg-secondary border-b border-border flex items-center justify-center">
                       <div className="text-center text-text-muted">
                         <Monitor size={40} className="mx-auto mb-3 opacity-50" />
@@ -251,7 +252,6 @@ const Portfolio = () => {
                       </div>
                     </div>
                   </div>
-                </div>
               </div>
             </FadeIn>
           </div>
