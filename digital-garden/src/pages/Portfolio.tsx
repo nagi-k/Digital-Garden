@@ -18,7 +18,10 @@ const PhonePrototype = ({ src, title, desc, fullHref }: PhonePrototypeProps) => 
 
   useEffect(() => {
     const update = () => {
-      if (wrapRef.current) setScale(wrapRef.current.clientWidth / 393)
+      if (wrapRef.current) {
+        const availableWidth = Math.max(0, wrapRef.current.clientWidth - 32)
+        setScale(availableWidth / 393)
+      }
     }
     update()
     const ro = new ResizeObserver(update)
@@ -28,13 +31,13 @@ const PhonePrototype = ({ src, title, desc, fullHref }: PhonePrototypeProps) => 
 
   return (
     <div className="card p-0 group overflow-hidden">
-      <div ref={wrapRef} className="relative w-full overflow-hidden bg-[#F1EFEA] aspect-[393/852]">
+      <div ref={wrapRef} className="relative w-full overflow-hidden bg-[#F1EFEA] aspect-[393/852] flex items-center justify-center p-4">
         <iframe
           src={src}
-          className="absolute top-0 left-0 border-0"
+          className="border-0"
           width={393}
           height={852}
-          style={{ transform: `scale(${scale})`, transformOrigin: 'top left' }}
+          style={{ transform: `scale(${scale})`, transformOrigin: 'center' }}
           title={title}
         />
       </div>
@@ -192,7 +195,7 @@ const Portfolio = () => {
                   <Smartphone size={20} className="text-accent-terracotta" />
                   <h3 className="font-display-zh text-h3">UI 原型</h3>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   {/* 第一行：竖版手机 APP 原型 */}
                   <PhonePrototype
                     src="prototypes/mood-garden/index.html?embed=1"
@@ -225,8 +228,32 @@ const Portfolio = () => {
                     </div>
                   </div>
 
+                  {/* 占位：第三个 APP 原型 */}
+                  <div className="card p-0 group overflow-hidden">
+                    <div className="aspect-[393/852] bg-bg-secondary border-b border-border flex items-center justify-center">
+                      <div className="text-center text-text-muted">
+                        <Smartphone size={40} className="mx-auto mb-3 opacity-50" />
+                        <p className="text-xs">可交互原型占位符</p>
+                        <p className="text-xs mt-1">等待导入交互式 APP 原型</p>
+                      </div>
+                    </div>
+                    <div className="p-5">
+                      <h4 className="font-display-zh text-lg mb-1">APP 原型名称</h4>
+                      <p className="text-sm text-text-secondary mb-3">
+                        高保真交互原型，支持页面跳转与操作反馈
+                      </p>
+                      <div className="flex items-center gap-2 text-xs text-text-muted">
+                        <span>查看原型</span>
+                        <ArrowRight
+                          size={12}
+                          className="opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
                   {/* 第二行：单列横版网页原型占位符 */}
-                  <div className="card p-0 group overflow-hidden md:col-span-2">
+                  <div className="card p-0 group overflow-hidden md:col-span-3">
                     <div className="aspect-[16/9] bg-bg-secondary border-b border-border flex items-center justify-center">
                       <div className="text-center text-text-muted">
                         <Monitor size={40} className="mx-auto mb-3 opacity-50" />
