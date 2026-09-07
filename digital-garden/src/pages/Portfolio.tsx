@@ -107,7 +107,7 @@ const Portfolio = () => {
 
               <FadeIn delay={0.2}>
                 <a
-                  href="/王颖-工业设计作品集.pdf"
+                  href="王颖-工业设计作品集.pdf"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="card p-8 lg:p-12 group relative overflow-hidden h-full min-h-[280px] flex flex-col justify-between"
