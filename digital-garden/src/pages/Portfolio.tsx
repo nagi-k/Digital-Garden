@@ -160,6 +160,7 @@ const Portfolio = () => {
                         glbUrl="models/2.glb"
                         aspect="video"
                         className="rounded-xl"
+                        cameraDistance={0.55}
                       />
                     </div>
                     <h4 className="font-display-zh text-lg mb-1">模型一</h4>

@@ -9,6 +9,7 @@ interface GlbViewerProps {
   glbUrl: string
   className?: string
   aspect?: 'video' | 'square' | 'auto'
+  cameraDistance?: number
   onLoad?: () => void
   onError?: (err: Error) => void
 }
@@ -17,6 +18,7 @@ export default function GlbViewer({
   glbUrl,
   className = '',
   aspect = 'video',
+  cameraDistance = 0.85,
   onLoad,
   onError,
 }: GlbViewerProps) {
@@ -155,7 +157,7 @@ export default function GlbViewer({
         ground.position.y = scaledBox.min.y + bottomLift - 0.05
 
         const modelCenterY = (scaledBox.max.y + scaledBox.min.y) / 2 + bottomLift
-        const dist = maxDim * scale * 0.85
+        const dist = maxDim * scale * cameraDistance
         camera.position.set(dist * 0.8, dist * 0.6, dist)
         controls.target.set(0, modelCenterY, 0)
         controls.update()
