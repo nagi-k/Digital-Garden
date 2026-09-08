@@ -179,17 +179,30 @@ const Portfolio = () => {
                     <p className="text-sm text-text-secondary">产品造型与 CMF 细节</p>
                   </div>
 
-                  {/* 占位卡位：等待更多 .glb 文件 */}
+                  {/* 真实模型预览 */}
                   <div className="card p-6 group">
-                    <div className="aspect-[16/9] md:aspect-[21/9] bg-bg-secondary border border-border border-dashed mb-4 flex flex-col items-center justify-center gap-3">
-                      <Upload size={32} className="text-text-muted opacity-50" />
-                      <div className="text-center text-text-muted">
-                        <p className="text-xs">3D 查看器已就绪</p>
-                        <p className="text-xs mt-1">请上传 .glb 模型文件以替换此占位</p>
-                      </div>
+                    <div className="rounded-xl overflow-hidden mb-4">
+                      <GlbViewer
+                        glbUrl="models/model-3.glb"
+                        aspect="video"
+                        className="rounded-xl"
+                      />
                     </div>
                     <h4 className="font-display-zh text-lg mb-1">模型三</h4>
                     <p className="text-sm text-text-secondary">结构与人机工程验证</p>
+                  </div>
+
+                  {/* 真实模型预览 */}
+                  <div className="card p-6 group">
+                    <div className="rounded-xl overflow-hidden mb-4">
+                      <GlbViewer
+                        glbUrl="models/model-4.glb"
+                        aspect="video"
+                        className="rounded-xl"
+                      />
+                    </div>
+                    <h4 className="font-display-zh text-lg mb-1">模型四</h4>
+                    <p className="text-sm text-text-secondary">CMF 与细节推敲</p>
                   </div>
                 </div>
               </div>
