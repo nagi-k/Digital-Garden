@@ -1,4 +1,4 @@
-import { ArrowRight, ArrowUpRight, Monitor, Box, Smartphone } from 'lucide-react';
+import { ArrowUpRight, Monitor, Box, Smartphone } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import PageTransition from '@/components/layout/PageTransition';
 import SectionTitle from '@/components/ui/SectionTitle';
@@ -220,29 +220,35 @@ const Portfolio = () => {
                   />
                 </div>
 
-                {/* 第二行：单列横版网页原型占位符 */}
+                {/* 第二行：择校星网页原型 */}
                 <div className="card p-0 group overflow-hidden mt-8">
-                    <div className="aspect-[16/9] bg-bg-secondary border-b border-border flex items-center justify-center">
-                      <div className="text-center text-text-muted">
-                        <Monitor size={40} className="mx-auto mb-3 opacity-50" />
-                        <p className="text-xs">网页原型占位符</p>
-                        <p className="text-xs mt-1">等待导入可交互网页原型</p>
-                      </div>
-                    </div>
-                    <div className="p-5">
-                      <h4 className="font-display-zh text-lg mb-1">网页原型名称</h4>
-                      <p className="text-sm text-text-secondary mb-3">
-                        响应式网页交互原型，适配桌面与移动端
-                      </p>
-                      <div className="flex items-center gap-2 text-xs text-text-muted">
-                        <span>查看原型</span>
-                        <ArrowRight
-                          size={12}
-                          className="opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all"
-                        />
-                      </div>
-                    </div>
+                  <div className="aspect-[16/9] bg-bg-secondary border-b border-border overflow-hidden">
+                    <iframe
+                      src="prototypes/web-prototype/index.html"
+                      className="w-full h-full border-0"
+                      title="择校星 ChoiceStar"
+                      loading="lazy"
+                    />
                   </div>
+                  <div className="p-5">
+                    <h4 className="font-display-zh text-lg mb-1">择校星 ChoiceStar</h4>
+                    <p className="text-sm text-text-secondary mb-3">
+                      输入分数，看见未来 · 响应式网页交互原型
+                    </p>
+                    <a
+                      href="prototypes/web-prototype/index.html"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 text-xs text-text-muted hover:text-accent-terracotta transition-colors"
+                    >
+                      <span>全屏查看原型</span>
+                      <ArrowUpRight
+                        size={12}
+                        className="opacity-0 group-hover:opacity-100 group-hover:translate-x-1 group-hover:-translate-y-1 transition-all"
+                      />
+                    </a>
+                  </div>
+                </div>
               </div>
             </FadeIn>
           </div>
