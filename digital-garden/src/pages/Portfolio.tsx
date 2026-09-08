@@ -1,4 +1,4 @@
-import { ArrowRight, ArrowUpRight, Monitor, Box, Smartphone, Upload } from 'lucide-react';
+import { ArrowRight, ArrowUpRight, Monitor, Box, Smartphone } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import PageTransition from '@/components/layout/PageTransition';
 import SectionTitle from '@/components/ui/SectionTitle';
@@ -179,31 +179,7 @@ const Portfolio = () => {
                     <p className="text-sm text-text-secondary">产品造型与 CMF 细节</p>
                   </div>
 
-                  {/* 真实模型预览 */}
-                  <div className="card p-6 group">
-                    <div className="rounded-xl overflow-hidden mb-4">
-                      <GlbViewer
-                        glbUrl="models/model-3.glb"
-                        aspect="video"
-                        className="rounded-xl"
-                      />
-                    </div>
-                    <h4 className="font-display-zh text-lg mb-1">模型三</h4>
-                    <p className="text-sm text-text-secondary">结构与人机工程验证</p>
-                  </div>
 
-                  {/* 真实模型预览 */}
-                  <div className="card p-6 group">
-                    <div className="rounded-xl overflow-hidden mb-4">
-                      <GlbViewer
-                        glbUrl="models/model-4.glb"
-                        aspect="video"
-                        className="rounded-xl"
-                      />
-                    </div>
-                    <h4 className="font-display-zh text-lg mb-1">模型四</h4>
-                    <p className="text-sm text-text-secondary">CMF 与细节推敲</p>
-                  </div>
                 </div>
               </div>
             </FadeIn>
