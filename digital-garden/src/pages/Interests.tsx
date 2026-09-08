@@ -78,7 +78,7 @@ const Interests = () => {
                           </span>
                         </div>
 
-                        <div className="img-container aspect-[2/3] mb-4  overflow-hidden">
+                        <div className="img-container aspect-square mb-4  overflow-hidden">
                           <img
                             src={item.cover}
                             alt={item.title}
