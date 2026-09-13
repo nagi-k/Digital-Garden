@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Web3D 智能滚筒洗衣机</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="style.css">
+<script type="importmap">
+{ "imports": { "three": "./lib/three.module.js" } }
+</script>
+</head>
+<body>
+<div id="app">
+  <canvas id="scene"></canvas>
+
+  <!-- 加载遮罩 -->
+  <div id="loading">
+    <div class="load-box">
+      <div class="load-ring"></div>
+      <div id="load-text">正在加载洗衣机模型…</div>
+    </div>
+  </div>
+
+  <!-- 顶部标题 -->
+  <header id="topbar">
+    <div class="brand">
+      <span class="logo"></span>
+      <div>
+        <h1>Web3D 智能滚筒洗衣机</h1>
+        <p>Blender 建模 · Three.js 实时渲染</p>
+      </div>
+    </div>
+    <div id="state-chip" class="chip standby">待机</div>
+  </header>
+
+  <!-- 阶段指示器 -->
+  <nav id="stage-bar">
+    <div class="stage" data-stage="IDLE">待机</div>
+    <div class="stage" data-stage="FILL">注水</div>
+    <div class="stage" data-stage="WASH">洗涤</div>
+    <div class="stage" data-stage="DRAIN">排水</div>
+    <div class="stage" data-stage="RINSE">漂洗</div>
+    <div class="stage" data-stage="SPIN">脱水</div>
+    <div class="stage" data-stage="DONE">完成</div>
+  </nav>
+
+  <!-- 智能控制面板 -->
+  <aside id="panel">
+    <div class="panel-title">智能控制面板</div>
+
+    <!-- 显示屏 -->
+    <div id="screen">
+      <div class="screen-row">
+        <span id="scr-state">待机</span>
+        <span id="scr-time">--:--</span>
+      </div>
+      <div class="screen-row small">
+        <span id="scr-prog">程序:棉麻洗</span>
+        <span id="scr-temp">40°C</span>
+        <span id="scr-rpm">1000 转</span>
+      </div>
+      <div class="progress"><div id="scr-progress"></div></div>
+    </div>
+
+    <!-- 程序选择 -->
+    <div class="group-label">洗涤程序</div>
+    <div class="btn-row" id="prog-row">
+      <button class="opt active" data-prog="cotton">棉麻洗</button>
+      <button class="opt" data-prog="quick">快洗</button>
+      <button class="opt" data-prog="wool">羊毛洗</button>
+    </div>
+
+    <!-- 温度 -->
+    <div class="group-label">水温</div>
+    <div class="btn-row" id="temp-row">
+      <button class="opt" data-temp="20">20°C</button>
+      <button class="opt active" data-temp="40">40°C</button>
+      <button class="opt" data-temp="60">60°C</button>
+      <button class="opt" data-temp="90">90°C</button>
+    </div>
+
+    <!-- 转速 -->
+    <div class="group-label">脱水转速</div>
+    <div class="btn-row" id="rpm-row">
+      <button class="opt" data-rpm="400">400</button>
+      <button class="opt" data-rpm="800">800</button>
+      <button class="opt active" data-rpm="1000">1000</button>
+      <button class="opt" data-rpm="1200">1200</button>
+    </div>
+
+    <!-- 主操作 -->
+    <div class="btn-row main-actions">
+      <button id="btn-start" class="action primary" disabled>启动</button>
+      <button id="btn-door" class="action">开门</button>
+    </div>
+    <div class="btn-row">
+      <button id="btn-clothes" class="action small">放入衣物</button>
+      <button id="btn-drawer" class="action small">洗涤剂盒</button>
+    </div>
+    <div class="btn-row">
+      <button id="btn-demo" class="action small">自动演示</button>
+      <button id="btn-xray" class="action small">透明剖视</button>
+    </div>
+  </aside>
+
+  <!-- 提示 -->
+  <footer id="hint">拖拽旋转视角 · 滚轮缩放 · 可点击舱门 / 旋钮 / 按键直接操作</footer>
+  <div id="toast"></div>
+</div>
+<script type="module" src="main.js"></script>
+</body>
+</html>

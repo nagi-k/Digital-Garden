@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>组件嵌入示例 — Web3D 滚筒洗衣机</title>
+<style>
+  /* 模拟你原有网页的样式 */
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: #f5f7fa;
+    color: #1f2937;
+  }
+  .page {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 60px 24px;
+  }
+  h1 { font-size: 32px; margin-bottom: 12px; }
+  p.lead { color: #4b5563; margin-bottom: 40px; }
+  .section {
+    background: #fff;
+    border-radius: 20px;
+    padding: 32px;
+    margin-bottom: 32px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+  }
+  .section h2 { font-size: 20px; margin-bottom: 16px; color: #111827; }
+  .section p { color: #4b5563; font-size: 14px; margin-bottom: 16px; }
+  pre {
+    background: #0f172a;
+    color: #e2e8f0;
+    padding: 18px;
+    border-radius: 12px;
+    overflow-x: auto;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+  code { font-family: "SFMono-Regular", Consolas, monospace; }
+</style>
+<link rel="stylesheet" href="embed.css">
+</head>
+<body>
+<div class="page">
+  <h1>我的作品集</h1>
+  <p class="lead">下面是 Web3D 智能滚筒洗衣机项目，作为我原有网页中的一个区域嵌入展示。</p>
+
+  <div class="section">
+    <h2>项目：Web3D 智能滚筒洗衣机</h2>
+    <p>基于 Blender 程序化建模与 Three.js 实时渲染，完整呈现智能家电的洗护流程。你可以直接在此区域开关舱门、选择程序、启动洗涤。</p>
+
+    <!-- 方案 A：自动初始化 -->
+    <div
+      data-wm-embed="demo/"
+      data-wm-ratio="16/9"
+      data-wm-min-height="720"
+      data-wm-max-height="1200"
+      data-wm-border-radius="20px"
+    ></div>
+  </div>
+
+  <div class="section">
+    <h2>嵌入代码</h2>
+    <p>在父页面引入 CSS 和 JS，然后放置一个带 <code>data-wm-embed</code> 属性的容器即可。</p>
+<pre><code>&lt;!-- 引入组件样式和脚本 --&gt;
+&lt;link rel="stylesheet" href="embed/embed.css"&gt;
+&lt;script src="embed/embed.js"&gt;&lt;/script&gt;
+
+&lt;!-- 自动初始化：容器会根据父页面宽度自适应 16/9 比例，高度在 720px~1200px 之间 --&gt;
+&lt;div
+  data-wm-embed="embed/demo/"
+  data-wm-ratio="16/9"
+  data-wm-min-height="720"
+  data-wm-max-height="1200"
+  data-wm-border-radius="20px"
+&gt;&lt;/div&gt;</code></pre>
+  </div>
+
+  <div class="section">
+    <h2>其他内容区域</h2>
+    <p>这里可以继续放你原有网页的其他内容，嵌入区域不会影响页面其他部分。</p>
+  </div>
+</div>
+
+<script src="embed.js"></script>
+</body>
+</html>
