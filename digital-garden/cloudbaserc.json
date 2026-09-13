@@ -7,8 +7,8 @@
     "public": "./dist",
     "rewrites": [
       {
-        "source": "/garden/**",
-        "destination": "/garden/index.html"
+        "source": "/**",
+        "destination": "/index.html"
       }
     ]
   }
