@@ -8,11 +8,7 @@ export const siteData = {
     '我是一名热爱细节与叙事的 UI/UX 设计师。我相信好的设计不仅是视觉的愉悦，更是人与产品之间温柔的对话。在这里，我记录作品、学习思考和生活灵感。',
   keywords: ['细致观察者', '叙事型设计师', '持续学习者'],
   email: 'hello@wangying.online',
-  social: [
-    { name: 'Behance', url: 'https://behance.net' },
-    { name: 'Dribbble', url: 'https://dribbble.com' },
-    { name: 'GitHub', url: 'https://github.com' },
-  ],
+  social: [] as { name: string; url: string }[],
   icp: '鲁ICP备2026053100号-1',
 };
 
