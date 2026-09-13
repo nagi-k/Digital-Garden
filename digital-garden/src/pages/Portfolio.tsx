@@ -1,72 +1,8 @@
-import { ArrowUpRight, Monitor, Box, Smartphone } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { ArrowUpRight, Monitor, Box } from 'lucide-react';
 import PageTransition from '@/components/layout/PageTransition';
 import SectionTitle from '@/components/ui/SectionTitle';
 import FadeIn from '@/components/effects/FadeIn';
 import GlbViewer from '@/components/3d/GlbViewer';
-
-interface PhonePrototypeProps {
-  src: string
-  title: string
-  desc: string
-  fullHref: string
-  frameWidth?: number
-  frameHeight?: number
-  previewScale?: number
-}
-
-const PhonePrototype = ({ src, title, desc, fullHref, frameWidth = 393, frameHeight = 852, previewScale = 0.82 }: PhonePrototypeProps) => {
-  const wrapRef = useRef<HTMLDivElement>(null)
-  const [scale, setScale] = useState(1)
-
-  useEffect(() => {
-    const update = () => {
-      if (wrapRef.current) {
-        const availableWidth = Math.max(0, wrapRef.current.clientWidth)
-        setScale((availableWidth / frameWidth) * previewScale)
-      }
-    }
-    update()
-    const ro = new ResizeObserver(update)
-    if (wrapRef.current) ro.observe(wrapRef.current)
-    return () => ro.disconnect()
-  }, [frameWidth, previewScale])
-
-  return (
-    <div className="card p-0 group overflow-hidden">
-      <div
-        ref={wrapRef}
-        className="relative w-full overflow-hidden bg-transparent flex items-center justify-center"
-        style={{ aspectRatio: frameWidth / frameHeight }}
-      >
-        <iframe
-          src={src}
-          className="border-0"
-          width={frameWidth}
-          height={frameHeight}
-          style={{ transform: `scale(${scale})`, transformOrigin: 'center' }}
-          title={title}
-        />
-      </div>
-      <div className="p-5">
-        <h4 className="font-display-zh text-lg mb-1">{title}</h4>
-        <p className="text-sm text-text-secondary mb-3">{desc}</p>
-        <a
-          href={fullHref}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 text-xs text-text-muted hover:text-accent-terracotta transition-colors"
-        >
-          <span>全屏查看原型</span>
-          <ArrowUpRight
-            size={12}
-            className="opacity-0 group-hover:opacity-100 group-hover:translate-x-1 group-hover:-translate-y-1 transition-all"
-          />
-        </a>
-      </div>
-    </div>
-  )
-}
 
 const Portfolio = () => {
   return (
@@ -185,72 +121,7 @@ const Portfolio = () => {
               </div>
             </FadeIn>
 
-            {/* UI 原型展示区域 */}
-            <FadeIn delay={0.2}>
-              <div>
-                <div className="flex items-center gap-3 mb-8">
-                  <Smartphone size={20} className="text-accent-terracotta" />
-                  <h3 className="font-display-zh text-h3">UI 原型</h3>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-                  {/* 第一行：竖版手机 APP 原型 */}
-                  <PhonePrototype
-                    src="prototypes/mood-garden/index.html?embed=1"
-                    title="Mood Garden 情绪花园"
-                    desc="iOS 情绪记录与心理健康陪伴 App · 高保真交互原型"
-                    fullHref="prototypes/mood-garden/index.html"
-                  />
 
-                  <PhonePrototype
-                    src="prototypes/wandermap/index.html"
-                    title="WanderMap 城市慢游"
-                    desc="城市探索与慢游路线规划 App · 可交互高保真原型"
-                    fullHref="prototypes/wandermap/index.html"
-                    frameWidth={417}
-                    frameHeight={876}
-                  />
-
-                  <PhonePrototype
-                    src="prototypes/case-3/prototype.html"
-                    title="梦屿 Dream Bank"
-                    desc="梦境记录与 AI 解梦陪伴 App · 可交互高保真原型"
-                    fullHref="prototypes/case-3/prototype.html"
-                    frameWidth={430}
-                    frameHeight={932}
-                  />
-                </div>
-
-                {/* 第二行：择校星网页原型 */}
-                <div className="card p-0 group overflow-hidden mt-8">
-                  <div className="aspect-[16/9] bg-bg-secondary border-b border-border overflow-hidden">
-                    <iframe
-                      src="prototypes/web-prototype/index.html"
-                      className="w-full h-full border-0"
-                      title="择校星 ChoiceStar"
-                      loading="lazy"
-                    />
-                  </div>
-                  <div className="p-5">
-                    <h4 className="font-display-zh text-lg mb-1">择校星 ChoiceStar</h4>
-                    <p className="text-sm text-text-secondary mb-3">
-                      输入分数，看见未来 · 响应式网页交互原型
-                    </p>
-                    <a
-                      href="prototypes/web-prototype/index.html"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 text-xs text-text-muted hover:text-accent-terracotta transition-colors"
-                    >
-                      <span>全屏查看原型</span>
-                      <ArrowUpRight
-                        size={12}
-                        className="opacity-0 group-hover:opacity-100 group-hover:translate-x-1 group-hover:-translate-y-1 transition-all"
-                      />
-                    </a>
-                  </div>
-                </div>
-              </div>
-            </FadeIn>
           </div>
         </section>
       </div>
