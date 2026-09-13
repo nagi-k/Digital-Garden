@@ -13,7 +13,7 @@ export const siteData = {
     { name: 'Dribbble', url: 'https://dribbble.com' },
     { name: 'GitHub', url: 'https://github.com' },
   ],
-  icp: 'ICP备案号待备案',
+  icp: '鲁ICP备2026053100号-1',
 };
 
 export const navLinks = [
