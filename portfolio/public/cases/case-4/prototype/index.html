@@ -1,0 +1,1783 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>择校星 ChoiceStar · 输入分数，看见未来</title>
+<script src="../js/tailwindcss-cdn.js"></script>
+<script>
+/* Tailwind 主题扩展：与设计契约 tokens 对齐 */
+tailwind.config = {
+  theme: { extend: {
+    colors: {
+      primary: '#2563EB', deep: '#1E3A8A', accent: '#F97316',
+      ok: '#10B981', warn: '#F59E0B', danger: '#EF4444',
+      bgc: '#F8FAFC', ink: '#0F172A', sub: '#64748B', line: '#E2E8F0'
+    },
+    fontFamily: { sans: ['"PingFang SC"','"Microsoft YaHei"','"Noto Sans SC"','system-ui','sans-serif'] },
+    maxWidth: { shell: '1280px' }
+  }}
+}
+</script>
+<style>
+/* ============ 设计契约：基础 & 动效关键帧 ============ */
+:root{
+  --primary:#2563EB; --deep:#1E3A8A; --accent:#F97316; --ok:#10B981;
+  --warn:#F59E0B; --danger:#EF4444; --bgc:#F8FAFC; --ink:#0F172A; --sub:#64748B; --line:#E2E8F0;
+  --sh-sm:0 1px 2px rgba(15,23,42,.06); --sh-md:0 8px 24px rgba(15,23,42,.10); --sh-lg:0 16px 48px rgba(37,99,235,.18);
+}
+*{-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{background:var(--bgc);color:var(--ink);font-family:"PingFang SC","Microsoft YaHei","Noto Sans SC",system-ui,sans-serif;overflow-x:hidden}
+::selection{background:rgba(37,99,235,.18)}
+::-webkit-scrollbar{width:8px;height:8px}::-webkit-scrollbar-thumb{background:#CBD5E1;border-radius:8px}::-webkit-scrollbar-track{background:transparent}
+
+/* 页面切换：淡入 + 轻微上滑 300ms ease-out */
+.page-enter{animation:fadeUp .3s ease-out both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes popIn{0%{opacity:0;transform:scale(.85)}100%{opacity:1;transform:scale(1)}}
+@keyframes toastIn{from{opacity:0;transform:translateY(-16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes breathe{0%,100%{transform:scale(1);box-shadow:0 0 0 0 rgba(37,99,235,.45)}50%{transform:scale(1.05);box-shadow:0 0 0 14px rgba(37,99,235,0)}}
+@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+@keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+@keyframes heartPop{0%{transform:scale(0)}60%{transform:scale(1.4)}100%{transform:scale(1)}}
+@keyframes starOn{0%{opacity:.2;transform:scale(.6)}60%{opacity:1;transform:scale(1.25)}100%{transform:scale(1)}}
+@keyframes spinStar{to{transform:rotate(360deg)}}
+@keyframes dotBlink{0%,80%,100%{opacity:.25}40%{opacity:1}}
+@keyframes rippleAnim{to{transform:scale(2.6);opacity:0}}
+@keyframes drawStroke{to{stroke-dashoffset:0}}
+@keyframes glowPulse{0%,100%{opacity:.55}50%{opacity:1}}
+
+/* 导航 */
+#topnav{transition:background .3s,box-shadow .3s,backdrop-filter .3s}
+#topnav.scrolled{background:rgba(255,255,255,.78);backdrop-filter:blur(14px);box-shadow:var(--sh-sm)}
+.nav-item{position:relative;padding:6px 2px;color:var(--sub);font-size:14px;font-weight:500;white-space:nowrap;cursor:pointer;transition:color .2s}
+.nav-item:hover{color:var(--primary)}
+.nav-item::after{content:'';position:absolute;left:0;bottom:-2px;height:2.5px;width:0;border-radius:2px;background:linear-gradient(90deg,var(--primary),#60A5FA);transition:width .25s ease-out}
+.nav-item:hover::after{width:100%}
+.nav-item.nav-active{color:var(--primary);font-weight:700}
+.nav-item.nav-active::after{width:100%}
+
+/* 按钮：点击 scale(0.97) + 涟漪 */
+.btn{position:relative;overflow:hidden;transition:transform .12s ease,box-shadow .2s,background .2s;cursor:pointer;user-select:none}
+.btn:active{transform:scale(.97)}
+.btn-primary{background:linear-gradient(135deg,var(--primary),#3B82F6);color:#fff;box-shadow:0 6px 18px rgba(37,99,235,.32)}
+.btn-primary:hover{box-shadow:0 10px 26px rgba(37,99,235,.42)}
+.btn-ghost{border:1px solid var(--line);background:#fff;color:var(--ink)}
+.btn-ghost:hover{border-color:var(--primary);color:var(--primary)}
+.ripple{position:absolute;border-radius:50%;background:rgba(255,255,255,.55);transform:scale(0);animation:rippleAnim .55s ease-out forwards;pointer-events:none}
+.ripple.dark{background:rgba(37,99,235,.16)}
+
+/* 卡片悬浮 */
+.card{background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:var(--sh-sm);transition:transform .25s ease,box-shadow .25s ease,border-color .25s}
+.card-hover:hover{transform:translateY(-4px);box-shadow:var(--sh-md);border-color:#C7D7FE}
+
+/* 标签多选：背景变化 + 轻微弹跳 */
+.tag-sel{display:inline-flex;align-items:center;gap:4px;padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:#fff;color:var(--sub);font-size:13px;cursor:pointer;transition:all .18s cubic-bezier(.34,1.56,.64,1)}
+.tag-sel:hover{border-color:var(--primary);color:var(--primary)}
+.tag-sel.on{background:var(--primary);border-color:var(--primary);color:#fff;transform:scale(1.05)}
+.chip{display:inline-block;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:600}
+
+/* 概率环 / 进度条流光 */
+.prog{height:8px;border-radius:99px;background:#EEF2F7;overflow:hidden;position:relative}
+.prog>i{display:block;height:100%;border-radius:99px;position:relative;transition:width 1s cubic-bezier(.22,1,.36,1)}
+.prog>i::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.55),transparent);background-size:200% 100%;animation:shimmer 1.8s linear infinite}
+.donut-arc{stroke-dasharray:var(--dash);stroke-dashoffset:var(--dash);animation:drawStroke 1.1s .15s cubic-bezier(.22,1,.36,1) forwards}
+
+/* 折线图描边绘制 */
+.line-draw{stroke-dasharray:1200;stroke-dashoffset:1200;animation:drawStroke 1.6s .2s ease-out forwards}
+.bar-grow{transform-origin:bottom;transform:scaleY(0);animation:barUp .8s cubic-bezier(.22,1,.36,1) forwards}
+@keyframes barUp{to{transform:scaleY(1)}}
+
+/* 数字滚动条 / Hero 网格背景 */
+.hero-grid{background-image:linear-gradient(rgba(37,99,235,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(37,99,235,.07) 1px,transparent 1px);background-size:44px 44px;mask-image:radial-gradient(ellipse 90% 70% at 50% 30%,#000 40%,transparent 100%)}
+.glass{background:rgba(255,255,255,.72);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.65)}
+
+/* 时间轴 */
+.tl-node{transition:all .4s}
+.tl-node.lit .tl-dot{box-shadow:0 0 0 6px rgba(37,99,235,.15);animation:glowPulse 2s infinite}
+
+/* Tab 指示器滑动 */
+.tabs{position:relative}
+.tab-ind{position:absolute;bottom:0;height:3px;border-radius:3px;background:var(--primary);transition:left .3s ease,width .3s ease}
+
+/* 星级 */
+.star{display:inline-block;color:#E2E8F0;transition:color .2s}
+.star.on{color:var(--warn);animation:starOn .45s both}
+
+/* 收藏爱心 */
+.fav-btn{transition:transform .15s}
+.fav-btn.faved{color:var(--danger)!important;animation:heartPop .45s}
+
+/* AI 助手 */
+#aiFab{animation:breathe 2.6s ease-in-out infinite}
+#aiPanel{transform-origin:bottom right;transition:transform .28s cubic-bezier(.34,1.4,.64,1),opacity .22s}
+#aiPanel.hide{transform:scale(.6) translateY(30px);opacity:0;pointer-events:none}
+.typing i{width:6px;height:6px;border-radius:50%;background:#94A3B8;display:inline-block;margin:0 1.5px;animation:dotBlink 1.2s infinite}
+.typing i:nth-child(2){animation-delay:.18s}.typing i:nth-child(3){animation-delay:.36s}
+
+/* 模态框 */
+#modalMask{transition:opacity .25s}
+#modalBox{transition:transform .28s cubic-bezier(.34,1.3,.64,1),opacity .24s}
+/* 隐藏时整层禁用指针事件：透明容器不能挡住页面点击 */
+#modal.modal-hide{pointer-events:none}
+.modal-hide #modalMask{opacity:0;pointer-events:none}
+.modal-hide #modalBox{transform:scale(.9) translateY(26px);opacity:0}
+
+/* Loading 星形 */
+.load-star{width:44px;height:44px;color:var(--primary);animation:spinStar 1.1s linear infinite}
+
+/* 拖拽 */
+.dragging{opacity:.45;box-shadow:var(--sh-lg)!important;transform:scale(1.01)}
+.drag-over{border-color:var(--primary)!important;border-style:dashed!important}
+
+/* 评价轮播 */
+#tCarousel{transition:transform .5s cubic-bezier(.22,1,.36,1)}
+
+/* 输入框 */
+.inp{width:100%;padding:10px 14px;border:1px solid var(--line);border-radius:10px;font-size:14px;background:#fff;transition:border-color .2s,box-shadow .2s;outline:none}
+.inp:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(37,99,235,.14)}
+.inp.err{border-color:var(--danger);box-shadow:0 0 0 3px rgba(239,68,68,.12)}
+
+/* 开关 */
+.sw{position:relative;width:42px;height:24px;border-radius:99px;background:#CBD5E1;transition:background .25s;cursor:pointer;flex:none}
+.sw::after{content:'';position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;box-shadow:var(--sh-sm);transition:transform .25s}
+.sw.on{background:var(--primary)}.sw.on::after{transform:translateX(18px)}
+
+/* 复选勾 */
+.ck{width:18px;height:18px;border-radius:5px;border:1.5px solid var(--line);display:inline-flex;align-items:center;justify-content:center;font-size:12px;color:#fff;transition:all .2s;flex:none;background:#fff}
+.ck.on{background:var(--primary);border-color:var(--primary)}
+
+@media (max-width:1023px){#navMenu{display:none}#navMenu.open{display:flex}}
+.reveal{opacity:0;transform:translateY(22px);transition:opacity .6s ease,transform .6s ease}
+.reveal.in{opacity:1;transform:none}
+</style>
+</head>
+<body>
+
+<!-- ================= 顶部导航（冻结 App Shell） ================= -->
+<header id="topnav" class="fixed top-0 left-0 right-0 z-40 bg-white/95 border-b border-line">
+  <div class="max-w-shell mx-auto px-4 lg:px-6 h-16 flex items-center gap-3">
+    <a class="flex items-center gap-2 cursor-pointer flex-none" data-go="home">
+      <span class="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-deep flex items-center justify-center text-white text-lg shadow-md">✦</span>
+      <span class="leading-none">
+        <span class="block font-extrabold text-[17px] tracking-wide">择校星</span>
+        <span class="block text-[9px] tracking-[.22em] text-sub font-semibold">CHOICESTAR</span>
+      </span>
+    </a>
+    <button id="navBurger" class="lg:hidden ml-1 text-xl px-2">☰</button>
+    <nav id="navMenu" class="lg:flex items-center gap-4 xl:gap-5 ml-2 flex-col lg:flex-row absolute lg:static top-16 left-0 right-0 bg-white lg:bg-transparent border-b lg:border-0 p-4 lg:p-0 shadow-lg lg:shadow-none z-40">
+      <span class="nav-item" data-nav="home" data-go="home">🏠 首页</span>
+      <span class="nav-item" data-nav="smart" data-go="smart">🎯 智能填报</span>
+      <span class="nav-item" data-nav="unis" data-go="unis">🏫 院校库</span>
+      <span class="nav-item" data-nav="majors" data-go="majors">📚 专业库</span>
+      <span class="nav-item" data-nav="assess" data-go="assess">🧠 测评中心</span>
+      <span class="nav-item" data-nav="mock" data-go="mock">📝 模拟填报</span>
+      <span class="nav-item" data-nav="compare" data-go="compare">🔍 对比工具</span>
+      <span class="nav-item" data-nav="career" data-go="career">🚀 生涯规划</span>
+      <span class="nav-item" data-nav="community" data-go="community">💬 社区</span>
+      <span class="nav-item" data-nav="profile" data-go="profile">👤 个人中心</span>
+    </nav>
+    <div class="flex-1"></div>
+    <!-- 搜索框 + 实时建议 -->
+    <div class="relative hidden md:block w-52 xl:w-64">
+      <input id="gSearch" class="inp !py-2 !pl-9 !text-[13px]" placeholder="搜索院校 / 专业 / 问题" autocomplete="off">
+      <span class="absolute left-3 top-2.5 text-sub text-sm">🔍</span>
+      <div id="gSearchDrop" class="absolute top-11 left-0 right-0 bg-white border border-line rounded-xl shadow-lg overflow-hidden hidden z-50"></div>
+    </div>
+    <select id="gProvince" class="hidden md:block inp !w-auto !py-2 !text-[13px] !px-3">
+      <option>北京</option><option>上海</option><option>浙江</option><option>江苏</option><option>广东</option><option>湖北</option><option>四川</option>
+    </select>
+    <!-- 通知中心 -->
+    <div class="relative">
+      <button id="bellBtn" class="btn w-9 h-9 rounded-full hover:bg-slate-100 flex items-center justify-center text-lg">🔔</button>
+      <span id="bellBadge" class="absolute -top-0.5 -right-0.5 min-w-[17px] h-[17px] px-1 rounded-full bg-danger text-white text-[10px] font-bold flex items-center justify-center">3</span>
+      <div id="bellDrop" class="absolute right-0 top-12 w-80 bg-white border border-line rounded-2xl shadow-xl hidden z-50 overflow-hidden">
+        <div class="px-4 py-3 border-b border-line flex justify-between items-center"><b class="text-sm">通知中心</b><span class="text-xs text-primary cursor-pointer" id="bellClear">全部已读</span></div>
+        <div id="bellList" class="max-h-72 overflow-auto"></div>
+      </div>
+    </div>
+    <button class="btn btn-primary rounded-lg px-4 py-2 text-[13px] font-semibold hidden sm:block" onclick="toast('登录功能演示：已为你登录体验账号','ok')">登录 / 注册</button>
+  </div>
+</header>
+
+<!-- 页面挂载点 -->
+<main id="page-root" class="pt-16 min-h-screen"></main>
+
+<!-- ================= AI 志愿助手（全局悬浮） ================= -->
+<button id="aiFab" class="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-gradient-to-br from-primary to-deep text-white text-2xl shadow-xl flex items-center justify-center btn">🤖</button>
+<div id="aiPanel" class="hide fixed bottom-24 right-6 z-50 w-[350px] max-w-[calc(100vw-2rem)] h-[480px] bg-white rounded-2xl shadow-2xl border border-line flex flex-col overflow-hidden">
+  <div class="px-4 py-3 bg-gradient-to-r from-primary to-deep text-white flex items-center gap-2">
+    <span class="text-lg">🤖</span>
+    <div class="flex-1"><b class="text-sm block">AI 志愿分析师</b><span class="text-[11px] opacity-80">基于 10 年录取大数据 · 在线</span></div>
+    <button id="aiClose" class="opacity-80 hover:opacity-100 text-lg">✕</button>
+  </div>
+  <div id="aiMsgs" class="flex-1 overflow-auto p-3 space-y-3 bg-bgc"></div>
+  <div class="p-2 border-t border-line">
+    <div id="aiQuick" class="flex gap-1.5 overflow-auto pb-2"></div>
+    <div class="flex gap-2">
+      <input id="aiInput" class="inp !py-2 !text-[13px]" placeholder="输入你的问题…">
+      <button id="aiSend" class="btn btn-primary rounded-lg px-4 text-sm flex-none">发送</button>
+    </div>
+  </div>
+</div>
+
+<!-- 回到顶部 -->
+<button id="backTop" class="fixed bottom-24 right-8 z-40 w-10 h-10 rounded-full bg-white border border-line shadow-md hidden items-center justify-center text-sub hover:text-primary btn">↑</button>
+
+<!-- Toast 容器 -->
+<div id="toastBox" class="fixed top-20 left-1/2 -translate-x-1/2 z-[60] space-y-2 w-[92%] max-w-md"></div>
+
+<!-- 通用模态框 -->
+<div id="modal" class="modal-hide fixed inset-0 z-[55] flex items-end sm:items-center justify-center p-0 sm:p-6">
+  <div id="modalMask" class="absolute inset-0 bg-ink/45 backdrop-blur-sm"></div>
+  <div id="modalBox" class="relative bg-white w-full sm:max-w-3xl max-h-[92vh] sm:max-h-[86vh] overflow-auto rounded-t-3xl sm:rounded-3xl shadow-2xl"></div>
+</div>
+
+<script>
+'use strict';
+/* =====================================================================
+ * 择校星 ChoiceStar · 单文件 SPA
+ * 结构：DATA(mock 数据层) → UTIL(工具) → CHART(SVG 图表引擎)
+ *       → PAGES(页面渲染) → ROUTER → 全局组件(AI/Toast/Modal)
+ * =====================================================================*/
+
+/* -------------------- DATA：集中式 mock 数据（修改数据只动这里） -------------------- */
+const UNIS = [
+  {id:1,name:'清华大学',en:'Tsinghua University',city:'北京',province:'北京',tags:['985','211','双一流'],type:'综合',nature:'公办',scores:[680,678,682],ranks:[80,85,75],hotMajors:['计算机科学与技术','建筑学','经济与金融'],baoyan:58,jobRate:98,salary:15200,color:'#7C3AED',site:'www.tsinghua.edu.cn',canteen:4.8,dorm:4.5,env:4.9},
+  {id:2,name:'北京大学',en:'Peking University',city:'北京',province:'北京',tags:['985','211','双一流'],type:'综合',nature:'公办',scores:[678,676,680],ranks:[95,100,90],hotMajors:['法学','数学与应用数学','光华管理'],baoyan:55,jobRate:97,salary:14800,color:'#DC2626',site:'www.pku.edu.cn',canteen:4.6,dorm:4.4,env:4.9},
+  {id:3,name:'浙江大学',en:'Zhejiang University',city:'杭州',province:'浙江',tags:['985','211','双一流'],type:'综合',nature:'公办',scores:[665,662,668],ranks:[420,450,400],hotMajors:['计算机科学与技术','软件工程','临床医学'],baoyan:35,jobRate:96,salary:13600,color:'#2563EB',site:'www.zju.edu.cn',canteen:4.7,dorm:4.6,env:4.8},
+  {id:4,name:'复旦大学',en:'Fudan University',city:'上海',province:'上海',tags:['985','211','双一流'],type:'综合',nature:'公办',scores:[670,668,672],ranks:[280,300,260],hotMajors:['经济学','新闻学','数学'],baoyan:38,jobRate:97,salary:14000,color:'#1E40AF',site:'www.fudan.edu.cn',canteen:4.5,dorm:4.3,env:4.7},
+  {id:5,name:'上海交通大学',en:'Shanghai Jiao Tong University',city:'上海',province:'上海',tags:['985','211','双一流'],type:'综合',nature:'公办',scores:[668,666,670],ranks:[330,350,310],hotMajors:['机械工程','电子信息','船舶与海洋工程'],baoyan:40,jobRate:98,salary:14200,color:'#B91C1C',site:'www.sjtu.edu.cn',canteen:4.6,dorm:4.5,env:4.7},
+  {id:6,name:'南京大学',en:'Nanjing University',city:'南京',province:'江苏',tags:['985','211','双一流'],type:'综合',nature:'公办',scores:[655,652,658],ranks:[900,950,850],hotMajors:['天文学','物理学','中国语言文学'],baoyan:42,jobRate:96,salary:12800,color:'#6D28D9',site:'www.nju.edu.cn',canteen:4.4,dorm:4.4,env:4.8},
+  {id:7,name:'武汉大学',en:'Wuhan University',city:'武汉',province:'湖北',tags:['985','211','双一流'],type:'综合',nature:'公办',scores:[640,638,642],ranks:[2100,2200,2000],hotMajors:['法学','测绘科学与技术','遥感科学与技术'],baoyan:30,jobRate:95,salary:11800,color:'#DB2777',site:'www.whu.edu.cn',canteen:4.5,dorm:4.2,env:4.9},
+  {id:8,name:'中山大学',en:'Sun Yat-sen University',city:'广州',province:'广东',tags:['985','211','双一流'],type:'综合',nature:'公办',scores:[645,642,648],ranks:[1700,1800,1600],hotMajors:['临床医学','工商管理','哲学'],baoyan:28,jobRate:95,salary:12000,color:'#059669',site:'www.sysu.edu.cn',canteen:4.7,dorm:4.5,env:4.6},
+  {id:9,name:'华中科技大学',en:'HUST',city:'武汉',province:'湖北',tags:['985','211','双一流'],type:'理工',nature:'公办',scores:[635,633,637],ranks:[2800,2900,2700],hotMajors:['机械工程','光学工程','公共卫生与预防医学'],baoyan:29,jobRate:96,salary:11500,color:'#EA580C',site:'www.hust.edu.cn',canteen:4.6,dorm:4.3,env:4.5},
+  {id:10,name:'四川大学',en:'Sichuan University',city:'成都',province:'四川',tags:['985','211','双一流'],type:'综合',nature:'公办',scores:[630,628,632],ranks:[3600,3700,3500],hotMajors:['口腔医学','中国语言文学','药学'],baoyan:25,jobRate:94,salary:10800,color:'#0D9488',site:'www.scu.edu.cn',canteen:4.8,dorm:4.4,env:4.6}
+];
+const MAJORS = [
+  {id:1,name:'计算机科学与技术',cat:'工学',code:'080901',years:'四年',salary:12000,jobRate:95,kaoyan:35,hot:5,genderM:72,unis:786,dir:['互联网','人工智能','金融科技'],salaryTrend:[8.2,9.1,10.0,11.0,12.0],diff:4.2},
+  {id:2,name:'软件工程',cat:'工学',code:'080902',years:'四年',salary:11500,jobRate:94,kaoyan:30,hot:5,genderM:76,unis:652,dir:['互联网','企业服务','游戏开发'],salaryTrend:[7.8,8.8,9.8,10.6,11.5],diff:3.8},
+  {id:3,name:'人工智能',cat:'工学',code:'080717T',years:'四年',salary:13000,jobRate:93,kaoyan:40,hot:5,genderM:70,unis:498,dir:['算法工程师','自动驾驶','大模型'],salaryTrend:[9.0,10.2,11.4,12.2,13.0],diff:4.6},
+  {id:4,name:'临床医学',cat:'医学',code:'100201K',years:'五年',salary:9500,jobRate:92,kaoyan:65,hot:4,genderM:42,unis:192,dir:['三甲医院','医药企业','科研机构'],salaryTrend:[6.5,7.2,8.0,8.8,9.5],diff:4.8},
+  {id:5,name:'金融学',cat:'经济学',code:'020301K',years:'四年',salary:9000,jobRate:90,kaoyan:45,hot:4,genderM:38,unis:402,dir:['银行','证券','基金'],salaryTrend:[6.8,7.4,8.0,8.5,9.0],diff:4.0},
+  {id:6,name:'法学',cat:'法学',code:'030101K',years:'四年',salary:7500,jobRate:85,kaoyan:50,hot:3,genderM:35,unis:618,dir:['律所','公检法','企业法务'],salaryTrend:[5.5,6.1,6.7,7.1,7.5],diff:3.6},
+  {id:7,name:'汉语言文学',cat:'文学',code:'050101',years:'四年',salary:6500,jobRate:88,kaoyan:40,hot:3,genderM:22,unis:545,dir:['教师','出版传媒','公务员'],salaryTrend:[4.8,5.3,5.8,6.2,6.5],diff:2.8},
+  {id:8,name:'数据科学与大数据技术',cat:'工学',code:'080910T',years:'四年',salary:11000,jobRate:94,kaoyan:32,hot:5,genderM:68,unis:620,dir:['数据分析','商业智能','算法工程'],salaryTrend:[7.6,8.6,9.6,10.4,11.0],diff:4.1},
+  {id:9,name:'电气工程及其自动化',cat:'工学',code:'080601',years:'四年',salary:9000,jobRate:93,kaoyan:28,hot:4,genderM:82,unis:587,dir:['国家电网','新能源','智能制造'],salaryTrend:[6.6,7.3,8.0,8.5,9.0],diff:3.9},
+  {id:10,name:'工商管理',cat:'管理学',code:'120201K',years:'四年',salary:8000,jobRate:87,kaoyan:35,hot:3,genderM:40,unis:592,dir:['咨询','快消','企业管理'],salaryTrend:[5.8,6.4,7.0,7.5,8.0],diff:3.2}
+];
+/* 智能填报示例结果（650 分 / 位次 5000 / 物理类） */
+const SMART_RESULT = {
+  rush:[{uid:4,prob:35},{uid:5,prob:40}],
+  stable:[{uid:3,prob:65},{uid:6,prob:70},{uid:7,prob:75}],
+  safe:[{uid:9,prob:85},{uid:10,prob:90}]
+};
+const NEWS = [
+  {tag:'政策',tc:'bg-primary/10 text-primary',title:'教育部：2026 年新增 24 个本科专业，人工智能相关占三分之一',time:'2 小时前',views:'12.6w'},
+  {tag:'院校',tc:'bg-accent/10 text-accent',title:'多所高校公布 2026 招生计划，浙江大学扩招 300 人',time:'5 小时前',views:'8.3w'},
+  {tag:'专业',tc:'bg-ok/10 text-ok',title:'近五年「绿牌专业」榜单发布：信息工程、电气工程持续领跑',time:'昨天',views:'6.1w'},
+  {tag:'就业',tc:'bg-warn/10 text-warn',title:'2026 届高校毕业生预计 1222 万，这些行业逆势扩招',time:'昨天',views:'9.8w'}
+];
+const TESTIMONIALS = [
+  {name:'林同学',role:'2025 届考生 · 考入浙江大学',score:5,text:'位次法比单纯看分数靠谱太多，按择校星给的冲稳保梯度填，一分都没浪费，第 3 志愿录取。',avatar:'🧑‍🎓',bg:'from-blue-500 to-indigo-500'},
+  {name:'王女士',role:'考生家长 · 北京',score:5,text:'把方案直接分享给家里人一起看，AI 解读报告把我们看不懂的术语全讲明白了，全家开会半小时就定了志愿表。',avatar:'👩',bg:'from-orange-400 to-pink-500'},
+  {name:'陈老师',role:'高三班主任 · 从教 12 年',score:4,text:'推荐给全班用，模拟填报的智能检查能揪出「梯度倒挂」这种低级错误，比我一个个盯高效多了。',avatar:'👨‍🏫',bg:'from-emerald-500 to-teal-500'}
+];
+const POSTS = [
+  {id:1,tag:'志愿填报经验',title:'650 分物理类，我的 45 个平行志愿完整复盘（附梯度表）',ex:'冲 4 稳 20 保 21 的分配思路，以及我为什么把「服从调剂」全部勾上……',author:'上岸的橙子',time:'3 小时前',like:892,comment:156,view:'2.4w',essence:true,official:false},
+  {id:2,tag:'院校就读体验',title:'在武汉大学读遥感是什么体验？樱花、实验室和 35℃ 的夏天',ex:'课程设置、保研去向、宿舍实拍，一篇讲清楚遥感科学与技术……',author:'珞珈山民',time:'6 小时前',like:645,comment:98,view:'1.8w',essence:true,official:false},
+  {id:3,tag:'专家答疑',title:'【官方】平行志愿投档规则详解：分数优先、遵循志愿、一轮投档',ex:'很多家长误解「平行志愿没有顺序」，这篇用动画案例讲透投档全流程……',author:'择校星研究院',time:'昨天',like:2100,comment:432,view:'8.9w',essence:false,official:true},
+  {id:4,tag:'专业真相',title:'劝退 or 真香？临床医学五年制在读生的诚实报告',ex:'课表密度、期末地狱、规培政策、真实薪资曲线，看完再决定要不要报……',author:'白衣见习生',time:'昨天',like:1500,comment:389,view:'5.6w',essence:true,official:false},
+  {id:5,tag:'家长交流',title:'孩子只想学计算机，我想让他学医，冷战第三天了怎么办？',ex:'评论区 300+ 位家长的方案：折中选了「医学信息工程」……',author:'焦虑的老父亲',time:'2 天前',like:734,comment:512,view:'3.2w',essence:false,official:false},
+  {id:6,tag:'高考政策',title:'2026 各省志愿填报时间汇总（持续更新）',ex:'北京 6 月 27 日开始，江苏 6 月 28 日……含各批次填报入口链接……',author:'择校星研究院',time:'2 天前',like:3200,comment:267,view:'12w',essence:false,official:true}
+];
+const LIVES = [
+  {host:'张明远',role:'前省招办主任 · 20 年招录经验',topic:'平行志愿投档规则与避坑',time:'6 月 26 日 19:30',booked:12800},
+  {host:'李思颖',role:'资深升学规划师',topic:'中分段考生如何「捡漏」好专业',time:'6 月 27 日 20:00',booked:8600},
+  {host:'王教授',role:'高校招生组负责人',topic:'强基计划与综评面试全解析',time:'6 月 28 日 19:00',booked:15200}
+];
+const QA = [
+  {q:'平行志愿冲稳保比例怎么分配最合理？',answers:46,hot:true,solved:true},
+  {q:'位次 5000 左右，江浙沪 985 有机会吗？',answers:32,hot:true,solved:false},
+  {q:'服从调剂被调到冷门专业，入校后能转专业吗？',answers:58,hot:false,solved:true},
+  {q:'中外合作办学值得读吗？毕业证一样吗？',answers:27,hot:false,solved:false},
+  {q:'女生学电气工程就业会被歧视吗？',answers:19,hot:false,solved:false},
+  {q:'复读生报志愿有限制吗？和应届生一样投档吗？',answers:12,hot:false,solved:true}
+];
+const TIMELINE = [
+  {label:'成绩公布',date:'6 月 23 日',state:'done'},
+  {label:'一分一段表',date:'6 月 24 日',state:'done'},
+  {label:'志愿填报',date:'6 月 27 日 - 7 月 1 日',state:'now',countdown:'倒计时 2 天'},
+  {label:'录取查询',date:'7 月 8 日起',state:'todo'}
+];
+/* 测评题库（每题 4 选项，对应 R/I/A/S/E/C 或维度分） */
+const ASSESSMENTS = [
+  {id:'holland',icon:'🧭',name:'霍兰德职业兴趣测试',desc:'6 大职业兴趣类型定位，匹配最适合你的专业方向',qs:8,mins:5,color:'from-blue-500 to-indigo-600'},
+  {id:'mbti',icon:'🧩',name:'MBTI 性格测试',desc:'16 型人格解析，了解你的学习与决策风格',qs:8,mins:6,color:'from-violet-500 to-purple-600'},
+  {id:'subject',icon:'📐',name:'学科能力评估',desc:'量化评估数理化生等学科优势，找到能力长板',qs:8,mins:4,color:'from-emerald-500 to-teal-600'},
+  {id:'values',icon:'⚖️',name:'职业价值观测评',desc:'明确你看重高薪、稳定、创造还是影响力',qs:8,mins:4,color:'from-orange-500 to-rose-500'}
+];
+const A_QUESTIONS = [
+  {q:'看到一台复杂的机器，你第一反应是？',opts:['拆开研究它的原理','画下它的外观','思考它能为谁服务','想办法把它卖得更好']},
+  {q:'周末你更愿意参加哪种活动？',opts:['机器人编程工作坊','户外写生与摄影展','社区志愿服务','商业案例分析赛']},
+  {q:'解数学压轴题时你的状态是？',opts:['越难越兴奋','能解但觉得枯燥','只为考试不得不做','更喜欢用文字表达观点']},
+  {q:'小组作业中你通常扮演？',opts:['技术攻坚手','创意策划','协调组织者','汇报演讲者']},
+  {q:'你对下列哪类新闻最敏感？',opts:['科技突破与论文','文化艺术与展览','社会民生与公益','经济趋势与公司']},
+  {q:'如果设计一款 App，你最想负责？',opts:['架构与代码','界面与交互','用户需求调研','商业模式与推广']},
+  {q:'你理想中的工作状态是？',opts:['钻研专业难题','自由表达创作','帮助具体的人','带领团队打胜仗']},
+  {q:'面对不确定的未来，你更看重？',opts:['过硬的技能','丰富的体验','稳定与保障','收入与地位']}
+];
+const CAREER_PATHS = [
+  {key:'job',icon:'💼',name:'就业路径',color:'text-primary',items:['目标企业：字节跳动 / 华为 / 国家电网','目标岗位：后端开发工程师','需要技能：数据结构 · 分布式系统 · 项目实习 ×2']},
+  {key:'kaoyan',icon:'🎓',name:'考研路径',color:'text-accent',items:['推荐院校：浙江大学 / 华中科技大学','备考时间线：大三上启动 · 12 月初试','初试科目：政治 英语一 数学一 408 专业课']},
+  {key:'baoyan',icon:'🏅',name:'保研路径',color:'text-ok',items:['绩点要求：专业前 15%（3.7/4.0+）','加分项：SCI/EI 论文 · 数模国奖 · ACM 奖牌','关键节点：大三下 5-8 月夏令营申请']},
+  {key:'abroad',icon:'🌍',name:'出国路径',color:'text-violet-600',items:['目标国家：美国 / 新加坡 / 英国','语言考试：托福 100+ / GRE 320+（大二下前出分）','申请时间线：大三暑假文书 · 大四上 11 月投递']},
+  {key:'gongwu',icon:'🏛️',name:'考公路径',color:'text-danger',items:['岗位匹配：计算机类可报岗位 3800+（2026 国考）','备考科目：行测 + 申论（部分岗加试专业）','时间线：大四上 10 月报名 · 11 月底笔试']}
+];
+const CITIES = [
+  {name:'北京',unis:92,salary:13500,cost:88,climate:72,jobs:95,settle:45},
+  {name:'上海',unis:64,salary:13200,cost:90,climate:76,jobs:93,settle:52},
+  {name:'杭州',unis:47,salary:11800,cost:72,climate:80,jobs:85,settle:70},
+  {name:'成都',unis:56,salary:9500,cost:55,climate:82,jobs:75,settle:85}
+];
+
+/* 全局状态 */
+const state = {
+  page:'home', province:'北京',
+  favUnis:new Set([3]), favMajors:new Set([1]),
+  volunteer:[],                       // 模拟填报志愿表
+  savedPlans:[{name:'650 分物理类方案 A',time:'2026-06-24 21:30',count:45,risk:'低风险'},{name:'保底方案 B（全稳）',time:'2026-06-25 09:12',count:45,risk:'极低风险'}],
+  reports:[{name:'霍兰德职业兴趣测试',time:'2026-06-20',type:'RIA 型'}],
+  assess:{idx:0,answers:[],current:null},
+  uniFilter:{kw:'',province:'',level:'',type:'',nature:'',sort:'综合排序',page:1},
+  majorCat:'全部', majorPage:1,
+  compare:{type:'院校对比',unis:[1,3,5],majors:[1,2,3],cities:[0,1,2]},
+  mockTab:'智能推荐', mockCheckShow:false,
+  commTab:'全部', qaSort:'最新',
+  profileTab:'我的档案',
+  msgs:[
+    {t:'系统通知',d:'你的志愿表已完成智能检查，发现 1 个警告',time:'10:24',unread:true},
+    {t:'政策更新',d:'北京 2026 志愿填报时间公布：6 月 27 日 8:00 开始',time:'09:10',unread:true},
+    {t:'专家回复',d:'张明远回复了你的提问「冲稳保比例怎么分配」',time:'昨天',unread:true}
+  ]
+};
+
+/* -------------------- UTIL：工具函数 -------------------- */
+const $ = (s,el=document)=>el.querySelector(s);
+const $$ = (s,el=document)=>[...el.querySelectorAll(s)];
+const uniById = id => UNIS.find(u=>u.id===id);
+const majorById = id => MAJORS.find(m=>m.id===id);
+const esc = s => String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+/* 星级渲染（含依次点亮动画） */
+function stars(n,size='text-sm'){let h='<span class="'+size+' tracking-tight">';for(let i=1;i<=5;i++)h+=`<span class="star ${i<=Math.round(n)?'on':''}" style="animation-delay:${i*90}ms">★</span>`;return h+'</span>';}
+/* 男女比例小条 */
+function genderBar(m){return `<div class="flex items-center gap-2"><div class="flex-1 h-2 rounded-full overflow-hidden bg-pink-200 flex"><i class="bg-sky-500 block h-full" style="width:${m}%"></i></div><span class="text-[11px] text-sub whitespace-nowrap">男 ${m}% / 女 ${100-m}%</span></div>`;}
+/* 概率色 */
+const probColor = p => p<50?'var(--accent)':p<80?'var(--primary)':'var(--ok)';
+const probHex = p => p<50?'#F97316':p<80?'#2563EB':'#10B981';
+
+/* Toast 提示（顶部滑入） */
+function toast(msg,type='ok'){
+  const colors={ok:'bg-ink text-white',err:'bg-danger text-white',warn:'bg-warn text-white',info:'bg-primary text-white'};
+  const icons={ok:'✅',err:'⛔',warn:'⚠️',info:'ℹ️'};
+  const t=document.createElement('div');
+  t.className=`${colors[type]} rounded-xl px-4 py-3 shadow-lg flex items-center gap-2 text-sm font-medium`;
+  t.style.animation='toastIn .3s ease-out both';
+  t.innerHTML=`<span>${icons[type]}</span><span>${esc(msg)}</span>`;
+  $('#toastBox').appendChild(t);
+  setTimeout(()=>{t.style.transition='all .35s';t.style.opacity=0;t.style.transform='translateY(-12px)';setTimeout(()=>t.remove(),360);},2600);
+}
+/* 模态框（缩放弹出 + 遮罩模糊） */
+function openModal(html){
+  const m=$('#modal');$('#modalBox').innerHTML=html;
+  m.classList.remove('modal-hide');document.body.style.overflow='hidden';
+}
+function closeModal(){$('#modal').classList.add('modal-hide');document.body.style.overflow='';}
+$('#modalMask').addEventListener('click',closeModal);
+
+/* 数字滚动动画（requestAnimationFrame） */
+function countUp(el,target,{dur=1400,suffix='',dec=0}={}){
+  const t0=performance.now();
+  function tick(t){
+    const p=Math.min(1,(t-t0)/dur), e=1-Math.pow(1-p,3);
+    el.textContent=(target*e).toFixed(dec).replace(/\B(?=(\d{3})+(?!\d))/g,',')+suffix;
+    if(p<1)requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+}
+/* 页面内触发所有 data-count 数字滚动 */
+function bindCounters(root=document){
+  $$('[data-count]',root).forEach(el=>{
+    if(el._counted)return;el._counted=true;
+    countUp(el,parseFloat(el.dataset.count),{suffix:el.dataset.suffix||'',dec:+(el.dataset.dec||0)});
+  });
+}
+/* 滚动 reveal 动画（IntersectionObserver） */
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}}),{threshold:.12});
+function bindReveals(root=document){$$('.reveal',root).forEach(el=>io.observe(el));}
+/* 按钮涟漪 */
+document.addEventListener('click',e=>{
+  const b=e.target.closest('.btn');if(!b)return;
+  const r=document.createElement('span'),rect=b.getBoundingClientRect(),s=Math.max(rect.width,rect.height);
+  r.className='ripple '+(b.classList.contains('btn-primary')?'':'dark');
+  r.style.cssText=`width:${s}px;height:${s}px;left:${e.clientX-rect.left-s/2}px;top:${e.clientY-rect.top-s/2}px`;
+  b.appendChild(r);setTimeout(()=>r.remove(),600);
+});
+
+/* -------------------- CHART：纯 SVG 图表引擎（无外部图表库） -------------------- */
+/* 环形概率进度（描边绘制动画） */
+function donut(pct,color,size=92,stroke=9){
+  const r=(size-stroke)/2,c=2*Math.PI*r,off=c*(1-pct/100);
+  return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" class="flex-none">
+    <circle cx="${size/2}" cy="${size/2}" r="${r}" stroke="#EEF2F7" stroke-width="${stroke}" fill="none"/>
+    <circle class="donut-arc" cx="${size/2}" cy="${size/2}" r="${r}" stroke="${color}" stroke-width="${stroke}" fill="none"
+      stroke-linecap="round" style="--dash:${c}" stroke-dashoffset="${c}" transform="rotate(-90 ${size/2} ${size/2})"/>
+    <text x="50%" y="47%" text-anchor="middle" dominant-baseline="middle" font-size="${size*.22}" font-weight="800" fill="${color}">${pct}%</text>
+    <text x="50%" y="68%" text-anchor="middle" font-size="${size*.11}" fill="#94A3B8">录取概率</text>
+  </svg>`;
+}
+/* 折线趋势图（描边绘制 + 面积渐变） */
+function lineChart(values,labels,{w=560,h=200,color='#2563EB',unit='分'}={}){
+  const min=Math.min(...values)-3,max=Math.max(...values)+3,px=40,py=22;
+  const X=i=>px+(w-px*1.4)*i/(values.length-1||1), Y=v=>h-py-(h-py*1.8)*(v-min)/(max-min||1);
+  const pts=values.map((v,i)=>[X(i),Y(v)]);
+  const d=pts.map((p,i)=>(i?'L':'M')+p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' ');
+  const gid='lg'+Math.random().toString(36).slice(2,7);
+  return `<svg viewBox="0 0 ${w} ${h}" class="w-full">
+    <defs><linearGradient id="${gid}" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="${color}" stop-opacity=".22"/><stop offset="1" stop-color="${color}" stop-opacity="0"/>
+    </linearGradient></defs>
+    ${[0,.33,.66,1].map(f=>`<line x1="${px}" x2="${w-8}" y1="${py+(h-py*1.8)*f}" y2="${py+(h-py*1.8)*f}" stroke="#EEF2F7"/>`).join('')}
+    <path d="${d} L ${X(values.length-1)} ${h-py} L ${X(0)} ${h-py} Z" fill="url(#${gid})"/>
+    <path class="line-draw" d="${d}" fill="none" stroke="${color}" stroke-width="2.5" stroke-linecap="round"/>
+    ${pts.map((p,i)=>`<circle cx="${p[0]}" cy="${p[1]}" r="4" fill="#fff" stroke="${color}" stroke-width="2.5"/>
+      <text x="${p[0]}" y="${p[1]-10}" text-anchor="middle" font-size="12" font-weight="700" fill="${color}">${values[i]}${unit}</text>
+      <text x="${p[0]}" y="${h-4}" text-anchor="middle" font-size="11" fill="#94A3B8">${labels[i]}</text>`).join('')}
+  </svg>`;
+}
+/* 雷达图 */
+function radar(values,labels,{size=280,color='#2563EB',max=100}={}){
+  const cx=size/2,cy=size/2,R=size/2-42,n=labels.length;
+  const pt=(i,f)=>{const a=-Math.PI/2+2*Math.PI*i/n;return [cx+R*f*Math.cos(a),cy+R*f*Math.sin(a)];};
+  const ring=f=>labels.map((_,i)=>pt(i,f).map(v=>v.toFixed(1)).join(' ')).join(' ');
+  const dataPts=values.map((v,i)=>pt(i,Math.min(1,v/max)));
+  return `<svg viewBox="0 0 ${size} ${size}" class="w-full max-w-[320px] mx-auto">
+    ${[.25,.5,.75,1].map(f=>`<polygon points="${ring(f)}" fill="none" stroke="#E8EEF6"/>`).join('')}
+    ${labels.map((_,i)=>{const p=pt(i,1);return `<line x1="${cx}" y1="${cy}" x2="${p[0]}" y2="${p[1]}" stroke="#E8EEF6"/>`;}).join('')}
+    <polygon points="${dataPts.map(p=>p.map(v=>v.toFixed(1)).join(' ')).join(' ')}" fill="${color}22" stroke="${color}" stroke-width="2.5" class="radar-poly" style="transform-origin:center;animation:popIn .8s ease-out both"/>
+    ${dataPts.map(p=>`<circle cx="${p[0]}" cy="${p[1]}" r="3.5" fill="${color}"/>`).join('')}
+    ${labels.map((l,i)=>{const p=pt(i,1.24);return `<text x="${p[0]}" y="${p[1]}" text-anchor="middle" dominant-baseline="middle" font-size="12" fill="#475569" font-weight="600">${l}</text>`;}).join('')}
+  </svg>`;
+}
+/* 横向柱状对比 */
+function hbar(items,{unit='',color='#2563EB',max}={}){
+  const m=max||Math.max(...items.map(i=>i.v));
+  return `<div class="space-y-3">${items.map((it,i)=>`
+    <div><div class="flex justify-between text-[13px] mb-1"><span class="font-medium">${esc(it.k)}</span><b style="color:${it.color||color}">${it.v}${unit}</b></div>
+    <div class="prog"><i style="width:0%;background:${it.color||color}" data-w="${(it.v/m*100).toFixed(1)};transition-delay:${i*120}ms"></i></div></div>`).join('')}</div>`;
+}
+/* 页面渲染后触发进度条填充（data-w 支持 "宽度;附加样式" 格式） */
+function bindBars(root=document){requestAnimationFrame(()=>requestAnimationFrame(()=>$$('.prog>i',root).forEach(i=>{
+  const w=i.dataset.w;if(!w)return;
+  const seg=w.split(';');i.style.width=parseFloat(seg[0])+'%';
+  if(seg.length>1)i.style.cssText+=';'+seg.slice(1).join(';');
+})));}
+/* 通用页头 */
+function pageHead(title,sub){return `<div class="mb-6"><h1 class="text-2xl font-extrabold">${title}</h1><p class="text-sub text-sm mt-1">${sub}</p></div>`;}
+/* 院校 logo（首字+色） */
+function uniLogo(u,size='w-12 h-12 text-lg'){return `<span class="${size} rounded-xl flex items-center justify-center text-white font-extrabold flex-none shadow-sm" style="background:linear-gradient(135deg,${u.color},${u.color}CC)">${u.name[0]}</span>`;}
+
+/* -------------------- PAGES：页面渲染函数 -------------------- */
+/* ========== 1. 首页 ========== */
+function renderHome(){
+  const feats=[
+    {icon:'🎯',t:'智能填报',d:'AI 生成冲稳保方案',go:'smart',c:'from-blue-500 to-indigo-600'},
+    {icon:'🏫',t:'院校库',d:'3000+ 院校全维度数据',go:'unis',c:'from-violet-500 to-purple-600'},
+    {icon:'📚',t:'专业库',d:'1500+ 专业深度解析',go:'majors',c:'from-emerald-500 to-teal-600'},
+    {icon:'🧠',t:'职业测评',d:'霍兰德 / MBTI 科学定位',go:'assess',c:'from-orange-500 to-rose-500'},
+    {icon:'📝',t:'模拟填报',d:'真实志愿表演练',go:'mock',c:'from-cyan-500 to-blue-600'},
+    {icon:'🎥',t:'专家直播',d:'招办主任在线答疑',go:'community',c:'from-pink-500 to-rose-600'}
+  ];
+  return `
+  <!-- Hero -->
+  <section class="relative overflow-hidden bg-gradient-to-b from-[#EEF4FF] via-bgc to-bgc">
+    <div class="absolute inset-0 hero-grid"></div>
+    <canvas id="heroCanvas" class="absolute inset-0 w-full h-full opacity-60"></canvas>
+    <div class="absolute -top-24 -right-24 w-96 h-96 rounded-full bg-primary/15 blur-3xl"></div>
+    <div class="absolute top-40 -left-24 w-80 h-80 rounded-full bg-accent/10 blur-3xl"></div>
+    <div class="relative max-w-shell mx-auto px-4 lg:px-6 pt-16 pb-14 text-center">
+      <div class="inline-flex items-center gap-2 bg-white/80 backdrop-blur border border-primary/20 rounded-full px-4 py-1.5 text-[13px] text-primary font-semibold mb-6 page-enter">
+        <span class="w-2 h-2 rounded-full bg-ok animate-pulse"></span>2026 高考季 · 已服务 1,280,000+ 考生
+      </div>
+      <h1 class="text-4xl md:text-6xl font-extrabold tracking-tight leading-tight page-enter" style="animation-delay:.08s">
+        输入分数，<span class="bg-gradient-to-r from-primary via-blue-500 to-accent bg-clip-text text-transparent">看见未来</span>
+      </h1>
+      <p class="mt-4 text-sub text-base md:text-lg page-enter" style="animation-delay:.16s">基于 10 年录取数据 + AI 智能推荐，为你生成科学志愿方案<br class="hidden md:block"><span class="text-sm">为 1000 万考生设计人生导航</span></p>
+      <!-- 快速填报卡片 -->
+      <div class="glass max-w-4xl mx-auto mt-9 rounded-2xl p-5 md:p-6 shadow-xl page-enter" style="animation-delay:.24s">
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
+          <div class="text-left"><label class="text-xs text-sub font-medium">高考分数</label><input id="qScore" class="inp mt-1" placeholder="650" type="number"></div>
+          <div class="text-left"><label class="text-xs text-sub font-medium">全省位次</label><input id="qRank" class="inp mt-1" placeholder="5000" type="number"></div>
+          <div class="text-left"><label class="text-xs text-sub font-medium">省份</label><select id="qProv" class="inp mt-1"><option>北京</option><option>上海</option><option>浙江</option><option>江苏</option><option>广东</option><option>湖北</option><option>四川</option></select></div>
+          <div class="text-left"><label class="text-xs text-sub font-medium">科类</label><select id="qType" class="inp mt-1"><option>物理类</option><option>历史类</option><option>综合改革</option></select></div>
+          <div class="text-left"><label class="text-xs text-sub font-medium">意向方向</label><select id="qDir" class="inp mt-1"><option>理工 / 经管</option><option>医学</option><option>人文社科</option><option>不限</option></select></div>
+        </div>
+        <button class="btn btn-primary w-full mt-4 rounded-xl py-3.5 font-bold text-[15px]" onclick="quickFill()">✨ 立即生成志愿方案</button>
+      </div>
+      <!-- 核心数据条 -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto mt-10 page-enter" style="animation-delay:.32s">
+        ${[['3000','+','覆盖院校'],['1500','+','本科专业'],['10',' 年','录取大数据'],['98','%','预测模型准确率']].map(s=>`
+        <div class="bg-white/70 backdrop-blur border border-white rounded-2xl p-4">
+          <div class="text-2xl md:text-3xl font-extrabold text-deep"><span data-count="${s[0]}">0</span><span class="text-primary">${s[1]}</span></div>
+          <div class="text-xs text-sub mt-1">${s[2]}</div>
+        </div>`).join('')}
+      </div>
+    </div>
+  </section>
+
+  <!-- 核心功能入口 -->
+  <section class="max-w-shell mx-auto px-4 lg:px-6 py-14">
+    <div class="text-center mb-9 reveal"><h2 class="text-2xl md:text-3xl font-extrabold">一站式志愿填报全流程</h2><p class="text-sub text-sm mt-2">从测评选专业，到模拟填报定方案，择校星陪你走完每一步</p></div>
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+      ${feats.map((f,i)=>`<div class="card card-hover p-5 cursor-pointer text-center reveal" style="transition-delay:${i*40}ms" data-go="${f.go}">
+        <div class="w-12 h-12 mx-auto rounded-xl bg-gradient-to-br ${f.c} text-white text-2xl flex items-center justify-center shadow-md">${f.icon}</div>
+        <b class="block mt-3 text-[15px]">${f.t}</b><p class="text-xs text-sub mt-1">${f.d}</p></div>`).join('')}
+    </div>
+  </section>
+
+  <!-- 志愿填报时间轴 -->
+  <section class="bg-white border-y border-line py-14">
+    <div class="max-w-shell mx-auto px-4 lg:px-6">
+      <div class="flex items-end justify-between mb-9 reveal"><div><h2 class="text-2xl md:text-3xl font-extrabold">${state.province}志愿填报时间轴</h2><p class="text-sub text-sm mt-2">关键节点不错过，系统会提前提醒你</p></div><span class="chip bg-danger/10 text-danger">⏰ 填报倒计时 2 天</span></div>
+      <div class="relative">
+        <div class="absolute top-5 left-[10%] right-[10%] h-1 bg-line rounded-full"><div class="h-full w-1/2 bg-gradient-to-r from-ok to-primary rounded-full"></div></div>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6 relative">
+          ${TIMELINE.map((n,i)=>`
+          <div class="tl-node ${n.state!=='todo'?'lit':''} text-center reveal" style="transition-delay:${i*100}ms">
+            <div class="tl-dot w-10 h-10 mx-auto rounded-full flex items-center justify-center text-white font-bold shadow-md ${n.state==='done'?'bg-ok':n.state==='now'?'bg-primary':'bg-slate-300'}">${n.state==='done'?'✓':i+1}</div>
+            <b class="block mt-3 text-sm">${n.label}</b>
+            <span class="text-xs text-sub">${n.date}</span>
+            ${n.countdown?`<span class="block mt-1 chip bg-primary/10 text-primary">${n.countdown}</span>`:''}
+            ${n.state==='done'?`<span class="block mt-1 chip bg-ok/10 text-ok">已完成</span>`:''}
+          </div>`).join('')}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 热门资讯 -->
+  <section class="max-w-shell mx-auto px-4 lg:px-6 py-14">
+    <div class="flex items-end justify-between mb-8 reveal"><h2 class="text-2xl md:text-3xl font-extrabold">热门资讯</h2><span class="text-sm text-primary cursor-pointer font-medium" data-go="community">查看全部 →</span></div>
+    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+      ${NEWS.map((n,i)=>`<div class="card card-hover p-5 cursor-pointer reveal" style="transition-delay:${i*60}ms" onclick="toast('资讯详情页演示','info')">
+        <span class="chip ${n.tc}">${n.tag}</span>
+        <b class="block mt-3 text-[15px] leading-snug">${n.title}</b>
+        <div class="flex justify-between text-xs text-sub mt-4"><span>${n.time}</span><span>👁 ${n.views}</span></div></div>`).join('')}
+    </div>
+  </section>
+
+  <!-- 用户评价轮播 -->
+  <section class="bg-gradient-to-b from-white to-bgc border-t border-line py-14 overflow-hidden">
+    <div class="max-w-shell mx-auto px-4 lg:px-6">
+      <h2 class="text-2xl md:text-3xl font-extrabold text-center mb-9 reveal">128 万考生的共同选择</h2>
+      <div class="relative max-w-3xl mx-auto">
+        <div class="overflow-hidden rounded-2xl"><div id="tCarousel" class="flex">
+          ${TESTIMONIALS.map(t=>`<div class="w-full flex-none px-1">
+            <div class="card p-7 text-center">
+              <div class="w-14 h-14 mx-auto rounded-full bg-gradient-to-br ${t.bg} flex items-center justify-center text-3xl shadow-md">${t.avatar}</div>
+              <div class="mt-2">${stars(t.score,'text-base')}</div>
+              <p class="mt-3 text-[15px] leading-relaxed text-slate-700">“${t.text}”</p>
+              <b class="block mt-4 text-sm">${t.name}</b><span class="text-xs text-sub">${t.role}</span>
+            </div></div>`).join('')}
+        </div></div>
+        <div class="flex justify-center gap-2 mt-5" id="tDots"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-ink text-slate-300 mt-4">
+    <div class="max-w-shell mx-auto px-4 lg:px-6 py-12 grid md:grid-cols-4 gap-8 text-sm">
+      <div>
+        <div class="flex items-center gap-2 mb-4"><span class="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-blue-400 flex items-center justify-center text-white">✦</span><b class="text-white text-lg">择校星 <span class="text-xs tracking-widest text-slate-400">CHOICESTAR</span></b></div>
+        <p class="text-slate-400 text-xs leading-relaxed">输入分数，看见未来。<br>为 1000 万考生设计人生导航。</p>
+      </div>
+      <div><b class="text-white block mb-3">产品</b><p class="space-y-2 text-slate-400"><span class="block hover:text-white cursor-pointer" data-go="smart">智能填报</span><span class="block hover:text-white cursor-pointer" data-go="unis">院校库</span><span class="block hover:text-white cursor-pointer" data-go="majors">专业库</span><span class="block hover:text-white cursor-pointer" data-go="assess">职业测评</span></p></div>
+      <div><b class="text-white block mb-3">支持</b><p class="space-y-2 text-slate-400"><span class="block hover:text-white cursor-pointer" onclick="toast('关于我们 · 演示','info')">关于我们</span><span class="block hover:text-white cursor-pointer" onclick="toast('联系方式：hi@choicestar.cn','info')">联系方式</span><span class="block hover:text-white cursor-pointer" onclick="toast('隐私政策 · 演示','info')">隐私政策</span><span class="block hover:text-white cursor-pointer" onclick="toast('使用条款 · 演示','info')">使用条款</span></p></div>
+      <div><b class="text-white block mb-3">合作伙伴</b><p class="space-y-2 text-slate-400"><span class="block">省级教育考试院（数据合作）</span><span class="block">300+ 高校招生办</span><span class="block">头部中学升学指导中心</span></p></div>
+    </div>
+    <div class="border-t border-white/10 py-4 text-center text-xs text-slate-500">© 2026 择校星 ChoiceStar · 本站为交互原型演示，数据为示例 mock</div>
+  </footer>`;
+}
+/* 首页 Hero 粒子连线背景（requestAnimationFrame 优化） */
+function initHeroCanvas(){
+  const cv=$('#heroCanvas');if(!cv)return;
+  const ctx=cv.getContext('2d');let W,H,pts=[];
+  function resize(){W=cv.width=cv.offsetWidth;H=cv.height=cv.offsetHeight;
+    pts=Array.from({length:Math.min(46,W/28)},()=>({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.35,vy:(Math.random()-.5)*.35}));}
+  resize();window.addEventListener('resize',resize);
+  (function loop(){
+    if(!document.body.contains(cv))return; // 页面卸载即停止
+    ctx.clearRect(0,0,W,H);
+    pts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>W)p.vx*=-1;if(p.y<0||p.y>H)p.vy*=-1;
+      ctx.fillStyle='rgba(37,99,235,.5)';ctx.beginPath();ctx.arc(p.x,p.y,1.6,0,7);ctx.fill();});
+    for(let i=0;i<pts.length;i++)for(let j=i+1;j<pts.length;j++){
+      const dx=pts[i].x-pts[j].x,dy=pts[i].y-pts[j].y,d=dx*dx+dy*dy;
+      if(d<12000){ctx.strokeStyle=`rgba(37,99,235,${(1-d/12000)*.22})`;ctx.beginPath();ctx.moveTo(pts[i].x,pts[i].y);ctx.lineTo(pts[j].x,pts[j].y);ctx.stroke();}}
+    requestAnimationFrame(loop);
+  })();
+}
+/* 首页评价轮播 */
+let tTimer=null;
+function initCarousel(){
+  const box=$('#tCarousel');if(!box)return;
+  const dots=$('#tDots');let idx=0;
+  dots.innerHTML=TESTIMONIALS.map((_,i)=>`<button data-i="${i}" class="w-2.5 h-2.5 rounded-full transition-all ${i===0?'bg-primary w-6':'bg-slate-300'}"></button>`).join('');
+  function show(i){idx=i;box.style.transform=`translateX(-${i*100}%)`;
+    $$('#tDots button').forEach((d,j)=>d.className=`h-2.5 rounded-full transition-all ${j===i?'bg-primary w-6':'bg-slate-300 w-2.5'}`);}
+  dots.onclick=e=>{const b=e.target.closest('button');if(b){show(+b.dataset.i);restart();}};
+  function restart(){clearInterval(tTimer);tTimer=setInterval(()=>show((idx+1)%TESTIMONIALS.length),4000);}
+  restart();
+}
+function quickFill(){
+  const s=$('#qScore').value,r=$('#qRank').value;
+  if(!s||s<0||s>750){$('#qScore').classList.add('err');toast('请输入 0-750 之间的有效分数','warn');return;}
+  state.quickScore=s;state.quickRank=r||'';
+  go('smart');
+  setTimeout(()=>{const si=$('#sfScore');if(si){si.value=s;$('#sfRank').value=r||'';generatePlan();}},80);
+}
+
+/* ========== 2. 智能填报页 ========== */
+const SMART_FORM={dir:new Set(['理工','经管']),city:new Set(['长三角']),level:new Set(['985','211']),opt:{coop:false,fee:false,far:false,adjust:true}};
+function renderSmart(){
+  const dirs=['理工','医学','经管','人文','艺术','教育','农学'],cities=['京津冀','长三角','珠三角','成渝','中西部','东北'],levels=['985','211','双一流','省重点','普通本科','民办','专科'];
+  const opts=[['coop','接受中外合作'],['fee','接受高收费专业'],['far','接受偏远地区'],['adjust','必须服从调剂']];
+  return `
+  <div class="max-w-shell mx-auto px-4 lg:px-6 py-8">
+    ${pageHead('智能填报','录入成绩与偏好，AI 基于 10 年录取大数据生成冲稳保方案')}
+    <div class="grid lg:grid-cols-[380px_1fr] gap-6 items-start">
+      <!-- 左：成绩与偏好录入 -->
+      <div class="card p-6 lg:sticky lg:top-20">
+        <b class="text-[15px] flex items-center gap-2">📋 成绩与偏好</b>
+        <div class="grid grid-cols-2 gap-3 mt-4">
+          <div><label class="text-xs text-sub font-medium">高考分数 *</label><input id="sfScore" class="inp mt-1" type="number" value="${state.quickScore||650}"><p id="sfScoreErr" class="text-[11px] text-danger mt-1 hidden">请输入 0-750 分</p></div>
+          <div><label class="text-xs text-sub font-medium">全省位次</label><input id="sfRank" class="inp mt-1" type="number" value="${state.quickRank||5000}"></div>
+          <div><label class="text-xs text-sub font-medium">省份</label><select id="sfProv" class="inp mt-1" onchange="sfProvChange(this.value)"><option>北京</option><option>上海</option><option>浙江</option><option>江苏</option><option>广东</option><option>湖北</option><option>四川</option></select></div>
+          <div><label class="text-xs text-sub font-medium">科类</label><select id="sfType" class="inp mt-1"><option>物理类</option><option>历史类</option><option>综合改革</option></select></div>
+        </div>
+        <div id="sfSubjWrap" class="mt-4"><label class="text-xs text-sub font-medium">选科组合（新高考省份）</label>
+          <div class="flex flex-wrap gap-2 mt-2" id="sfSubj">${['物理','化学','生物','政治','历史','地理'].map((s,i)=>`<span class="tag-sel ${i<2?'on':''}" onclick="this.classList.toggle('on')">${s}</span>`).join('')}</div>
+        </div>
+        <div class="mt-4"><label class="text-xs text-sub font-medium">意向专业方向（多选）</label>
+          <div class="flex flex-wrap gap-2 mt-2">${dirs.map(d=>`<span class="tag-sel ${SMART_FORM.dir.has(d)?'on':''}" onclick="toggleSet(SMART_FORM.dir,'${d}',this)">${d}</span>`).join('')}</div></div>
+        <div class="mt-4"><label class="text-xs text-sub font-medium">城市偏好（多选）</label>
+          <div class="flex flex-wrap gap-2 mt-2">${cities.map(c=>`<span class="tag-sel ${SMART_FORM.city.has(c)?'on':''}" onclick="toggleSet(SMART_FORM.city,'${c}',this)">${c}</span>`).join('')}</div></div>
+        <div class="mt-4"><label class="text-xs text-sub font-medium">院校层次（多选）</label>
+          <div class="flex flex-wrap gap-2 mt-2">${levels.map(l=>`<span class="tag-sel ${SMART_FORM.level.has(l)?'on':''}" onclick="toggleSet(SMART_FORM.level,'${l}',this)">${l}</span>`).join('')}</div></div>
+        <div class="mt-5 space-y-3">${opts.map(o=>`
+          <div class="flex items-center justify-between text-sm"><span>${o[1]}</span><span class="sw ${SMART_FORM.opt[o[0]]?'on':''}" onclick="this.classList.toggle('on');SMART_FORM.opt['${o[0]}']=this.classList.contains('on')"></span></div>`).join('')}
+        </div>
+        <button class="btn btn-primary w-full mt-6 rounded-xl py-3 font-bold" onclick="generatePlan()">✨ 生成方案</button>
+      </div>
+      <!-- 右：方案结果 -->
+      <div id="planResult">
+        ${renderPlanInner()}
+      </div>
+    </div>
+  </div>`;
+}
+function toggleSet(set,v,el){el.classList.toggle('on');el.classList.contains('on')?set.add(v):set.delete(v);}
+function sfProvChange(v){/* 新高考省份显示选科 */$('#sfSubjWrap').style.display=['浙江','江苏','广东','湖北','四川'].includes(v)?'block':'none';}
+function renderPlanInner(){
+  const total=SMART_RESULT.rush.length+SMART_RESULT.stable.length+SMART_RESULT.safe.length;
+  const sec=(title,list,theme,range,icon)=>{
+    const themeCls={orange:['text-accent','bg-accent/10','border-accent/30'],blue:['text-primary','bg-primary/10','border-primary/30'],green:['text-ok','bg-ok/10','border-ok/30']}[theme];
+    return `<div class="mb-6">
+      <div class="flex items-center gap-2 mb-3"><span class="chip ${themeCls[1]} ${themeCls[0]} border ${themeCls[2]}">${icon} ${title}</span><span class="text-xs text-sub">录取概率 ${range}</span></div>
+      <div class="space-y-3">
+      ${list.map((it,i)=>{const u=uniById(it.uid);return `
+        <div class="card card-hover p-4 flex flex-col md:flex-row md:items-center gap-4 page-enter" style="animation-delay:${i*70}ms">
+          <div class="flex items-center gap-3 flex-1 min-w-0">
+            ${uniLogo(u)}
+            <div class="min-w-0">
+              <div class="flex items-center gap-2 flex-wrap"><b>${u.name}</b>${u.tags.slice(0,2).map(t=>`<span class="chip bg-deep/5 text-deep border border-deep/10">${t}</span>`).join('')}<span class="text-xs text-sub">📍${u.city}</span></div>
+              <p class="text-xs text-sub mt-1">近三年最低分 <b class="text-ink">${u.scores.join(' / ')}</b> · 位次 ${u.ranks.join(' / ')}</p>
+              <p class="text-xs mt-1"><span class="text-sub">推荐专业：</span>${u.hotMajors.join('、')}</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-3 md:gap-4">
+            ${donut(it.prob,probHex(it.prob),78,8)}
+            <div class="flex md:flex-col gap-2">
+              <button class="btn btn-ghost rounded-lg px-3 py-1.5 text-xs" onclick="addToMock(${u.id})">＋ 加入模拟填报</button>
+              <button class="btn btn-ghost rounded-lg px-3 py-1.5 text-xs" onclick="openUniModal(${u.id})">查看详情</button>
+            </div>
+          </div>
+        </div>`;}).join('')}
+      </div></div>`;
+  };
+  return `
+  <!-- 方案概览 -->
+  <div class="grid grid-cols-3 gap-3 mb-6">
+    <div class="card p-4 text-center"><div class="text-2xl font-extrabold text-primary"><span data-count="286">0</span></div><div class="text-xs text-sub mt-1">可填报院校</div></div>
+    <div class="card p-4 text-center"><div class="text-2xl font-extrabold text-accent"><span data-count="${total*6}">0</span></div><div class="text-xs text-sub mt-1">推荐志愿数</div></div>
+    <div class="card p-4 text-center"><div class="text-2xl font-extrabold text-ok">低风险</div><div class="text-xs text-sub mt-1">整体风险评级</div></div>
+  </div>
+  ${sec('冲一冲',SMART_RESULT.rush,'orange','30% - 50%','🚀')}
+  ${sec('稳一稳',SMART_RESULT.stable,'blue','50% - 80%','🎯')}
+  ${sec('保一保',SMART_RESULT.safe,'green','80% - 95%','🛡️')}
+  <!-- AI 解读报告 -->
+  <div class="glass rounded-2xl p-6 shadow-lg border border-primary/15 page-enter" style="animation-delay:.2s">
+    <div class="flex items-center gap-2 mb-4"><span class="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-deep text-white flex items-center justify-center">🤖</span><div><b>AI 志愿分析师</b><p class="text-xs text-sub">基于你的分数、位次与偏好生成的结构化解读</p></div></div>
+    <div class="space-y-3 text-sm leading-relaxed">
+      ${[
+        ['✅ 整体方案评价','梯度结构健康：冲 2 / 稳 3 / 保 2，兼顾院校层次与专业满意度，整体滑档风险低于 3%。','ok'],
+        ['⚠️ 最大风险点','复旦、上交近三年位次波动在 ±50 名内，你的位次存在「小年冲高」机会，但建议不要只填热门专业。','warn'],
+        ['📊 梯度合理性','稳区院校分差 5-8 分、位次差约 800 名，间距合理；保区留有 15 分以上余量，安全垫充足。','ok'],
+        ['🏙️ 优先级建议','你的偏好是「专业 > 城市 > 学校」：建议优先锁定浙大计科、南大物理等优势学科，再考虑城市因素。','info'],
+        ['🔀 是否服从调剂','强烈建议全部勾选服从调剂。冲区院校若不服从，退档风险将上升至 40%+。','warn'],
+        ['👉 下一步操作','将本方案加入「模拟填报」，用智能检查核验志愿表，并预约 6 月 26 日招办主任直播做最终确认。','info']
+      ].map(x=>`<div class="flex gap-3 bg-white/70 rounded-xl p-3 border border-white"><span class="flex-none">${x[0].split(' ')[0]}</span><div><b class="text-[13px]">${x[0].split(' ').slice(1).join(' ')}</b><p class="text-sub text-[13px] mt-0.5">${x[1]}</p></div></div>`).join('')}
+    </div>
+    <div class="flex flex-wrap gap-2 mt-5">
+      <button class="btn btn-primary rounded-lg px-4 py-2 text-sm" onclick="savePlan()">💾 保存方案</button>
+      <button class="btn btn-ghost rounded-lg px-4 py-2 text-sm" onclick="toast('PDF 导出成功（演示）','ok')">📄 导出 PDF</button>
+      <button class="btn btn-ghost rounded-lg px-4 py-2 text-sm" onclick="toast('分享链接已复制，可发送给家长','ok')">🔗 分享给家长</button>
+      <button class="btn btn-ghost rounded-lg px-4 py-2 text-sm" onclick="generatePlan()">🔄 重新生成</button>
+    </div>
+  </div>`;
+}
+function generatePlan(){
+  const s=$('#sfScore'),v=+s.value;
+  if(!v||v<0||v>750){s.classList.add('err');$('#sfScoreErr').classList.remove('hidden');toast('请先填写有效的高考分数','warn');return;}
+  s.classList.remove('err');$('#sfScoreErr').classList.add('hidden');
+  const box=$('#planResult');
+  /* 星形 loading */
+  box.innerHTML=`<div class="card p-20 flex flex-col items-center justify-center text-center">
+    <svg class="load-star" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.4 6.9H21l-5.4 4.2 2 7.1-5.6-4.3-5.6 4.3 2-7.1L3 8.9h6.6z"/></svg>
+    <b class="mt-4">AI 正在分析 10 年录取大数据…</b><p class="text-sub text-sm mt-1">匹配招生计划 · 计算录取概率 · 评估梯度风险</p></div>`;
+  setTimeout(()=>{box.innerHTML=renderPlanInner();bindCounters(box);bindBars(box);toast('志愿方案已生成：冲 2 / 稳 3 / 保 2','ok');},1200);
+}
+function savePlan(){
+  state.savedPlans.unshift({name:'650 分物理类方案（新）',time:'刚刚',count:42,risk:'低风险'});
+  toast('方案已保存到「个人中心 · 我的志愿表」','ok');
+}
+
+/* ========== 3. 院校库 ========== */
+function uniFiltered(){
+  const f=state.uniFilter;
+  let list=UNIS.filter(u=>
+    (!f.kw||u.name.includes(f.kw))&&(!f.province||u.province===f.province)&&
+    (!f.level||u.tags.includes(f.level))&&(!f.type||u.type===f.type)&&(!f.nature||u.nature===f.nature));
+  if(f.sort==='分数线')list=[...list].sort((a,b)=>b.scores[0]-a.scores[0]);
+  if(f.sort==='就业率')list=[...list].sort((a,b)=>b.jobRate-a.jobRate);
+  if(f.sort==='关注度')list=[...list].sort((a,b)=>b.id-a.id);
+  if(f.sort==='录取概率')list=[...list].sort((a,b)=>a.scores[0]-b.scores[0]);
+  return list;
+}
+function renderUnis(){
+  const f=state.uniFilter,list=uniFiltered(),perPage=9,pages=Math.max(1,Math.ceil(list.length/perPage));
+  const page=Math.min(f.page,pages),shown=list.slice((page-1)*perPage,page*perPage);
+  const sel=(key,opts,label)=>`<div><label class="text-xs text-sub font-medium">${label}</label>
+    <select class="inp mt-1" onchange="setUniFilter('${key}',this.value)"><option value="">全部</option>${opts.map(o=>`<option ${f[key]===o?'selected':''}>${o}</option>`).join('')}</select></div>`;
+  return `
+  <div class="max-w-shell mx-auto px-4 lg:px-6 py-8">
+    ${pageHead('院校库','3000+ 院校全维度数据：分数线、位次、招生计划、就业报告')}
+    <!-- 筛选区 -->
+    <div class="card p-5 mb-6">
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+        <div class="col-span-2"><label class="text-xs text-sub font-medium">搜索院校</label>
+          <input class="inp mt-1" placeholder="输入院校名称或关键词" value="${esc(f.kw)}" oninput="setUniFilter('kw',this.value)"></div>
+        ${sel('province',['北京','上海','浙江','江苏','广东','湖北','四川'],'院校省份')}
+        ${sel('level',['985','211','双一流','省重点','普通本科','民办','专科'],'院校层次')}
+        ${sel('type',['综合','理工','师范','财经','医药','农林','语言','艺术','体育','政法','民族','军事'],'院校类型')}
+        ${sel('nature',['公办','民办','中外合作办学'],'办学性质')}
+      </div>
+      <div class="flex flex-wrap items-center gap-3 mt-4">
+        <span class="text-xs text-sub font-medium">分数区间</span>
+        <input type="range" min="400" max="700" value="700" class="accent-primary w-40" oninput="$('#scoreRangeVal').textContent='≤ '+this.value+' 分'">
+        <span id="scoreRangeVal" class="text-xs text-primary font-semibold">≤ 700 分</span>
+        <div class="flex-1"></div>
+        <button class="btn btn-ghost rounded-lg px-4 py-2 text-sm" onclick="resetUniFilter()">重置</button>
+        <button class="btn btn-primary rounded-lg px-4 py-2 text-sm" onclick="toast('筛选已应用','ok');rerender()">应用筛选</button>
+      </div>
+    </div>
+    <!-- 排序 + 总数 -->
+    <div class="flex flex-wrap items-center gap-2 mb-5">
+      <span class="text-sm text-sub">共 <b class="text-ink">3,000+</b> 所院校，当前筛选出 <b class="text-primary">${list.length}</b> 所</span>
+      <div class="flex-1"></div>
+      <div class="tabs flex gap-4 text-sm" id="uniSort">
+        ${['综合排序','录取概率','分数线','关注度','就业率'].map(s=>`<span class="nav-item ${f.sort===s?'nav-active':''}" onclick="setUniFilter('sort','${s}')">${s}</span>`).join('')}
+      </div>
+    </div>
+    <!-- 卡片网格 -->
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+      ${shown.map((u,i)=>{const prob=Math.max(12,Math.min(95,100-(u.scores[0]-600)*1.6));return `
+      <div class="card card-hover p-5 cursor-pointer page-enter" style="animation-delay:${i*50}ms" onclick="openUniModal(${u.id})">
+        <div class="flex items-start gap-3">
+          ${uniLogo(u)}
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center justify-between"><b class="text-[15px]">${u.name}</b>
+              <button class="fav-btn btn text-lg ${state.favUnis.has(u.id)?'faved':'text-slate-300'}" onclick="event.stopPropagation();toggleFavUni(${u.id},this)">${state.favUnis.has(u.id)?'❤️':'🤍'}</button></div>
+            <div class="flex flex-wrap gap-1 mt-1">${u.tags.map(t=>`<span class="chip bg-deep/5 text-deep border border-deep/10">${t}</span>`).join('')}</div>
+            <p class="text-xs text-sub mt-1.5">📍 ${u.province} · ${u.city} ｜ ${u.type}类 ｜ ${u.nature}</p>
+          </div>
+        </div>
+        <div class="grid grid-cols-3 gap-2 mt-4 text-center bg-bgc rounded-xl py-2.5">
+          ${u.scores.map((s,j)=>`<div><b class="text-sm ${j===0?'text-primary':''}">${s}</b><p class="text-[10px] text-sub">${2025-j} 最低分</p></div>`).join('')}
+        </div>
+        <p class="text-xs mt-3"><span class="text-sub">推荐专业：</span><span class="font-medium">${u.hotMajors.join('、')}</span></p>
+        <div class="mt-3"><div class="flex justify-between text-[11px] mb-1"><span class="text-sub">以你的成绩预测录取概率</span><b style="color:${probHex(Math.round(prob))}">${Math.round(prob)}%</b></div>
+          <div class="prog"><i style="width:0%;background:${probHex(Math.round(prob))}" data-w="${Math.round(prob)};transition-delay:${i*80}ms"></i></div></div>
+      </div>`;}).join('')}
+    </div>
+    ${shown.length===0?`<div class="card p-16 text-center text-sub"><div class="text-4xl mb-3">🔍</div>没有符合条件的院校，试试放宽筛选</div>`:''}
+    <!-- 分页器 -->
+    <div class="flex items-center justify-center gap-2 mt-8">
+      <button class="btn btn-ghost rounded-lg px-3 py-2 text-sm ${page===1?'opacity-40 pointer-events-none':''}" onclick="uniPage(${page-1})">← 上一页</button>
+      ${Array.from({length:pages},(_,i)=>`<button class="btn rounded-lg w-9 h-9 text-sm ${i+1===page?'btn-primary':'btn-ghost'}" onclick="uniPage(${i+1})">${i+1}</button>`).join('')}
+      <button class="btn btn-ghost rounded-lg px-3 py-2 text-sm ${page===pages?'opacity-40 pointer-events-none':''}" onclick="uniPage(${page+1})">下一页 →</button>
+    </div>
+  </div>`;
+}
+function setUniFilter(k,v){state.uniFilter[k]=v;if(k!=='sort')state.uniFilter.page=1;
+  if(k==='kw'){clearTimeout(window._uf);window._uf=setTimeout(()=>{rerender();
+    /* 重渲染后恢复搜索框焦点，保证连续输入 */
+    const inp=$('#page-root input.inp');if(inp){inp.focus();inp.setSelectionRange(inp.value.length,inp.value.length);}},350);}
+  else rerender();}
+function resetUniFilter(){state.uniFilter={kw:'',province:'',level:'',type:'',nature:'',sort:'综合排序',page:1};rerender();}
+function uniPage(p){state.uniFilter.page=p;rerender();window.scrollTo({top:0,behavior:'smooth'});}
+function toggleFavUni(id,el){
+  const on=state.favUnis.has(id);on?state.favUnis.delete(id):state.favUnis.add(id);
+  el.classList.toggle('faved',!on);el.textContent=!on?'❤️':'🤍';
+  toast(!on?'已收藏到「个人中心 · 我的收藏」':'已取消收藏',!on?'ok':'info');
+}
+/* 院校详情弹窗 */
+function openUniModal(id){
+  const u=uniById(id);
+  openModal(`
+  <div class="p-6 md:p-8">
+    <div class="flex items-start gap-4">
+      ${uniLogo(u,'w-16 h-16 text-2xl')}
+      <div class="flex-1">
+        <div class="flex items-center gap-2 flex-wrap"><h2 class="text-xl font-extrabold">${u.name}</h2>${u.tags.map(t=>`<span class="chip bg-deep/5 text-deep border border-deep/10">${t}</span>`).join('')}</div>
+        <p class="text-sub text-sm mt-1">${u.en} ｜ 📍 ${u.province}${u.city} ｜ ${u.type}类 ｜ ${u.nature} ｜ 🌐 ${u.site}</p>
+      </div>
+      <button class="btn btn-ghost rounded-lg px-3 py-1.5 text-sm" onclick="closeModal()">✕</button>
+    </div>
+    <div class="flex flex-wrap gap-2 mt-4">
+      <button class="btn ${state.favUnis.has(u.id)?'btn-primary':'btn-ghost'} rounded-lg px-4 py-2 text-sm" onclick="toggleFavUni(${u.id},this);this.classList.toggle('btn-primary');this.classList.toggle('btn-ghost')">${state.favUnis.has(u.id)?'❤️ 已收藏':'🤍 收藏'}</button>
+      <button class="btn btn-ghost rounded-lg px-4 py-2 text-sm" onclick="addCompareUni(${u.id})">⚖️ 加入对比</button>
+      <button class="btn btn-ghost rounded-lg px-4 py-2 text-sm" onclick="addToMock(${u.id})">＋ 加入模拟填报</button>
+    </div>
+    <div class="grid md:grid-cols-2 gap-5 mt-6">
+      <div class="card !shadow-none p-5">
+        <b class="text-sm">📈 历年最低分数线趋势</b>
+        <div class="mt-2">${lineChart(u.scores,['2025','2024','2023'],{color:u.color})}</div>
+      </div>
+      <div class="card !shadow-none p-5">
+        <b class="text-sm">🎯 2025 专业分数线（物理类）</b>
+        <div class="mt-3 space-y-2.5 text-sm">
+          ${u.hotMajors.map((m,i)=>`<div class="flex justify-between items-center"><span>${m}</span><b style="color:${u.color}">${u.scores[0]+8-i*5} 分</b></div><div class="prog"><i style="width:0%;background:${u.color}" data-w="${92-i*9}"></i></div>`).join('')}
+        </div>
+        <div class="flex gap-2 mt-4">
+          <select class="inp !w-auto !py-1.5 !text-xs"><option>2025</option><option>2024</option><option>2023</option></select>
+          <select class="inp !w-auto !py-1.5 !text-xs"><option>物理类</option><option>历史类</option></select>
+        </div>
+      </div>
+      <div class="card !shadow-none p-5">
+        <b class="text-sm">📋 2026 招生计划（${state.province}）</b>
+        <div class="mt-3 space-y-2 text-sm">
+          ${u.hotMajors.map((m,i)=>`<div class="flex justify-between border-b border-dashed border-line pb-2"><span>${m}</span><span class="text-sub">招 ${18-i*4} 人</span></div>`).join('')}
+          <p class="text-xs text-sub pt-1">选科要求：物理 + 化学 ｜ 学费 5000-6500 元/年</p>
+        </div>
+      </div>
+      <div class="card !shadow-none p-5">
+        <b class="text-sm">💼 就业报告</b>
+        <div class="grid grid-cols-3 gap-2 text-center mt-3">
+          <div class="bg-bgc rounded-xl py-3"><b class="text-lg text-ok">${u.jobRate}%</b><p class="text-[11px] text-sub">就业率</p></div>
+          <div class="bg-bgc rounded-xl py-3"><b class="text-lg text-primary">${(u.salary/1000).toFixed(1)}k</b><p class="text-[11px] text-sub">平均月薪</p></div>
+          <div class="bg-bgc rounded-xl py-3"><b class="text-lg text-accent">${u.baoyan}%</b><p class="text-[11px] text-sub">保研率</p></div>
+        </div>
+        <p class="text-xs text-sub mt-3">主要就业城市：${u.city}、北京、上海、深圳</p>
+      </div>
+    </div>
+    <div class="grid md:grid-cols-2 gap-5 mt-5">
+      <div class="card !shadow-none p-5">
+        <b class="text-sm">🏠 校园生活</b>
+        <div class="mt-3 space-y-2.5 text-sm">
+          ${[['宿舍条件',u.dorm],['食堂口碑',u.canteen],['校园环境',u.env],['交通便利',4.4]].map(x=>`
+          <div class="flex items-center justify-between"><span>${x[0]}</span>${stars(x[1],'text-xs')}</div>`).join('')}
+          <p class="text-xs text-sub pt-1">宿舍 4 人间 · 空调独卫 ｜ 图书馆 24h 自习区 ｜ 地铁直达</p>
+        </div>
+      </div>
+      <div class="card !shadow-none p-5">
+        <b class="text-sm">🗣️ 学长学姐评价</b>
+        <div class="mt-3 space-y-3 text-[13px]">
+          ${[['20 级计算机 · 王学长','课程硬核但资源顶级，实验室大二就能进，保研去向非常好。'],['21 级经管 · 李学姐','实习机会多，校友网络强，秋招基本人手 3 个 offer 起。'],['19 级机械 · 张学长','食堂便宜好吃，就是冬天风大。学术氛围浓，适合沉下心读书。']].map(x=>`
+          <div class="bg-bgc rounded-xl p-3"><b class="text-xs text-primary">${x[0]}</b><p class="text-sub mt-1">${x[1]}</p></div>`).join('')}
+        </div>
+      </div>
+    </div>
+  </div>`);
+  bindBars($('#modalBox'));
+}
+function addCompareUni(id){
+  const c=state.compare.unis;
+  if(c.includes(id)){toast('该院校已在对比列表中','warn');return;}
+  if(c.length>=6){toast('最多同时对比 6 所院校','warn');return;}
+  c.push(id);closeModal();toast('已加入对比，前往「对比工具」查看','ok');
+}
+
+/* ========== 4. 专业库 ========== */
+const MAJOR_CATS=['全部','哲学','经济学','法学','教育学','文学','历史学','理学','工学','农学','医学','管理学','艺术学'];
+function renderMajors(){
+  const cat=state.majorCat,list=MAJORS.filter(m=>cat==='全部'||m.cat===cat);
+  const perPage=8,pages=Math.max(1,Math.ceil(list.length/perPage)),page=Math.min(state.majorPage,pages);
+  const shown=list.slice((page-1)*perPage,page*perPage);
+  return `
+  <div class="max-w-shell mx-auto px-4 lg:px-6 py-8">
+    ${pageHead('专业库','1500+ 本科专业深度解析：课程、就业、薪资、考研全透视')}
+    <!-- 分类导航 -->
+    <div class="flex gap-2 overflow-auto pb-3 mb-5" style="scrollbar-width:thin">
+      ${MAJOR_CATS.map(c=>`<span class="tag-sel !py-2 !px-4 !text-sm flex-none ${cat===c?'on':''}" onclick="state.majorCat='${c}';state.majorPage=1;rerender()">${c}</span>`).join('')}
+    </div>
+    <div class="flex items-center gap-3 mb-6">
+      <div class="relative flex-1 max-w-sm"><input class="inp !pl-9" placeholder="搜索专业名称" oninput="majorSearch(this.value)"><span class="absolute left-3 top-3 text-sub text-sm">🔍</span></div>
+      <span class="text-sm text-sub">当前分类共 <b class="text-primary">${list.length}</b> 个示例专业</span>
+    </div>
+    <!-- 专业卡片 -->
+    <div class="grid md:grid-cols-2 gap-4">
+      ${shown.map((m,i)=>`
+      <div class="card card-hover p-5 cursor-pointer page-enter" style="animation-delay:${i*50}ms" onclick="openMajorModal(${m.id})">
+        <div class="flex items-start justify-between gap-2">
+          <div>
+            <div class="flex items-center gap-2 flex-wrap"><b class="text-[15px]">${m.name}</b><span class="chip bg-primary/5 text-primary border border-primary/15">${m.cat} · ${m.code}</span><span class="chip bg-bgc text-sub border border-line">${m.years}</span></div>
+            <div class="mt-2">${stars(m.hot)}<span class="text-xs text-sub ml-1">热门程度</span></div>
+          </div>
+          <button class="fav-btn btn text-lg ${state.favMajors.has(m.id)?'faved':'text-slate-300'}" onclick="event.stopPropagation();toggleFavMajor(${m.id},this)">${state.favMajors.has(m.id)?'❤️':'🤍'}</button>
+        </div>
+        <div class="flex flex-wrap gap-1.5 mt-3">${m.dir.map(d=>`<span class="chip bg-ok/5 text-ok border border-ok/15">${d}</span>`).join('')}</div>
+        <div class="grid grid-cols-4 gap-2 mt-4 text-center bg-bgc rounded-xl py-3">
+          <div><b class="text-sm text-primary">${(m.salary/1000).toFixed(1)}k</b><p class="text-[10px] text-sub">平均月薪</p></div>
+          <div><b class="text-sm text-ok">${m.jobRate}%</b><p class="text-[10px] text-sub">就业率</p></div>
+          <div><b class="text-sm text-accent">${m.kaoyan}%</b><p class="text-[10px] text-sub">考研率</p></div>
+          <div><b class="text-sm text-deep">${m.unis}</b><p class="text-[10px] text-sub">开设院校</p></div>
+        </div>
+        <div class="mt-3">${genderBar(m.genderM)}</div>
+      </div>`).join('')}
+    </div>
+    ${shown.length===0?`<div class="card p-16 text-center text-sub"><div class="text-4xl mb-3">📭</div>该分类下暂无示例专业，切换到「全部」查看</div>`:''}
+    <div class="flex items-center justify-center gap-2 mt-8">
+      <button class="btn btn-ghost rounded-lg px-3 py-2 text-sm ${page===1?'opacity-40 pointer-events-none':''}" onclick="state.majorPage=${page-1};rerender()">← 上一页</button>
+      ${Array.from({length:pages},(_,i)=>`<button class="btn rounded-lg w-9 h-9 text-sm ${i+1===page?'btn-primary':'btn-ghost'}" onclick="state.majorPage=${i+1};rerender()">${i+1}</button>`).join('')}
+      <button class="btn btn-ghost rounded-lg px-3 py-2 text-sm ${page===pages?'opacity-40 pointer-events-none':''}" onclick="state.majorPage=${page+1};rerender()">下一页 →</button>
+    </div>
+  </div>`;
+}
+function majorSearch(v){clearTimeout(window._ms);window._ms=setTimeout(()=>{state.majorKw=v;toast('搜索：'+v+'（演示，已展示最匹配结果）','info');},400);}
+function toggleFavMajor(id,el){
+  const on=state.favMajors.has(id);on?state.favMajors.delete(id):state.favMajors.add(id);
+  el.classList.toggle('faved',!on);el.textContent=!on?'❤️':'🤍';
+  toast(!on?'专业已收藏':'已取消收藏',!on?'ok':'info');
+}
+/* 专业详情弹窗 */
+function openMajorModal(id){
+  const m=majorById(id);
+  const courses={1:['数据结构','操作系统','计算机组成原理','计算机网络','算法设计','数据库系统'],2:['软件工程导论','设计模式','软件测试','Web 开发框架','DevOps','项目管理'],3:['机器学习','深度学习','自然语言处理','计算机视觉','最优化方法','概率统计']}[id]||['专业导论','核心方法论','领域案例分析','实验与实践','前沿专题','毕业论文'];
+  const similar=id<=3?[['计算机科学与技术','重理论与系统，软硬件都学，考研面最广'],['软件工程','重工程实践与项目交付，就业导向最强'],['人工智能','重算法与数学，前沿但学习曲线陡']]:[['本专业','侧重本领域系统训练'],['相近专业 A','课程重叠约 60%'],['相近专业 B','就业方向有交叉']];
+  openModal(`
+  <div class="p-6 md:p-8">
+    <div class="flex items-start justify-between gap-3">
+      <div>
+        <div class="flex items-center gap-2 flex-wrap"><h2 class="text-xl font-extrabold">${m.name}</h2><span class="chip bg-primary/5 text-primary border border-primary/15">${m.cat} · ${m.code}</span><span class="chip bg-bgc text-sub border border-line">学制 ${m.years}</span></div>
+        <div class="mt-2">${stars(m.hot)}<span class="text-xs text-sub ml-2">热门程度 ${m.hot}.0</span></div>
+      </div>
+      <button class="btn btn-ghost rounded-lg px-3 py-1.5 text-sm" onclick="closeModal()">✕</button>
+    </div>
+    <div class="flex flex-wrap gap-2 mt-4">
+      <button class="btn ${state.favMajors.has(m.id)?'btn-primary':'btn-ghost'} rounded-lg px-4 py-2 text-sm" onclick="toggleFavMajor(${m.id},this);this.classList.toggle('btn-primary');this.classList.toggle('btn-ghost')">${state.favMajors.has(m.id)?'❤️ 已收藏':'🤍 收藏'}</button>
+      <button class="btn btn-ghost rounded-lg px-4 py-2 text-sm" onclick="closeModal();state.compare.majors=[...new Set([...state.compare.majors,${m.id}])].slice(0,6);go('compare')">⚖️ 加入对比</button>
+      <button class="btn btn-ghost rounded-lg px-4 py-2 text-sm" onclick="closeModal();go('unis')">🏫 查看开设院校</button>
+    </div>
+    <div class="card !shadow-none p-5 mt-5 bg-gradient-to-br from-primary/5 to-transparent">
+      <b class="text-sm">📖 专业介绍与培养目标</b>
+      <p class="text-sm text-sub mt-2 leading-relaxed">本专业培养掌握${m.name}基本理论、方法与工具，具备系统设计、工程实践与创新能力的高素质人才。毕业生可在${m.dir.join('、')}等领域从事研发、分析、管理等工作，或继续攻读硕士、博士学位。</p>
+    </div>
+    <div class="grid md:grid-cols-2 gap-5 mt-5">
+      <div class="card !shadow-none p-5">
+        <b class="text-sm">📚 核心课程</b>
+        <div class="flex flex-wrap gap-2 mt-3">${courses.map(c=>`<span class="chip bg-bgc border border-line text-slate-600 !py-1.5 !px-3 !text-xs">${c}</span>`).join('')}</div>
+        <div class="mt-4"><div class="flex justify-between text-xs mb-1"><span class="text-sub">学习难度</span><b class="text-danger">${m.diff}/5.0</b></div>
+        <div class="prog"><i style="width:0%;background:linear-gradient(90deg,var(--warn),var(--danger))" data-w="${m.diff*20}"></i></div></div>
+      </div>
+      <div class="card !shadow-none p-5">
+        <b class="text-sm">💰 近五年薪资趋势（千元/月）</b>
+        <div class="mt-2">${lineChart(m.salaryTrend,['2021','2022','2023','2024','2025'],{color:'#10B981',unit:'k'})}</div>
+      </div>
+      <div class="card !shadow-none p-5">
+        <b class="text-sm">🎯 就业方向 · 考研 · 考公</b>
+        <div class="mt-3 space-y-2.5 text-sm">
+          <p><span class="text-sub">就业方向：</span>${m.dir.join('、')}</p>
+          <p><span class="text-sub">推荐考研方向：</span>${m.name}（学硕）、${m.cat}专硕、交叉学科</p>
+          <p><span class="text-sub">考公岗位匹配：</span><b class="text-primary">${800+m.id*120} 个</b> 岗位可报（2026 国考目录）</p>
+        </div>
+      </div>
+      <div class="card !shadow-none p-5">
+        <b class="text-sm">🏫 开设院校 TOP 10</b>
+        <div class="mt-3 space-y-2 text-sm">
+          ${UNIS.slice(0,6).map((u,i)=>`<div class="flex items-center gap-2"><span class="w-5 h-5 rounded text-[10px] flex items-center justify-center font-bold ${i<3?'bg-accent/10 text-accent':'bg-bgc text-sub'}">${i+1}</span><span class="flex-1">${u.name}</span><span class="text-xs text-sub">${u.tags[0]}</span></div>`).join('')}
+          <p class="text-xs text-sub">… 全国共 ${m.unis} 所院校开设</p>
+        </div>
+      </div>
+    </div>
+    <div class="card !shadow-none p-5 mt-5">
+      <b class="text-sm">🔀 相近专业辨析</b>
+      <div class="grid md:grid-cols-3 gap-3 mt-3">
+        ${similar.map((s,i)=>`<div class="rounded-xl border ${i===0?'border-primary/30 bg-primary/5':'border-line'} p-3"><b class="text-[13px] ${i===0?'text-primary':''}">${s[0]}</b><p class="text-xs text-sub mt-1">${s[1]}</p></div>`).join('')}
+      </div>
+    </div>
+    <div class="card !shadow-none p-5 mt-5">
+      <b class="text-sm">🗣️ 学长学姐真实评价</b>
+      <div class="grid md:grid-cols-3 gap-3 mt-3 text-[13px]">
+        ${[['大三在读 · 女','课确实多，但做出项目那一刻真的很有成就感。'],['毕业 2 年 · 大厂','起薪高，但持续学习是常态，适合自驱力强的人。'],['研一在读','本科打好数学基础太重要了，后悔当时没更认真。']].map(x=>`
+        <div class="bg-bgc rounded-xl p-3"><b class="text-xs text-primary">${x[0]}</b><p class="text-sub mt-1">${x[1]}</p></div>`).join('')}
+      </div>
+    </div>
+  </div>`);
+  bindBars($('#modalBox'));
+}
+
+/* ========== 5. 测评中心 ========== */
+function renderAssess(){
+  const a=state.assess;
+  if(a.current==='report')return renderAssessReport();
+  if(a.current)return renderAssessQuiz();
+  return `
+  <div class="max-w-shell mx-auto px-4 lg:px-6 py-8">
+    ${pageHead('测评中心','科学定位你的兴趣、性格与能力，让专业选择有据可依')}
+    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+      ${ASSESSMENTS.map((t,i)=>`
+      <div class="card card-hover p-6 cursor-pointer page-enter" style="animation-delay:${i*60}ms" onclick="startAssess('${t.id}')">
+        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br ${t.color} text-white text-3xl flex items-center justify-center shadow-md">${t.icon}</div>
+        <b class="block mt-4 text-[15px]">${t.name}</b>
+        <p class="text-xs text-sub mt-1.5 leading-relaxed">${t.desc}</p>
+        <div class="flex items-center justify-between mt-4 text-xs text-sub"><span>📝 ${t.qs} 题 · 约 ${t.mins} 分钟</span><span class="text-primary font-semibold">开始 →</span></div>
+      </div>`).join('')}
+    </div>
+    <div class="card p-6 mt-8 bg-gradient-to-r from-primary/5 via-white to-accent/5">
+      <div class="flex flex-col md:flex-row items-center gap-5">
+        <div class="flex-1"><b>💡 为什么先测评再选专业？</b><p class="text-sm text-sub mt-2 leading-relaxed">教育部阳光高考平台调研显示：兴趣匹配度高的专业，大学四年 GPA 平均高出 0.4，就业满意度高出 37%。测评报告会自动同步到你的智能填报偏好中。</p></div>
+        <button class="btn btn-primary rounded-xl px-6 py-3 font-bold flex-none" onclick="startAssess('holland')">立即免费测评</button>
+      </div>
+    </div>
+  </div>`;
+}
+function startAssess(id){state.assess={current:id,idx:0,answers:[]};rerender();window.scrollTo({top:0});}
+function renderAssessQuiz(){
+  const t=ASSESSMENTS.find(x=>x.id===state.assess.current),i=state.assess.idx,q=A_QUESTIONS[i];
+  const pct=Math.round(i/A_QUESTIONS.length*100);
+  return `
+  <div class="max-w-2xl mx-auto px-4 py-10">
+    <div class="flex items-center justify-between mb-3 text-sm"><b>${t.icon} ${t.name}</b><span class="text-sub">第 ${i+1} / ${A_QUESTIONS.length} 题</span></div>
+    <div class="prog mb-8"><i style="width:${pct}%;background:linear-gradient(90deg,var(--primary),#60A5FA)"></i></div>
+    <div class="card p-7 page-enter" key="${i}">
+      <h2 class="text-lg font-bold leading-snug">${q.q}</h2>
+      <div class="grid gap-3 mt-6">
+        ${q.opts.map((o,j)=>`<button class="btn btn-ghost rounded-xl px-5 py-4 text-left text-sm font-medium hover:!border-primary hover:!text-primary ${state.assess.answers[i]===j?'!border-primary !text-primary !bg-primary/5':''}" onclick="answerQ(${j})"><span class="inline-flex w-6 h-6 rounded-full border border-current items-center justify-center text-xs mr-2 flex-none">${'ABCD'[j]}</span>${o}</button>`).join('')}
+      </div>
+    </div>
+    <div class="flex justify-between mt-6">
+      <button class="btn btn-ghost rounded-xl px-5 py-2.5 text-sm ${i===0?'opacity-40 pointer-events-none':''}" onclick="state.assess.idx--;rerender()">← 上一题</button>
+      <button class="btn btn-primary rounded-xl px-5 py-2.5 text-sm ${state.assess.answers[i]===undefined?'opacity-40 pointer-events-none':''}" onclick="nextQ()">${i===A_QUESTIONS.length-1?'生成报告 ✨':'下一题 →'}</button>
+    </div>
+  </div>`;
+}
+function answerQ(j){state.assess.answers[state.assess.idx]=j;rerender();}
+function nextQ(){
+  if(state.assess.idx<A_QUESTIONS.length-1){state.assess.idx++;rerender();return;}
+  /* 生成报告 loading */
+  $('#page-root').innerHTML=`<div class="min-h-[60vh] flex flex-col items-center justify-center text-center">
+    <svg class="load-star" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.4 6.9H21l-5.4 4.2 2 7.1-5.6-4.3-5.6 4.3 2-7.1L3 8.9h6.6z"/></svg>
+    <b class="mt-4 text-lg">正在生成你的专属测评报告…</b><p class="text-sub text-sm mt-1">分析兴趣维度 · 匹配专业数据库 · 生成职业画像</p></div>`;
+  const tname=ASSESSMENTS.find(x=>x.id===state.assess.current)?.name||'霍兰德职业兴趣测试';
+  setTimeout(()=>{state.assess.current='report';state.reports.unshift({name:tname,time:'刚刚',type:'RIA 型'});rerender();},1500);
+}
+function renderAssessReport(){
+  const recM=[3,1,8,2,9,5],recC=['算法工程师','数据分析师','系统架构师','产品经理','量化研究员','技术顾问'];
+  return `
+  <div class="max-w-shell mx-auto px-4 lg:px-6 py-8">
+    <div class="flex items-center justify-between flex-wrap gap-3 mb-6">
+      ${pageHead('测评报告 · 霍兰德职业兴趣测试','完成于 刚刚 · 报告编号 CS-2026-08623')}
+      <div class="flex gap-2">
+        <button class="btn btn-primary rounded-lg px-4 py-2 text-sm" onclick="toast('报告海报已生成，可保存分享','ok')">🖼️ 生成分享海报</button>
+        <button class="btn btn-ghost rounded-lg px-4 py-2 text-sm" onclick="toast('已保存到个人中心','ok')">💾 保存</button>
+        <button class="btn btn-ghost rounded-lg px-4 py-2 text-sm" onclick="state.assess={current:null,idx:0,answers:[]};rerender()">🔄 重新测评</button>
+      </div>
+    </div>
+    <div class="grid lg:grid-cols-3 gap-5">
+      <div class="card p-6">
+        <b class="text-sm">🧭 综合得分雷达图</b>
+        <div class="mt-3">${radar([88,76,64,58,52,40],['研究型 I','现实型 R','艺术型 A','社会型 S','企业型 E','常规型 C'])}</div>
+        <div class="bg-primary/5 border border-primary/15 rounded-xl p-4 mt-2">
+          <b class="text-primary text-sm">你的类型：RIA（研究-现实-艺术）</b>
+          <p class="text-xs text-sub mt-1.5 leading-relaxed">好奇心强、逻辑严谨，喜欢探究事物本质，同时具备一定的动手能力和审美表达欲。适合「理论 + 实践」并重的技术型专业。</p>
+        </div>
+      </div>
+      <div class="card p-6">
+        <b class="text-sm">🎯 推荐专业 TOP 10</b>
+        <div class="mt-3 space-y-2">
+          ${[...recM,4,6,7,10].slice(0,10).map((id,i)=>{const m=majorById(id);if(!m)return'';return `
+          <div class="flex items-center gap-2.5 text-sm cursor-pointer hover:bg-bgc rounded-lg p-1.5 -m-1.5" onclick="openMajorModal(${id})">
+            <span class="w-6 h-6 rounded-lg flex-none flex items-center justify-center text-xs font-bold ${i<3?'bg-accent/10 text-accent':'bg-bgc text-sub'}">${i+1}</span>
+            <span class="flex-1">${m.name}</span><span class="text-xs font-bold" style="color:${probHex(95-i*4)}">${95-i*4}%</span>
+          </div>`;}).join('')}
+        </div>
+      </div>
+      <div class="card p-6">
+        <b class="text-sm">💼 推荐职业 TOP 10</b>
+        <div class="mt-3 space-y-2">
+          ${[...recC,'数据科学家','量化交易员','高校研究员','专利代理人'].slice(0,10).map((c,i)=>`
+          <div class="flex items-center gap-2.5 text-sm"><span class="w-6 h-6 rounded-lg flex-none flex items-center justify-center text-xs font-bold ${i<3?'bg-primary/10 text-primary':'bg-bgc text-sub'}">${i+1}</span><span class="flex-1">${c}</span>${stars(Math.max(3,5-Math.floor(i/3)),'text-[10px]')}</div>`).join('')}
+        </div>
+        <div class="bg-warn/5 border border-warn/20 rounded-xl p-3.5 mt-4">
+          <b class="text-warn text-xs">⚠️ 相对不适合</b>
+          <p class="text-xs text-sub mt-1">纯事务性、重复流程类专业（如部分管理学方向），易感到枯燥。</p>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ========== 6. 模拟填报 ========== */
+function mockPool(){
+  if(state.mockTab==='我的收藏')return [...state.favUnis].map(id=>({u:uniById(id),prob:62}));
+  if(state.mockTab==='院校库')return UNIS.map(u=>({u,prob:Math.round(Math.max(15,Math.min(95,100-(u.scores[0]-600)*1.6)))}));
+  return [...SMART_RESULT.rush,...SMART_RESULT.stable,...SMART_RESULT.safe].map(x=>({u:uniById(x.uid),prob:x.prob}));
+}
+function renderMock(){
+  const pool=mockPool(),vol=state.volunteer,MAX=45;
+  return `
+  <div class="max-w-shell mx-auto px-4 lg:px-6 py-8">
+    ${pageHead('模拟填报','真实志愿表演练：45 个平行志愿 · 支持拖拽排序 · 智能风险检查')}
+    <div class="grid lg:grid-cols-[380px_1fr] gap-6 items-start">
+      <!-- 左：候选院校池 -->
+      <div class="card p-5 lg:sticky lg:top-20 max-h-[78vh] flex flex-col">
+        <div class="tabs flex gap-4 text-sm border-b border-line pb-2" id="mockTabs">
+          ${['智能推荐','我的收藏','院校库'].map(t=>`<span class="nav-item ${state.mockTab===t?'nav-active':''}" onclick="state.mockTab='${t}';rerender()">${t}</span>`).join('')}
+        </div>
+        <div class="flex gap-2 mt-3 mb-3">
+          ${['全部','冲','稳','保'].map((g,i)=>`<span class="tag-sel ${i===0?'on':''}" onclick="$$('#mockPoolList .pool-item').forEach(e=>e.style.display=(${i===0}||e.dataset.g==='${g}')?'':'none');$$('.tag-sel',this.parentElement).forEach(t=>t.classList.remove('on'));this.classList.add('on')">${g}</span>`).join('')}
+        </div>
+        <div id="mockPoolList" class="space-y-2.5 overflow-auto pr-1">
+          ${pool.map(({u,prob})=>`
+          <div class="pool-item border border-line rounded-xl p-3 hover:border-primary/40 transition-colors" data-g="${prob<50?'冲':prob<80?'稳':'保'}">
+            <div class="flex items-center gap-2.5">
+              ${uniLogo(u,'w-9 h-9 text-sm')}
+              <div class="flex-1 min-w-0"><b class="text-sm block truncate">${u.name}</b><span class="text-[11px] text-sub">${u.city} · 可报专业 <b class="text-primary">${6+u.id%4}</b> 个</span></div>
+              <span class="chip flex-none" style="color:${probHex(prob)};background:${probHex(prob)}14">${prob}%</span>
+            </div>
+            <button class="btn btn-ghost w-full mt-2.5 rounded-lg py-1.5 text-xs" onclick="addToMock(${u.id})">＋ 添加到志愿表</button>
+          </div>`).join('')}
+          ${pool.length===0?`<div class="text-center text-sub text-sm py-10">暂无候选，先去收藏一些院校吧</div>`:''}
+        </div>
+      </div>
+      <!-- 右：我的志愿表 -->
+      <div>
+        <div class="card p-5">
+          <div class="flex flex-wrap items-center gap-3">
+            <b class="text-[15px]">📋 我的志愿表（${state.province} · ${MAX} 个平行志愿）</b>
+            <span class="chip ${vol.length>MAX?'bg-danger/10 text-danger':'bg-primary/10 text-primary'}">已填 ${vol.length} / ${MAX}</span>
+            <div class="flex-1"></div>
+            <button class="btn btn-ghost rounded-lg px-3 py-1.5 text-xs" onclick="state.mockCheckShow=!state.mockCheckShow;rerender()">🩺 智能检查</button>
+            <button class="btn btn-ghost rounded-lg px-3 py-1.5 text-xs" onclick="toast('志愿表已保存','ok')">💾 保存</button>
+            <button class="btn btn-ghost rounded-lg px-3 py-1.5 text-xs" onclick="toast('Excel 导出成功（演示）','ok')">📊 Excel</button>
+            <button class="btn btn-ghost rounded-lg px-3 py-1.5 text-xs" onclick="toast('PDF 导出成功（演示）','ok')">📄 PDF</button>
+            <button class="btn btn-ghost rounded-lg px-3 py-1.5 text-xs" onclick="toast('分享链接已复制','ok')">🔗 分享</button>
+            <button class="btn btn-ghost rounded-lg px-3 py-1.5 text-xs !text-danger" onclick="state.volunteer=[];rerender();toast('志愿表已清空','info')">🗑️ 清空</button>
+          </div>
+          <!-- 智能检查面板 -->
+          ${state.mockCheckShow?renderMockCheck():''}
+        </div>
+        <div id="volList" class="mt-4 space-y-2.5">
+          ${vol.length===0?`<div class="card p-14 text-center text-sub border-dashed"><div class="text-4xl mb-3">📝</div>志愿表还是空的，从左侧「候选院校池」添加院校开始吧</div>`:''}
+          ${vol.map((v,i)=>{const u=uniById(v.uid);return `
+          <div class="card !rounded-xl p-3.5 flex items-center gap-3 vol-row" draggable="true" data-idx="${i}">
+            <span class="cursor-grab text-sub select-none text-lg" title="拖拽排序">⠿</span>
+            <span class="w-8 h-8 rounded-lg bg-deep/5 text-deep font-bold text-sm flex items-center justify-center flex-none">${i+1}</span>
+            ${uniLogo(u,'w-10 h-10 text-base')}
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 flex-wrap"><b class="text-sm">${u.name}</b><span class="text-xs text-sub">${v.major}</span></div>
+              <div class="flex items-center gap-3 mt-1 text-[11px] text-sub">
+                <span class="flex items-center gap-1 cursor-pointer" onclick="toggleAdjust(${i})"><span class="ck ${v.adjust?'on':''}">${v.adjust?'✓':''}</span>服从调剂</span>
+                <span class="text-primary cursor-pointer" onclick="replaceMajor(${i})">🔄 替换专业</span>
+              </div>
+            </div>
+            <div class="text-right flex-none">
+              <b class="text-sm" style="color:${probHex(v.prob)}">${v.prob}%</b>
+              <div class="prog !w-20 mt-1"><i style="width:${v.prob}%;background:${probHex(v.prob)}"></i></div>
+            </div>
+            <button class="btn text-sub hover:text-danger flex-none" onclick="state.volunteer.splice(${i},1);rerender();toast('已删除该志愿','info')">✕</button>
+          </div>`;}).join('')}
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+function renderMockCheck(){
+  const vol=state.volunteer;
+  const probs=vol.map(v=>v.prob);
+  const checks=[
+    {name:'志愿是否填满',st:vol.length>=45?'pass':vol.length>0?'warn':'err',tip:vol.length>=45?'已填满 45 个志愿':`仅填报 ${vol.length}/45 个，建议填满以最大化录取机会`},
+    {name:'梯度是否合理',st:vol.length<3?'warn':(probs[0]||0)>(probs[probs.length-1]||100)?'err':'pass',tip:vol.length<3?'志愿数量不足，无法评估梯度':'概率应从高到低排列（先冲后保），检测到'+(vol.length&&probs[0]<=probs[probs.length-1]?'正常梯度':'梯度倒挂！')},
+    {name:'是否有重复院校',st:new Set(vol.map(v=>v.uid)).size===vol.length?'pass':'err',tip:'平行志愿中重复填报同一院校会浪费志愿位'},
+    {name:'是否有重复专业',st:new Set(vol.map(v=>v.major)).size===vol.length||vol.length<2?'pass':'warn',tip:'不同院校填报相同专业可以接受，但建议分散方向'},
+    {name:'是否勾选服从调剂',st:vol.every(v=>v.adjust)?'pass':vol.some(v=>v.adjust)?'warn':'err',tip:vol.every(v=>v.adjust)?'全部勾选，退档风险最低':'存在未勾选调剂的志愿，冲区院校退档风险高'},
+    {name:'是否有无效志愿',st:'pass',tip:'所有志愿的选科要求与你的选科组合匹配'}
+  ];
+  const ic={pass:['✅','text-ok','bg-ok/10'],warn:['⚠️','text-warn','bg-warn/10'],err:['⛔','text-danger','bg-danger/10']};
+  return `<div class="mt-4 border-t border-line pt-4 grid md:grid-cols-2 gap-2.5">
+    ${checks.map(c=>`<div class="flex items-start gap-2.5 rounded-xl border border-line p-3 cursor-pointer hover:border-primary/40 transition-colors" onclick="toast('${c.tip}','${c.st==='pass'?'ok':c.st==='warn'?'warn':'err'}')">
+      <span class="${ic[c.st][2]} w-7 h-7 rounded-lg flex items-center justify-center text-sm flex-none">${ic[c.st][0]}</span>
+      <div><b class="text-[13px] ${ic[c.st][1]}">${c.name}</b><p class="text-[11px] text-sub mt-0.5">${c.tip}</p></div>
+    </div>`).join('')}
+  </div>`;
+}
+function addToMock(uid){
+  if(state.volunteer.some(v=>v.uid===uid)){toast('该院校已在志愿表中','warn');return;}
+  if(state.volunteer.length>=45){toast('志愿表已满（45 个）','warn');return;}
+  const found=[...SMART_RESULT.rush,...SMART_RESULT.stable,...SMART_RESULT.safe].find(x=>x.uid===uid);
+  const prob=found?found.prob:Math.round(Math.max(20,Math.min(95,100-(uniById(uid).scores[0]-600)*1.6)));
+  state.volunteer.push({uid,major:uniById(uid).hotMajors[0],adjust:true,prob});
+  closeModal();
+  if(state.page==='mock')rerender();
+  toast(`已添加「${uniById(uid).name}」到志愿表（第 ${state.volunteer.length} 志愿）`,'ok');
+}
+function toggleAdjust(i){state.volunteer[i].adjust=!state.volunteer[i].adjust;rerender();}
+function replaceMajor(i){
+  const u=uniById(state.volunteer[i].uid),cur=state.volunteer[i].major;
+  const next=u.hotMajors[(u.hotMajors.indexOf(cur)+1)%u.hotMajors.length];
+  state.volunteer[i].major=next;rerender();toast(`专业已替换为「${next}」`,'ok');
+}
+/* 拖拽排序（原生 DnD） */
+function initVolDrag(){
+  const list=$('#volList');if(!list)return;let from=null;
+  $$('.vol-row',list).forEach(row=>{
+    row.addEventListener('dragstart',e=>{from=+row.dataset.idx;row.classList.add('dragging');});
+    row.addEventListener('dragend',()=>{row.classList.remove('dragging');$$('.vol-row',list).forEach(r=>r.classList.remove('drag-over'));});
+    row.addEventListener('dragover',e=>{e.preventDefault();row.classList.add('drag-over');});
+    row.addEventListener('dragleave',()=>row.classList.remove('drag-over'));
+    row.addEventListener('drop',e=>{
+      e.preventDefault();const to=+row.dataset.idx;if(from===null||from===to)return;
+      const [m]=state.volunteer.splice(from,1);state.volunteer.splice(to,0,m);
+      rerender();toast(`已调整志愿顺序：${from+1} → ${to+1}`,'ok');
+    });
+  });
+}
+
+/* ========== 7. 对比工具 ========== */
+function renderCompare(){
+  const c=state.compare;
+  const tabs=['院校对比','专业对比','城市对比','方案对比'];
+  let body='';
+  if(c.type==='院校对比'){
+    const us=c.unis.map(uniById).filter(Boolean);
+    const rows=[
+      ['院校层次',u=>u.tags.join(' / ')],['所在地',u=>u.province+u.city],['院校类型',u=>u.type+'类'],
+      ['2025 最低分',u=>`<b class="text-primary">${u.scores[0]}</b>`],['2024 最低分',u=>u.scores[1]],['2023 最低分',u=>u.scores[2]],
+      ['保研率',u=>u.baoyan+'%'],['就业率',u=>u.jobRate+'%'],['平均月薪',u=>'¥'+u.salary.toLocaleString()],
+      ['校园环境',u=>stars(u.env,'text-xs')],['宿舍条件',u=>stars(u.dorm,'text-xs')],['食堂评分',u=>stars(u.canteen,'text-xs')],
+      ['热门专业',u=>u.hotMajors.join('、')]
+    ];
+    body=`
+    <div class="card p-5 mb-5">
+      <b class="text-sm mb-3 block">选择对比院校（2-6 所）</b>
+      <div class="flex flex-wrap gap-2">${UNIS.map(u=>`<span class="tag-sel ${c.unis.includes(u.id)?'on':''}" onclick="toggleCompareUni(${u.id})">${u.name}</span>`).join('')}</div>
+    </div>
+    <div class="card p-5 overflow-auto">
+      <table class="w-full text-sm min-w-[640px]">
+        <thead><tr class="border-b border-line"><th class="text-left py-3 text-sub font-medium w-28">对比维度</th>
+          ${us.map(u=>`<th class="py-3"><div class="flex flex-col items-center gap-1.5">${uniLogo(u,'w-10 h-10 text-base')}<b>${u.name}</b></div></th>`).join('')}</tr></thead>
+        <tbody>${rows.map(r=>`<tr class="border-b border-line/60 last:border-0"><td class="py-3 text-sub text-[13px]">${r[0]}</td>${us.map(u=>`<td class="py-3 text-center">${r[1](u)}</td>`).join('')}</tr>`).join('')}</tbody>
+      </table>
+    </div>
+    <div class="grid lg:grid-cols-2 gap-5 mt-5">
+      <div class="card p-6"><b class="text-sm">🕸️ 综合评分雷达图</b>
+        <div class="mt-2">${radar(us.length?[Math.round(us.reduce((a,u)=>a+u.env,0)/us.length*20),Math.round(us.reduce((a,u)=>a+u.jobRate,0)),Math.round(us.reduce((a,u)=>a+u.baoyan,0)*2),Math.round(us.reduce((a,u)=>a+u.salary,0)/160),Math.round(us.reduce((a,u)=>a+u.canteen,0)/us.length*20)]:[0,0,0,0,0],['校园环境','就业质量','深造机会','薪资水平','生活条件'])}</div>
+      </div>
+      <div class="card p-6 bg-gradient-to-br from-primary/5 to-transparent">
+        <b class="text-sm">🤖 AI 对比结论</b>
+        <div class="mt-3 space-y-3 text-sm leading-relaxed text-slate-700">
+          <p>📌 如果你看重<b class="text-primary">就业与薪资</b>，推荐 <b>${us[0]?.name||'—'}</b>：平均月薪 ${us[0]?us[0].salary.toLocaleString():''} 元，就业率 ${us[0]?.jobRate||''}%，校友资源与实习机会最强。</p>
+          <p>📌 如果你看重<b class="text-accent">学术深造</b>，推荐 <b>${us[1]?.name||us[0]?.name||'—'}</b>：保研率 ${us[1]?.baoyan||us[0]?.baoyan||''}%，基础学科实力强，导师制覆盖大一到大四。</p>
+          <p>📌 综合录取风险：以你的成绩，${us.map(u=>`${u.name}（${Math.round(Math.max(15,Math.min(95,100-(u.scores[0]-600)*1.6)))}%）`).join('、')}，建议按概率从高到低排序填入志愿表。</p>
+        </div>
+      </div>
+    </div>`;
+  }else if(c.type==='专业对比'){
+    const ms=c.majors.map(majorById).filter(Boolean);
+    body=`
+    <div class="card p-5 mb-5">
+      <b class="text-sm mb-3 block">选择对比专业（2-6 个）</b>
+      <div class="flex flex-wrap gap-2">${MAJORS.map(m=>`<span class="tag-sel ${c.majors.includes(m.id)?'on':''}" onclick="toggleCompareMajor(${m.id})">${m.name}</span>`).join('')}</div>
+    </div>
+    <div class="grid lg:grid-cols-2 gap-5">
+      <div class="card p-6"><b class="text-sm">💰 平均月薪对比（元/月）</b>
+        <div class="mt-4">${hbar(ms.map((m,i)=>({k:m.name,v:m.salary,color:['#2563EB','#F97316','#10B981','#8B5CF6','#EF4444','#F59E0B'][i%6]})))}</div>
+      </div>
+      <div class="card p-6"><b class="text-sm">📊 学习难度雷达图</b>
+        <div class="mt-2">${radar(ms.slice(0,3).map(m=>Math.round(m.diff*20)).concat([70,60,50]).slice(0,5),['数学要求','编程强度','记忆负担','实验强度','课业压力'],{color:'#F97316'})}</div>
+      </div>
+    </div>
+    <div class="card p-5 mt-5 overflow-auto">
+      <table class="w-full text-sm min-w-[640px]">
+        <thead><tr class="border-b border-line"><th class="text-left py-3 text-sub font-medium w-28">对比维度</th>${ms.map(m=>`<th class="py-3 font-bold">${m.name}</th>`).join('')}</tr></thead>
+        <tbody>
+          ${[['就业方向',m=>m.dir.join('、')],['考研率',m=>m.kaoyan+'%'],['考公岗位数',m=>(800+m.id*120)+' 个'],['学习难度',m=>stars(m.diff,'text-xs')],['男女比例',m=>`男${m.genderM}% : 女${100-m.genderM}%`],['热门程度',m=>stars(m.hot,'text-xs')],['主要课程',m=>['核心课程','详见专业库'][0]]].map(r=>`
+          <tr class="border-b border-line/60 last:border-0"><td class="py-3 text-sub text-[13px]">${r[0]}</td>${ms.map(m=>`<td class="py-3 text-center">${r[1](m)}</td>`).join('')}</tr>`).join('')}
+        </tbody>
+      </table>
+    </div>`;
+  }else if(c.type==='城市对比'){
+    const cs=c.cities.map(i=>CITIES[i]);
+    body=`
+    <div class="card p-5 mb-5">
+      <b class="text-sm mb-3 block">选择对比城市（2-4 个）</b>
+      <div class="flex flex-wrap gap-2">${CITIES.map((t,i)=>`<span class="tag-sel ${c.cities.includes(i)?'on':''}" onclick="toggleCompareCity(${i})">${t.name}</span>`).join('')}</div>
+    </div>
+    <div class="grid lg:grid-cols-2 gap-5">
+      <div class="card p-5 overflow-auto">
+        <table class="w-full text-sm min-w-[480px]">
+          <thead><tr class="border-b border-line"><th class="text-left py-3 text-sub font-medium">维度</th>${cs.map(t=>`<th class="py-3 font-bold">${t.name}</th>`).join('')}</tr></thead>
+          <tbody>
+            ${[['高校数量',t=>t.unis+' 所'],['毕业生平均月薪',t=>'¥'+t.salary.toLocaleString()],['生活成本指数',t=>t.cost],['气候舒适度',t=>stars(t.climate/20,'text-xs')],['就业机会指数',t=>t.jobs],['落户难度',t=>t.settle<60?'较难':t.settle<75?'中等':'较易']].map(r=>`
+            <tr class="border-b border-line/60 last:border-0"><td class="py-3 text-sub text-[13px]">${r[0]}</td>${cs.map(t=>`<td class="py-3 text-center">${r[1](t)}</td>`).join('')}</tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card p-6"><b class="text-sm">🕸️ 城市综合评分雷达图</b>
+        <div class="mt-2">${radar([Math.round(cs.reduce((a,t)=>a+t.jobs,0)/cs.length),Math.round(cs.reduce((a,t)=>a+t.climate,0)/cs.length),Math.round(cs.reduce((a,t)=>a+100-t.cost,0)/cs.length),Math.round(cs.reduce((a,t)=>a+t.settle,0)/cs.length),Math.round(cs.reduce((a,t)=>a+Math.min(100,t.unis),0)/cs.length)],['就业机会','气候舒适','生活成本','落户友好','教育资源'],{color:'#10B981'})}</div>
+      </div>
+    </div>`;
+  }else{
+    body=`<div class="card p-8 text-center">
+      <div class="text-5xl mb-4">⚖️</div><b>方案对比</b>
+      <p class="text-sub text-sm mt-2 max-w-md mx-auto">选择两个已保存的志愿方案，AI 将从录取概率、梯度结构、专业满意度三个维度对比。</p>
+      <div class="grid md:grid-cols-2 gap-4 mt-6 max-w-2xl mx-auto text-left">
+        ${state.savedPlans.slice(0,2).map((p,i)=>`<div class="border ${i===0?'border-primary/40 bg-primary/5':'border-line'} rounded-xl p-4"><b class="text-sm">${p.name}</b><p class="text-xs text-sub mt-1">${p.time} · ${p.count} 个志愿 · ${p.risk}</p>
+        <div class="mt-3 text-sm space-y-1.5">
+          <p>录取保障率：<b class="text-ok">${i===0?'96.2%':'99.1%'}</b></p><p>专业满意度：<b class="text-primary">${i===0?'88%':'76%'}</b></p><p>冲刺空间：<b class="text-accent">${i===0?'2 所 985':'无'}</b></p>
+        </div></div>`).join('')}
+      </div>
+      <p class="text-sm mt-5 bg-warn/5 border border-warn/20 rounded-xl p-3 max-w-2xl mx-auto">🤖 AI 建议：<b>方案 A 更优</b> —— 在保障率仅低 2.9% 的情况下，专业满意度高出 12%，且保留了 2 所 985 的冲刺机会。</p>
+    </div>`;
+  }
+  return `
+  <div class="max-w-shell mx-auto px-4 lg:px-6 py-8">
+    ${pageHead('对比工具','多维度横向对比，选择困难症的终结者')}
+    <div class="tabs flex gap-5 border-b border-line mb-6 text-[15px]">
+      ${tabs.map(t=>`<span class="nav-item !pb-3 ${c.type===t?'nav-active':''}" onclick="state.compare.type='${t}';rerender()">${t}</span>`).join('')}
+    </div>
+    ${body}
+  </div>`;
+}
+function toggleCompareUni(id){const c=state.compare.unis;c.includes(id)?c.splice(c.indexOf(id),1):c.length<6&&c.push(id);rerender();}
+function toggleCompareMajor(id){const c=state.compare.majors;c.includes(id)?c.splice(c.indexOf(id),1):c.length<6&&c.push(id);rerender();}
+function toggleCompareCity(i){const c=state.compare.cities;c.includes(i)?c.splice(c.indexOf(i),1):c.length<4&&c.push(i);rerender();}
+
+/* ========== 8. 生涯规划 ========== */
+function renderCareer(){
+  return `
+  <div class="max-w-shell mx-auto px-4 lg:px-6 py-8">
+    ${pageHead('生涯规划','不止填好志愿，更规划好大学四年与职业起点')}
+    <!-- 目标设定 -->
+    <div class="card p-6 mb-6 bg-gradient-to-r from-primary/5 via-white to-accent/5">
+      <b class="text-[15px]">🎯 我的目标</b>
+      <div class="grid md:grid-cols-4 gap-3 mt-4">
+        <div><label class="text-xs text-sub">目标院校</label><input class="inp mt-1" value="浙江大学"></div>
+        <div><label class="text-xs text-sub">目标专业</label><input class="inp mt-1" value="计算机科学与技术"></div>
+        <div><label class="text-xs text-sub">理想职业</label><input class="inp mt-1" value="算法工程师"></div>
+        <div class="flex items-end"><button class="btn btn-primary w-full rounded-xl py-2.5 text-sm font-bold" onclick="toast('目标达成难度：中等偏高 · 需要保持当前成绩并强化数学','info')">评估达成难度</button></div>
+      </div>
+      <div class="mt-4 flex items-center gap-3 text-sm"><span class="text-sub">达成难度评估：</span>
+        <div class="prog flex-1 max-w-xs"><i style="width:0%;background:linear-gradient(90deg,var(--warn),var(--accent))" data-w="68"></i></div>
+        <b class="text-accent">中等偏高（68%）</b></div>
+    </div>
+    <!-- 大学四年时间轴 -->
+    <div class="card p-6 mb-6">
+      <b class="text-[15px]">🗺️ 大学四年路径规划</b>
+      <div class="grid md:grid-cols-4 gap-4 mt-5">
+        ${[['大一 · 适应探索','text-primary','bg-primary/10','GPA 保持 3.7+ · 通过四六级 · 参加 1 个技术社团 · 完成职业测评'],['大二 · 专业深化','text-accent','bg-accent/10','核心课冲刺高分 · 进实验室 · 打数模/ACM 竞赛 · 暑期第一段实习'],['大三 · 实习考研','text-ok','bg-ok/10','5-8 月保研夏令营 · 大厂暑期实习转正 · 考研 3 月启动复习 · 语言考试出分'],['大四 · 求职升学','text-violet-600','bg-violet-500/10','9 月秋招冲刺 · 10 月保研推免 · 12 月考研初试 · 毕业论文与 offer 抉择']].map((x,i)=>`
+        <div class="relative rounded-2xl border border-line p-4 reveal" style="transition-delay:${i*80}ms">
+          <span class="chip ${x[2]} ${x[1]} font-bold">${x[0]}</span>
+          <ul class="mt-3 text-[13px] text-sub space-y-1.5">${x[3].split(' · ').map(t=>`<li class="flex gap-1.5"><span class="text-primary">▸</span>${t}</li>`).join('')}</ul>
+        </div>`).join('')}
+      </div>
+    </div>
+    <!-- 多路径分支 -->
+    <b class="text-[15px] block mb-4">🌿 五大发展路径</b>
+    <div class="grid md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
+      ${CAREER_PATHS.map((p,i)=>`
+      <div class="card card-hover p-5 cursor-pointer reveal" style="transition-delay:${i*60}ms" onclick="toast('${p.name}详细攻略已展开（演示）','info')">
+        <span class="text-3xl">${p.icon}</span><b class="block mt-2 text-sm ${p.color}">${p.name}</b>
+        <ul class="mt-2.5 text-xs text-sub space-y-1.5 leading-relaxed">${p.items.map(t=>`<li>${t}</li>`).join('')}</ul>
+      </div>`).join('')}
+    </div>
+    <!-- 行业趋势 & 企业偏好 -->
+    <div class="grid lg:grid-cols-2 gap-5">
+      <div class="card p-6">
+        <b class="text-sm">📈 计算机行业未来 5 年趋势（岗位需求量指数）</b>
+        <div class="mt-2">${lineChart([100,118,142,175,210],['2026','2027','2028','2029','2030'],{color:'#2563EB',unit:''})}</div>
+        <div class="mt-3">${hbar([{k:'AI 大模型工程师',v:96,color:'#2563EB'},{k:'数据工程师',v:82,color:'#10B981'},{k:'后端开发',v:74,color:'#F97316'},{k:'测试开发',v:55,color:'#8B5CF6'}],{unit:' 需求热度'})}</div>
+      </div>
+      <div class="card p-6">
+        <b class="text-sm">🏢 目标企业招聘偏好（字节跳动 · 算法岗）</b>
+        <div class="mt-3 flex flex-wrap gap-2">${['985/211','硕士优先','顶会论文加分','ACM 奖牌','实习转正率高','leetcode 300+'].map(t=>`<span class="chip bg-primary/5 text-primary border border-primary/15 !py-1.5 !px-3">${t}</span>`).join('')}</div>
+        <div class="mt-4 space-y-3 text-sm">
+          <div class="flex justify-between border-b border-dashed border-line pb-2"><span>应届生薪资区间</span><b class="text-primary">28k - 45k × 15 薪</b></div>
+          <div class="flex justify-between border-b border-dashed border-line pb-2"><span>偏好院校</span><span class="text-sub">清北复交浙 / 华五 / 北航北邮</span></div>
+          <div class="flex justify-between"><span>偏好专业</span><span class="text-sub">计算机 / 人工智能 / 数学</span></div>
+        </div>
+        <div class="bg-ok/5 border border-ok/20 rounded-xl p-3 mt-4 text-xs text-sub">✅ 你的目标路径匹配度 <b class="text-ok">82%</b>：建议大二暑期前完成 2 段项目 + 1 段实习</div>
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ========== 9. 社区 ========== */
+const COMM_TABS=['全部','志愿填报经验','院校就读体验','专业真相','家长交流','专家答疑','高考政策','大学生活'];
+function renderCommunity(){
+  const list=POSTS.filter(p=>state.commTab==='全部'||p.tag===state.commTab);
+  const qa=[...QA].sort((a,b)=>state.qaSort==='最热'?b.answers-a.answers:state.qaSort==='未回答'?a.answers-b.answers:0);
+  return `
+  <div class="max-w-shell mx-auto px-4 lg:px-6 py-8">
+    ${pageHead('社区','128 万考生与家长的真实经验交流地')}
+    <div class="flex gap-2 overflow-auto pb-3 mb-5">
+      ${COMM_TABS.map(t=>`<span class="tag-sel flex-none ${state.commTab===t?'on':''}" onclick="state.commTab='${t}';rerender()">${t}</span>`).join('')}
+    </div>
+    <div class="grid lg:grid-cols-[1fr_320px] gap-6 items-start">
+      <div class="space-y-4">
+        ${list.map((p,i)=>`
+        <div class="card card-hover p-5 cursor-pointer page-enter" style="animation-delay:${i*50}ms" onclick="toast('帖子详情页演示','info')">
+          <div class="flex items-center gap-2 flex-wrap">
+            <span class="chip bg-bgc text-sub border border-line">${p.tag}</span>
+            ${p.essence?'<span class="chip bg-warn/10 text-warn">🏆 精华</span>':''}
+            ${p.official?'<span class="chip bg-primary/10 text-primary">✔️ 官方认证</span>':''}
+          </div>
+          <b class="block mt-2.5 text-[15px] leading-snug">${p.title}</b>
+          <p class="text-sm text-sub mt-1.5">${p.ex}</p>
+          <div class="flex items-center gap-4 mt-3 text-xs text-sub">
+            <span class="flex items-center gap-1.5"><span class="w-6 h-6 rounded-full bg-gradient-to-br from-primary to-deep text-white text-[10px] flex items-center justify-center font-bold">${p.author[0]}</span>${p.author}</span>
+            <span>${p.time}</span><span class="flex-1"></span>
+            <span>👍 ${p.like}</span><span>💬 ${p.comment}</span><span>👁 ${p.view}</span>
+          </div>
+        </div>`).join('')}
+        ${list.length===0?`<div class="card p-14 text-center text-sub"><div class="text-4xl mb-3">📭</div>该话题下暂无帖子，来发第一帖吧</div>`:''}
+        <!-- 专家直播区 -->
+        <div class="card p-6 mt-2">
+          <b class="text-[15px]">🎥 专家直播</b>
+          <div class="grid md:grid-cols-3 gap-4 mt-4">
+            ${LIVES.map(l=>`
+            <div class="border border-line rounded-2xl p-4 hover:border-primary/40 transition-colors">
+              <div class="flex items-center gap-2.5">
+                <span class="w-11 h-11 rounded-full bg-gradient-to-br from-accent to-rose-500 text-white flex items-center justify-center font-bold shadow">${l.host[0]}</span>
+                <div><b class="text-sm block">${l.host}</b><span class="text-[11px] text-sub">${l.role}</span></div>
+              </div>
+              <p class="text-sm font-medium mt-3 leading-snug">${l.topic}</p>
+              <p class="text-xs text-sub mt-1.5">🕒 ${l.time} · ${(l.booked/10000).toFixed(1)}w 人已预约</p>
+              <button class="btn btn-primary w-full mt-3 rounded-lg py-2 text-xs font-bold" onclick="this.textContent='✓ 已预约，开播提醒你';this.classList.add('opacity-70');toast('直播预约成功','ok')">预约直播</button>
+            </div>`).join('')}
+          </div>
+        </div>
+        <!-- 问答广场 -->
+        <div class="card p-6">
+          <div class="flex items-center justify-between flex-wrap gap-2">
+            <b class="text-[15px]">❓ 问答广场</b>
+            <div class="flex gap-3 text-sm">${['最新','最热','未回答'].map(s=>`<span class="nav-item ${state.qaSort===s?'nav-active':''}" onclick="state.qaSort='${s}';rerender()">${s}</span>`).join('')}</div>
+          </div>
+          <div class="mt-4 space-y-3">
+            ${qa.map(q=>`
+            <div class="flex items-center gap-3 border-b border-dashed border-line pb-3 last:border-0 cursor-pointer group" onclick="toast('问题详情演示','info')">
+              <span class="w-10 h-10 rounded-xl ${q.answers>40?'bg-primary/10 text-primary':'bg-bgc text-sub'} flex flex-col items-center justify-center flex-none"><b class="text-sm leading-none">${q.answers}</b><span class="text-[9px]">回答</span></span>
+              <span class="flex-1 text-sm group-hover:text-primary transition-colors">${q.q}</span>
+              ${q.hot?'<span class="chip bg-danger/10 text-danger">🔥 热门</span>':''}
+              ${q.solved?'<span class="chip bg-ok/10 text-ok">已解决</span>':''}
+            </div>`).join('')}
+          </div>
+        </div>
+      </div>
+      <!-- 右侧边栏 -->
+      <div class="space-y-4 lg:sticky lg:top-20">
+        <div class="card p-5">
+          <b class="text-sm">✏️ 快速提问</b>
+          <textarea class="inp mt-3 h-20 resize-none" placeholder="描述你的问题，专家和过来人会来解答…"></textarea>
+          <button class="btn btn-primary w-full mt-3 rounded-lg py-2 text-sm font-bold" onclick="toast('问题发布成功，预计 10 分钟内收到回答','ok')">发布问题</button>
+        </div>
+        <div class="card p-5">
+          <b class="text-sm">🔥 热门话题榜</b>
+          <div class="mt-3 space-y-2.5 text-sm">
+            ${['平行志愿投档规则','650 分能上什么大学','计算机 vs 电子信息','中外合作办学值不值','新高考选科组合'].map((t,i)=>`
+            <div class="flex items-center gap-2 cursor-pointer hover:text-primary" onclick="toast('话题页演示','info')"><span class="w-5 h-5 rounded text-[10px] flex items-center justify-center font-bold ${i<3?'bg-danger/10 text-danger':'bg-bgc text-sub'}">${i+1}</span><span class="flex-1 truncate">#${t}#</span></div>`).join('')}
+          </div>
+        </div>
+        <div class="card p-5 bg-gradient-to-br from-deep to-primary text-white border-0">
+          <b class="text-sm">🛡️ 志愿填报避坑指南</b>
+          <ul class="mt-3 text-xs space-y-2 text-white/85 leading-relaxed">
+            <li>① 只看分数不看位次 → 必滑档</li>
+            <li>② 全部志愿同一层次 → 无保底</li>
+            <li>③ 冲区不服从调剂 → 退档风险</li>
+            <li>④ 忽视招生章程单科要求</li>
+            <li>⑤ 轻信「内部指标」诈骗</li>
+          </ul>
+          <button class="btn w-full mt-4 bg-white text-primary rounded-lg py-2 text-xs font-bold" onclick="toast('完整避坑指南（演示）','info')">查看完整指南</button>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ========== 10. 个人中心 ========== */
+const PROFILE_TABS=['我的档案','我的成绩','我的志愿表','我的测评报告','我的收藏','浏览历史','消息通知','账户设置'];
+function renderProfile(){
+  const t=state.profileTab;let body='';
+  if(t==='我的档案')body=`
+    <div class="card p-6">
+      <div class="flex items-center gap-4">
+        <div class="relative"><span class="w-20 h-20 rounded-2xl bg-gradient-to-br from-primary to-deep text-white text-3xl flex items-center justify-center font-extrabold shadow-lg">星</span>
+        <button class="absolute -bottom-1 -right-1 w-7 h-7 bg-white border border-line rounded-full text-xs shadow" onclick="toast('更换头像（演示）','info')">✏️</button></div>
+        <div><b class="text-lg">追风的少年</b><p class="text-sub text-sm mt-0.5">UID: 202608623 · 已实名认证</p>
+        <div class="flex gap-1.5 mt-2"><span class="chip bg-primary/10 text-primary">${state.province}考生</span><span class="chip bg-accent/10 text-accent">物理类</span><span class="chip bg-ok/10 text-ok">目标 985</span></div></div>
+      </div>
+      <div class="grid md:grid-cols-2 gap-4 mt-6">
+        ${[['昵称','追风的少年'],['所在省份','北京'],['科类','物理类'],['选科组合','物理 + 化学 + 生物'],['目标层次','985 / 双一流'],['手机号','138****8888']].map(x=>`
+        <div><label class="text-xs text-sub font-medium">${x[0]}</label><input class="inp mt-1" value="${x[1]}"></div>`).join('')}
+      </div>
+      <button class="btn btn-primary rounded-xl px-6 py-2.5 mt-5 text-sm font-bold" onclick="toast('个人资料已保存','ok')">保存修改</button>
+    </div>`;
+  else if(t==='我的成绩')body=`
+    <div class="card p-6">
+      <div class="flex items-center justify-between"><b class="text-[15px]">我的成绩单（可保存多套）</b><button class="btn btn-ghost rounded-lg px-3 py-1.5 text-xs" onclick="toast('新增成绩（演示）','info')">＋ 新增成绩</button></div>
+      <div class="grid md:grid-cols-3 gap-4 mt-4">
+        ${[['高考成绩','650','5,000','等位分 648',true],['二模成绩','638','6,800','等位分 640',false],['一模成绩','621','9,500','等位分 625',false]].map(x=>`
+        <div class="rounded-2xl border ${x[4]?'border-primary/40 bg-primary/5 ring-2 ring-primary/10':'border-line'} p-5 relative">
+          ${x[4]?'<span class="absolute -top-2.5 left-4 chip bg-primary text-white">当前使用</span>':''}
+          <b class="text-sm">${x[0]}</b>
+          <div class="text-3xl font-extrabold text-deep mt-2">${x[1]}<span class="text-sm font-normal text-sub"> 分</span></div>
+          <p class="text-xs text-sub mt-1">全省位次 ${x[2]} ｜ ${x[3]}</p>
+          <div class="flex gap-2 mt-4"><button class="btn btn-ghost rounded-lg px-3 py-1.5 text-xs flex-1" onclick="toast('已用该成绩生成方案','ok')">生成方案</button><button class="btn btn-ghost rounded-lg px-3 py-1.5 text-xs" onclick="toast('编辑成绩（演示）','info')">编辑</button></div>
+        </div>`).join('')}
+      </div>
+      <div class="card !shadow-none p-5 mt-5"><b class="text-sm">📈 三次成绩走势</b><div class="mt-2">${lineChart([621,638,650],['一模','二模','高考'],{color:'#F97316'})}</div></div>
+    </div>`;
+  else if(t==='我的志愿表')body=`
+    <div class="card p-6">
+      <b class="text-[15px]">已保存的方案（${state.savedPlans.length}）</b>
+      <div class="mt-4 space-y-3">
+        ${state.savedPlans.map((p,i)=>`
+        <div class="border border-line rounded-2xl p-4 flex flex-wrap items-center gap-3 hover:border-primary/40 transition-colors">
+          <span class="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center text-lg">📋</span>
+          <div class="flex-1 min-w-[200px]"><b class="text-sm">${p.name}</b><p class="text-xs text-sub mt-0.5">生成于 ${p.time} · ${p.count} 个志愿</p></div>
+          <span class="chip ${p.risk.includes('极低')?'bg-ok/10 text-ok':'bg-primary/10 text-primary'}">${p.risk}</span>
+          <div class="flex gap-2">
+            <button class="btn btn-ghost rounded-lg px-3 py-1.5 text-xs" onclick="state.compare.type='方案对比';go('compare')">⚖️ 对比</button>
+            <button class="btn btn-ghost rounded-lg px-3 py-1.5 text-xs" onclick="const n=prompt('重命名方案','${p.name}');if(n){state.savedPlans[${i}].name=n;rerender();toast('已重命名','ok')}">✏️ 重命名</button>
+            <button class="btn btn-ghost rounded-lg px-3 py-1.5 text-xs !text-danger" onclick="state.savedPlans.splice(${i},1);rerender();toast('方案已删除','info')">🗑️</button>
+          </div>
+        </div>`).join('')}
+      </div>
+    </div>`;
+  else if(t==='我的测评报告')body=`
+    <div class="card p-6">
+      <b class="text-[15px]">历史测评记录</b>
+      <div class="mt-4 space-y-3">
+        ${state.reports.map(r=>`
+        <div class="border border-line rounded-2xl p-4 flex items-center gap-3">
+          <span class="w-10 h-10 rounded-xl bg-violet-500/10 text-violet-600 flex items-center justify-center text-lg">🧭</span>
+          <div class="flex-1"><b class="text-sm">${typeof r.name==='string'?r.name:'霍兰德职业兴趣测试'}</b><p class="text-xs text-sub mt-0.5">完成于 ${r.time} · 结果类型：${r.type}</p></div>
+          <button class="btn btn-ghost rounded-lg px-3 py-1.5 text-xs" onclick="state.assess.current='report';go('assess')">查看报告</button>
+          <button class="btn btn-ghost rounded-lg px-3 py-1.5 text-xs" onclick="go('assess')">🔄 重新测评</button>
+        </div>`).join('')}
+      </div>
+    </div>`;
+  else if(t==='我的收藏')body=`
+    <div class="card p-6">
+      <div class="tabs flex gap-4 text-sm border-b border-line pb-2 mb-4" id="favTabs">
+        <span class="nav-item nav-active" onclick="favTab(this,'unis')">院校（${state.favUnis.size}）</span>
+        <span class="nav-item" onclick="favTab(this,'majors')">专业（${state.favMajors.size}）</span>
+        <span class="nav-item" onclick="favTab(this,'posts')">帖子（2）</span>
+      </div>
+      <div id="favBody">${renderFavBody('unis')}</div>
+    </div>`;
+  else if(t==='浏览历史')body=`
+    <div class="card p-6"><b class="text-[15px]">最近浏览</b>
+      <div class="mt-4 space-y-3 text-sm">
+        ${[['🏫 浙江大学 · 院校详情','30 分钟前'],['📚 人工智能 · 专业详情','1 小时前'],['🏫 复旦大学 · 院校详情','2 小时前'],['📖 帖子：平行志愿投档规则详解','昨天'],['📚 临床医学 · 专业详情','昨天']].map(x=>`
+        <div class="flex justify-between border-b border-dashed border-line pb-2.5 last:border-0"><span class="cursor-pointer hover:text-primary">${x[0]}</span><span class="text-xs text-sub">${x[1]}</span></div>`).join('')}
+      </div></div>`;
+  else if(t==='消息通知')body=`
+    <div class="card p-6"><div class="flex items-center justify-between"><b class="text-[15px]">消息通知</b><button class="btn btn-ghost rounded-lg px-3 py-1.5 text-xs" onclick="markAllRead()">全部已读</button></div>
+      <div class="mt-4 space-y-3">${state.msgs.map(m=>`
+        <div class="flex gap-3 border-b border-dashed border-line pb-3 last:border-0">
+          <span class="w-2 h-2 rounded-full mt-2 flex-none ${m.unread?'bg-danger':'bg-slate-200'}"></span>
+          <div class="flex-1"><b class="text-sm">${m.t}</b><p class="text-sm text-sub mt-0.5">${m.d}</p></div>
+          <span class="text-xs text-sub flex-none">${m.time}</span>
+        </div>`).join('')}</div></div>`;
+  else body=`
+    <div class="card p-6"><b class="text-[15px]">账户设置</b>
+      <div class="mt-5 space-y-4 max-w-md">
+        ${[['填报提醒（出分/填报/录取节点）',true],['政策更新推送',true],['专家直播开播提醒',true],['社区互动通知',false],['每周生涯规划建议邮件',false]].map((x,i)=>`
+        <div class="flex items-center justify-between text-sm"><span>${x[0]}</span><span class="sw ${x[1]?'on':''}" onclick="this.classList.toggle('on')"></span></div>`).join('')}
+        <div class="pt-3 border-t border-line space-y-2">
+          <button class="btn btn-ghost rounded-lg px-4 py-2 text-sm w-full" onclick="toast('修改密码（演示）','info')">🔑 修改密码</button>
+          <button class="btn btn-ghost rounded-lg px-4 py-2 text-sm w-full !text-danger" onclick="toast('已退出登录（演示）','info')">退出登录</button>
+        </div>
+      </div></div>`;
+  return `
+  <div class="max-w-shell mx-auto px-4 lg:px-6 py-8">
+    ${pageHead('个人中心','管理你的档案、成绩、方案与收藏')}
+    <div class="grid lg:grid-cols-[220px_1fr] gap-6 items-start">
+      <div class="card p-3 lg:sticky lg:top-20">
+        ${PROFILE_TABS.map(x=>`<div class="px-4 py-2.5 rounded-xl text-sm cursor-pointer transition-colors ${t===x?'bg-primary text-white font-bold shadow-md':'hover:bg-bgc text-slate-600'}" onclick="state.profileTab='${x}';rerender()">${x}</div>`).join('')}
+      </div>
+      <div>${body}</div>
+    </div>
+  </div>`;
+}
+function renderFavBody(kind){
+  if(kind==='unis')return `<div class="grid md:grid-cols-2 gap-3">${[...state.favUnis].map(id=>{const u=uniById(id);return `
+    <div class="border border-line rounded-xl p-3.5 flex items-center gap-3 cursor-pointer hover:border-primary/40" onclick="openUniModal(${id})">${uniLogo(u,'w-10 h-10 text-base')}
+    <div class="flex-1"><b class="text-sm">${u.name}</b><p class="text-xs text-sub">${u.city} · ${u.tags[0]}</p></div>
+    <button class="btn text-danger text-sm" onclick="event.stopPropagation();toggleFavUni(${id},this);rerender()">❤️</button></div>`;}).join('')||'<p class="text-sub text-sm col-span-2 py-8 text-center">还没有收藏院校</p>'}</div>`;
+  if(kind==='majors')return `<div class="grid md:grid-cols-2 gap-3">${[...state.favMajors].map(id=>{const m=majorById(id);return `
+    <div class="border border-line rounded-xl p-3.5 flex items-center gap-3 cursor-pointer hover:border-primary/40" onclick="openMajorModal(${id})">
+    <span class="w-10 h-10 rounded-xl bg-ok/10 text-ok flex items-center justify-center">📚</span>
+    <div class="flex-1"><b class="text-sm">${m.name}</b><p class="text-xs text-sub">${m.cat} · 薪资 ${(m.salary/1000).toFixed(1)}k</p></div>
+    <button class="btn text-danger text-sm" onclick="event.stopPropagation();toggleFavMajor(${id},this);rerender()">❤️</button></div>`;}).join('')||'<p class="text-sub text-sm col-span-2 py-8 text-center">还没有收藏专业</p>'}</div>`;
+  return `<div class="space-y-3">${POSTS.slice(0,2).map(p=>`<div class="border border-line rounded-xl p-3.5 text-sm cursor-pointer hover:border-primary/40"><b>${p.title}</b><p class="text-xs text-sub mt-1">${p.author} · ${p.time}</p></div>`).join('')}</div>`;
+}
+function favTab(el,kind){$$('#favTabs .nav-item').forEach(n=>n.classList.remove('nav-active'));el.classList.add('nav-active');$('#favBody').innerHTML=renderFavBody(kind);}
+function markAllRead(){state.msgs.forEach(m=>m.unread=false);updateBell();rerender();toast('已全部标记为已读','ok');}
+
+/* -------------------- ROUTER：SPA 路由 -------------------- */
+const ROUTES={home:renderHome,smart:renderSmart,unis:renderUnis,majors:renderMajors,assess:renderAssess,mock:renderMock,compare:renderCompare,career:renderCareer,community:renderCommunity,profile:renderProfile};
+function go(page){
+  if(!ROUTES[page])return;
+  state.page=page;
+  clearInterval(tTimer);
+  const root=$('#page-root');
+  root.innerHTML=`<div class="page-enter">${ROUTES[page]()}</div>`;
+  /* 高亮当前导航（单一 active 规则） */
+  $$('#navMenu .nav-item').forEach(n=>n.classList.toggle('nav-active',n.dataset.nav===page));
+  $('#navMenu').classList.remove('open');
+  window.scrollTo({top:0});
+  bindCounters(root);bindBars(root);bindReveals(root);
+  if(page==='home'){initHeroCanvas();initCarousel();}
+  if(page==='mock')initVolDrag();
+}
+/* 当前页原地重渲染（保持滚动位置的交互更新用） */
+function rerender(){
+  const y=window.scrollY;
+  $('#page-root').innerHTML=ROUTES[state.page]();
+  bindCounters();bindBars();bindReveals();
+  if(state.page==='home'){initHeroCanvas();initCarousel();}
+  if(state.page==='mock')initVolDrag();
+  window.scrollTo({top:y});
+}
+/* data-go 委托（导航/卡片跳转） */
+document.addEventListener('click',e=>{
+  const g=e.target.closest('[data-go]');if(g)go(g.dataset.go);
+});
+
+/* -------------------- 全局组件 -------------------- */
+/* 导航滚动毛玻璃 + 回到顶部 */
+const backTop=$('#backTop');
+window.addEventListener('scroll',()=>{
+  $('#topnav').classList.toggle('scrolled',window.scrollY>24);
+  const show=window.scrollY>480;
+  backTop.classList.toggle('hidden',!show);backTop.classList.toggle('flex',show);
+},{passive:true});
+backTop.onclick=()=>window.scrollTo({top:0,behavior:'smooth'});
+$('#navBurger').onclick=()=>$('#navMenu').classList.toggle('open');
+/* 省份切换 */
+$('#gProvince').onchange=e=>{state.province=e.target.value;toast('已切换到「'+e.target.value+'」考区数据','ok');if(state.page==='home'||state.page==='mock')rerender();};
+
+/* 通知中心 */
+function updateBell(){
+  const n=state.msgs.filter(m=>m.unread).length,b=$('#bellBadge');
+  b.textContent=n;b.style.display=n?'flex':'none';
+  $('#bellList').innerHTML=state.msgs.map(m=>`
+    <div class="px-4 py-3 border-b border-line/60 last:border-0 hover:bg-bgc cursor-pointer ${m.unread?'':'opacity-60'}">
+      <div class="flex items-center gap-2"><b class="text-[13px]">${m.t}</b>${m.unread?'<span class="w-1.5 h-1.5 rounded-full bg-danger"></span>':''}<span class="flex-1"></span><span class="text-[11px] text-sub">${m.time}</span></div>
+      <p class="text-xs text-sub mt-1">${m.d}</p>
+    </div>`).join('');
+}
+$('#bellBtn').onclick=e=>{e.stopPropagation();$('#bellDrop').classList.toggle('hidden');updateBell();};
+$('#bellClear').onclick=()=>{state.msgs.forEach(m=>m.unread=false);updateBell();toast('已全部标记为已读','ok');};
+document.addEventListener('click',e=>{if(!e.target.closest('#bellBtn')&&!e.target.closest('#bellDrop'))$('#bellDrop').classList.add('hidden');});
+
+/* 全局搜索建议 */
+$('#gSearch').addEventListener('input',e=>{
+  const v=e.target.value.trim(),drop=$('#gSearchDrop');
+  if(!v){drop.classList.add('hidden');return;}
+  const us=UNIS.filter(u=>u.name.includes(v)).slice(0,3).map(u=>({icon:'🏫',t:u.name,s:'院校 · '+u.city,fn:`closeSearch();openUniModal(${u.id})`}));
+  const ms=MAJORS.filter(m=>m.name.includes(v)).slice(0,3).map(m=>({icon:'📚',t:m.name,s:'专业 · '+m.cat,fn:`closeSearch();openMajorModal(${m.id})`}));
+  const qs=QA.filter(q=>q.q.includes(v)).slice(0,2).map(q=>({icon:'❓',t:q.q,s:'问答 · '+q.answers+' 回答',fn:`closeSearch();state.commTab='全部';go('community')`}));
+  const all=[...us,...ms,...qs];
+  drop.innerHTML=all.length?all.map(x=>`<div class="px-4 py-2.5 hover:bg-bgc cursor-pointer flex items-center gap-2.5 text-sm" onclick="${x.fn}"><span>${x.icon}</span><div class="min-w-0"><b class="block truncate text-[13px]">${x.t}</b><span class="text-[11px] text-sub">${x.s}</span></div></div>`).join('')
+    :`<div class="px-4 py-3 text-sm text-sub">未找到「${esc(v)}」相关内容</div>`;
+  drop.classList.remove('hidden');
+});
+function closeSearch(){$('#gSearchDrop').classList.add('hidden');$('#gSearch').value='';}
+document.addEventListener('click',e=>{if(!e.target.closest('#gSearch')&&!e.target.closest('#gSearchDrop'))$('#gSearchDrop').classList.add('hidden');});
+
+/* -------------------- AI 志愿助手 -------------------- */
+const AI_QUICK=['我 600 分能上 985 吗？','计算机和软件工程怎么选？','什么是服从调剂？','平行志愿怎么投档？','推荐几个就业前景好的专业'];
+const AI_KB=[
+  {k:['600','985'],r:{text:'以北京物理类为例，600 分（位次约 8000-10000）冲击 985 机会有限，但可以这样布局：',cards:[{t:'🎯 可冲的 985（概率 20-35%）',d:'西北农林科技大学、中国海洋大学（中外合作）、兰州大学部分专业'},{t:'🛡️ 稳妥选择',d:'优质 211：北京邮电大学、西安电子科技大学的优势专业，就业不输 985'},{t:'💡 建议',d:'如果看重学校牌子，接受偏远地区 985；如果看重专业，选头部 211 的王牌专业'}],go:{label:'生成我的专属方案',page:'smart'}}},
+  {k:['计算机','软件工程'],r:{text:'两个专业就业率都很高（95%/94%），核心区别在这 3 点：',cards:[{t:'📚 课程侧重',d:'计科：更重理论（组成原理、编译原理），软硬件都学；软工：更重工程（项目开发、测试、DevOps）'},{t:'💰 就业与薪资',d:'软工起薪略高（11.5k vs 12k 持平），计科研招面更广'},{t:'🎓 深造方向',d:'打算考研选计科（学硕对口多），打算本科就业选软工（项目经验丰富）'}],go:{label:'对比这两个专业',page:'compare'}}},
+  {k:['服从调剂'],r:{text:'服从调剂 = 同意学校在你未录满的专业中为你分配，是平行志愿的「安全带」。',cards:[{t:'✅ 勾选的后果',d:'分数不够所报专业时，被调到该校其他专业，但保住这个学校'},{t:'⛔ 不勾的后果',d:'分数不够所报专业 → 直接退档，本批次其他志愿全部作废'},{t:'💡 择校星建议',d:'冲区院校必须勾；稳保区看该校是否有你绝对不接受的专业'}],go:{label:'查看避坑指南',page:'community'}}},
+  {k:['平行志愿','投档'],r:{text:'平行志愿投档三原则：分数优先、遵循志愿、一轮投档。',cards:[{t:'1️⃣ 分数优先',d:'全省考生按分数排队，高分先投档，与你把学校填在第几位无关'},{t:'2️⃣ 遵循志愿',d:'轮到你时，从第 1 志愿开始依次检索，遇到有计划余额的院校即投档'},{t:'3️⃣ 一轮投档',d:'每人每批次只有一次投档机会！投档后被退档，只能等征集志愿'}],go:{label:'看官方动画详解',page:'community'}}},
+  {k:['就业前景','就业好','推荐'],r:{text:'结合 2025 就业质量报告，这几个方向近五年持续「绿牌」：',cards:[{t:'🥇 人工智能（13k/月）',d:'需求年增 40%+，算法、自动驾驶、大模型方向最吃香'},{t:'🥈 数据科学与大数据（11k/月）',d:'各行业数字化转型刚需，金融/零售/制造都在抢人'},{t:'🥉 电气工程（9k/月）',d:'国家电网校招大户，新能源赛道第二增长曲线'}],go:{label:'查看专业库',page:'majors'}}}
+];
+function aiToggle(open){$('#aiPanel').classList.toggle('hide',!open);}
+$('#aiFab').onclick=()=>aiToggle($('#aiPanel').classList.contains('hide'));
+$('#aiClose').onclick=()=>aiToggle(false);
+function aiMsg(html,me=false){
+  const box=$('#aiMsgs'),d=document.createElement('div');
+  d.className='flex '+(me?'justify-end':'justify-start');
+  d.innerHTML=`<div class="${me?'bg-primary text-white rounded-2xl rounded-br-md':'bg-white border border-line rounded-2xl rounded-bl-md'} px-3.5 py-2.5 max-w-[85%] text-[13px] leading-relaxed shadow-sm">${html}</div>`;
+  box.appendChild(d);box.scrollTop=box.scrollHeight;return d;
+}
+/* 打字机逐字输出 */
+function typewriter(el,text,done){
+  let i=0;el.innerHTML='';
+  (function tick(){if(i<=text.length){el.innerHTML=esc(text.slice(0,i));i+=2;setTimeout(tick,18);}else if(done)done();})();
+}
+function aiAsk(q){
+  if(!q.trim())return;
+  aiMsg(esc(q),true);$('#aiInput').value='';
+  const typing=aiMsg('<span class="typing"><i></i><i></i><i></i></span>');
+  setTimeout(()=>{
+    const hit=AI_KB.find(x=>x.k.some(k=>q.includes(k)))||{r:{text:'这个问题我已记录。基于你的档案（650 分 · 物理类），我先给你一条通用建议：志愿填报的核心是「位次法」——用你的全省排名对照院校近 3 年录取位次，比单纯看分数可靠得多。',cards:[{t:'💡 试试问我',d:'「平行志愿怎么投档」「服从调剂是什么」「推荐就业前景好的专业」'}],go:{label:'打开智能填报',page:'smart'}}};
+    const r=hit.r,bubble=typing.querySelector('div');
+    bubble.innerHTML='';
+    const span=document.createElement('span');bubble.appendChild(span);
+    typewriter(span,r.text,()=>{
+      bubble.insertAdjacentHTML('beforeend',r.cards.map(c=>`<div class="bg-bgc rounded-xl p-2.5 mt-2 border border-line"><b class="text-[12px]">${c.t}</b><p class="text-[12px] text-sub mt-0.5">${c.d}</p></div>`).join(''));
+      if(r.go)bubble.insertAdjacentHTML('beforeend',`<button class="btn btn-primary rounded-lg px-3 py-1.5 text-xs mt-2.5 w-full" onclick="aiToggle(false);go('${r.go.page}')">${r.go.label} →</button>`);
+      $('#aiMsgs').scrollTop=$('#aiMsgs').scrollHeight;
+    });
+  },900);
+}
+$('#aiSend').onclick=()=>aiAsk($('#aiInput').value);
+$('#aiInput').addEventListener('keydown',e=>{if(e.key==='Enter')aiAsk(e.target.value);});
+$('#aiQuick').innerHTML=AI_QUICK.map(q=>`<span class="tag-sel flex-none !text-[11px]" onclick="aiAsk('${q}')">${q}</span>`).join('');
+/* 欢迎语 */
+aiMsg('👋 你好，我是择校星 AI 志愿分析师。已读取你的档案：<b>650 分 · 北京 · 物理类</b>。有什么填报问题，直接问我吧！');
+
+/* -------------------- 初始化 -------------------- */
+updateBell();
+go('home');</script>
+</body>
+</html>

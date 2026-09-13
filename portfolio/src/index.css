@@ -1,0 +1,113 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  body {
+    @apply bg-bg text-ink font-sans text-[15px] leading-[1.65];
+  }
+  ::selection {
+    background: rgba(37, 99, 235, 0.15);
+  }
+}
+
+@layer components {
+  .container-site {
+    @apply mx-auto w-full max-w-site px-6 md:px-8;
+  }
+  .eyebrow {
+    @apply text-xs font-semibold uppercase tracking-[0.18em] text-accent;
+  }
+  .btn {
+    @apply inline-flex h-11 items-center justify-center gap-2 rounded-btn px-6 text-sm font-medium transition-all duration-200 ease-out focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2;
+  }
+  .btn-primary {
+    @apply btn bg-accent text-white hover:bg-accent-hover active:scale-[0.98];
+  }
+  .btn-secondary {
+    @apply btn border border-line bg-white text-ink hover:border-muted hover:bg-[#f3f4f6] active:scale-[0.98];
+  }
+  .tag {
+    @apply inline-flex items-center rounded-full bg-accent-soft px-3 py-1 text-xs font-medium text-accent;
+  }
+  .tag-gray {
+    @apply inline-flex items-center rounded-full bg-[#f3f4f6] px-3 py-1 text-xs font-medium text-sub;
+  }
+  .input {
+    @apply h-11 w-full rounded-btn border border-line bg-white px-4 text-sm text-ink outline-none transition-all duration-200 placeholder:text-muted focus:border-accent focus:ring-4 focus:ring-accent/10;
+  }
+  .textarea {
+    @apply input h-auto min-h-[120px] py-3;
+  }
+  .card {
+    @apply rounded-card border border-line bg-white shadow-card;
+  }
+  .section-gap {
+    @apply py-20 md:py-28;
+  }
+}
+
+/* ---------- 滚动 reveal ---------- */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition:
+    opacity 0.6s ease,
+    transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+/* ---------- 图片懒加载模糊渐变 ---------- */
+.img-fade {
+  opacity: 0;
+  filter: blur(12px);
+  transform: scale(1.02);
+  transition:
+    opacity 0.5s ease,
+    filter 0.5s ease,
+    transform 0.5s ease;
+}
+.img-fade.is-loaded {
+  opacity: 1;
+  filter: blur(0);
+  transform: scale(1);
+}
+
+/* ---------- 轮播指示器 ---------- */
+.dot {
+  @apply h-1.5 w-1.5 rounded-full bg-white/50 transition-all duration-300;
+}
+.dot.is-active {
+  @apply w-6 bg-white;
+}
+
+/* 顶部进度细线 */
+.nav-link {
+  @apply relative text-sm font-medium text-sub transition-colors duration-200 hover:text-accent;
+}
+.nav-link::after {
+  content: '';
+  @apply absolute -bottom-1.5 left-0 h-[2px] w-0 rounded-full bg-accent transition-all duration-200;
+}
+.nav-link:hover::after,
+.nav-link.is-active::after {
+  @apply w-full;
+}
+.nav-link.is-active {
+  @apply text-ink;
+}

@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mood Garden 情绪花园 · 高保真交互原型</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Ccircle cx='20' cy='20' r='19' fill='%23E8F5E9'/%3E%3Cpath d='M20 30 V16' stroke='%233D7A66' stroke-width='2.4' stroke-linecap='round'/%3E%3Cpath d='M20 18 C20 12 15 9 10 10 C11 16 15 19 20 18Z' fill='%235BA68A'/%3E%3Cpath d='M20 15 C20 9 25 6 30 7 C29 13 25 16 20 15Z' fill='%237FBFA0'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="./mood-garden.css">
+</head>
+<body>
+
+<!-- ══════════════ 作品集模块舞台 ══════════════ -->
+<div class="stage">
+  <header class="stage-head">
+    <div class="stage-logo">
+      <svg viewBox="0 0 40 40" width="38" height="38"><circle cx="20" cy="20" r="19" fill="#E8F5E9"/><path d="M20 30 V16" stroke="#3D7A66" stroke-width="2.4" stroke-linecap="round"/><path d="M20 18 C20 12 15 9 10 10 C11 16 15 19 20 18Z" fill="#5BA68A"/><path d="M20 15 C20 9 25 6 30 7 C29 13 25 16 20 15Z" fill="#7FBFA0"/></svg>
+    </div>
+    <div class="stage-title">
+      <h1>Mood Garden 情绪花园</h1>
+      <p>iOS 情绪记录与心理健康陪伴 App · 高保真交互原型 · iPhone 15 Pro (393×852)</p>
+    </div>
+    <div class="stage-hint"><span class="pulse-dot"></span>全部可点击交互 · 试试浇水 / 记录 / 深呼吸</div>
+  </header>
+
+  <div class="phone-wrap">
+    <div class="phone" id="phone">
+      <div class="notch"></div>
+      <div class="statusbar">
+        <span class="sb-time" id="sbTime">9:41</span>
+        <div class="sb-icons">
+          <svg width="17" height="11" viewBox="0 0 17 11"><rect x="0" y="7" width="3" height="4" rx="1" fill="#292524"/><rect x="4.5" y="5" width="3" height="6" rx="1" fill="#292524"/><rect x="9" y="2.5" width="3" height="8.5" rx="1" fill="#292524"/><rect x="13.5" y="0" width="3" height="11" rx="1" fill="#292524" opacity=".35"/></svg>
+          <svg width="16" height="11" viewBox="0 0 16 11"><path d="M8 9.2a1.4 1.4 0 1 1 0 2.8 1.4 1.4 0 0 1 0-2.8zM8 5.6c1.8 0 3.4.7 4.6 1.9l-1.4 1.4A4.4 4.4 0 0 0 8 7.6c-1.2 0-2.4.5-3.2 1.3L3.4 7.5A6.4 6.4 0 0 1 8 5.6zM8 1c2.9 0 5.7 1.2 7.7 3.2l-1.4 1.4A8.4 8.4 0 0 0 8 3 8.4 8.4 0 0 0 1.7 5.6L.3 4.2A11 11 0 0 1 8 1z" fill="#292524"/></svg>
+          <svg width="25" height="12" viewBox="0 0 25 12"><rect x="0.5" y="0.5" width="20" height="11" rx="3.5" fill="none" stroke="#292524" opacity=".4"/><rect x="2" y="2" width="14" height="8" rx="2" fill="#292524"/><path d="M23 4v4a2.2 2.2 0 0 0 0-4z" fill="#292524" opacity=".4"/></svg>
+        </div>
+      </div>
+
+      <main class="viewport" id="viewport">
+
+        <!-- ════════ Onboarding ════════ -->
+        <div class="screen active" id="scr-onboard">
+
+          <!-- 1 闪屏 -->
+          <div class="ob-slide active" data-ob="0">
+            <div class="ob-splash">
+              <div class="splash-soil"></div>
+              <div class="splash-seed"></div>
+              <svg class="splash-leaf" viewBox="0 0 80 80" width="90" height="90">
+                <path d="M40 72 V34" stroke="#3D7A66" stroke-width="4" stroke-linecap="round" class="sl-stem"/>
+                <path d="M40 40 C40 24 28 16 12 18 C14 34 26 42 40 40Z" fill="#5BA68A" class="sl-l1"/>
+                <path d="M40 32 C40 16 52 8 68 10 C66 26 54 34 40 32Z" fill="#7FBFA0" class="sl-l2"/>
+              </svg>
+              <h1 class="splash-slogan">每天的情绪，<br>都会在这里长成一株植物。</h1>
+            </div>
+          </div>
+
+          <!-- 2 欢迎 -->
+          <div class="ob-slide" data-ob="1">
+            <div class="ob-welcome">
+              <svg class="ob-hero" viewBox="0 0 320 260">
+                <defs>
+                  <radialGradient id="glow" cx="50%" cy="60%" r="60%">
+                    <stop offset="0%" stop-color="#FFF7D6"/><stop offset="100%" stop-color="#FFF7D6" stop-opacity="0"/>
+                  </radialGradient>
+                  <linearGradient id="obsky" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#CDE9F6"/><stop offset="100%" stop-color="#F3F8EE"/>
+                  </linearGradient>
+                </defs>
+                <rect width="320" height="260" rx="24" fill="url(#obsky)"/>
+                <ellipse cx="160" cy="170" rx="150" ry="90" fill="url(#glow)"/>
+                <ellipse cx="160" cy="240" rx="200" ry="60" fill="#BFE3C8"/>
+                <g class="ob-hero-plant"><path d="M80 228 V190" stroke="#3D7A66" stroke-width="4" stroke-linecap="round"/><circle cx="80" cy="180" r="12" fill="#FBBF24"/><g fill="#FBBF24" opacity=".85"><ellipse cx="80" cy="162" rx="5" ry="10"/><ellipse cx="80" cy="198" rx="5" ry="10"/><ellipse cx="62" cy="180" rx="10" ry="5"/><ellipse cx="98" cy="180" rx="10" ry="5"/><ellipse cx="67" cy="167" rx="7" ry="7"/><ellipse cx="93" cy="167" rx="7" ry="7"/><ellipse cx="67" cy="193" rx="7" ry="7"/><ellipse cx="93" cy="193" rx="7" ry="7"/></g><circle cx="80" cy="180" r="7" fill="#8D5A2B"/></g>
+                <g class="ob-hero-plant" style="animation-delay:.2s"><path d="M160 232 V176" stroke="#3D7A66" stroke-width="4" stroke-linecap="round"/><g fill="#A78BFA"><circle cx="152" cy="168" r="6"/><circle cx="168" cy="168" r="6"/><circle cx="160" cy="158" r="6"/><circle cx="152" cy="184" r="6"/><circle cx="168" cy="184" r="6"/><circle cx="160" cy="176" r="7" fill="#8B6FE0"/></g></g>
+                <g class="ob-hero-plant" style="animation-delay:.4s"><path d="M240 228 V196" stroke="#3D7A66" stroke-width="4" stroke-linecap="round"/><g fill="#93C5FD"><circle cx="240" cy="184" r="9"/><circle cx="229" cy="191" r="7"/><circle cx="251" cy="191" r="7"/><circle cx="233" cy="178" r="6"/><circle cx="247" cy="178" r="6"/></g></g>
+                <g fill="#ffffff" opacity=".9"><ellipse cx="70" cy="60" rx="26" ry="12"/><ellipse cx="90" cy="54" rx="20" ry="10"/><ellipse cx="240" cy="44" rx="28" ry="12"/><ellipse cx="262" cy="38" rx="18" ry="9"/></g>
+                <circle cx="282" cy="70" r="16" fill="#FFE9A8"/>
+              </svg>
+              <h2 class="ob-title">欢迎来到你的情绪花园</h2>
+              <p class="ob-desc">每天 1 分钟，把心情种成植物。<br>坚持记录，看它长成一座只属于你的花园。</p>
+              <button class="btn-primary ob-next">开始种植</button>
+              <button class="ob-skip" data-skip>跳过引导</button>
+            </div>
+          </div>
+
+          <!-- 3 昵称与目标 -->
+          <div class="ob-slide" data-ob="2">
+            <div class="ob-form">
+              <h2 class="ob-title left">先认识一下你</h2>
+              <p class="ob-desc left">你的昵称</p>
+              <input class="ob-input" id="obName" type="text" placeholder="怎么称呼你？" value="Alex" maxlength="12">
+              <p class="ob-desc left" style="margin-top:20px">你想通过 Mood Garden 获得什么？</p>
+              <div class="goal-grid" id="goalGrid">
+                <button class="goal-chip active" data-goal="减压"><svg viewBox="0 0 24 24" width="22" height="22"><path d="M12 21c-4 0-7-3-7-7 0-5 4-9 7-11 3 2 7 6 7 11 0 4-3 7-7 7z" fill="#7DD3FC"/></svg>减压放松</button>
+                <button class="goal-chip" data-goal="自我了解"><svg viewBox="0 0 24 24" width="22" height="22"><circle cx="12" cy="12" r="9" fill="#A78BFA"/><circle cx="12" cy="12" r="4" fill="#fff"/></svg>自我了解</button>
+                <button class="goal-chip" data-goal="养成习惯"><svg viewBox="0 0 24 24" width="22" height="22"><path d="M12 21V9" stroke="#3D7A66" stroke-width="2.5"/><path d="M12 12C12 7 8 4 3 5c1 5 5 8 9 7z" fill="#5BA68A"/><path d="M12 10c0-5 4-8 9-7-1 5-5 8-9 7z" fill="#7FBFA0"/></svg>养成习惯</button>
+                <button class="goal-chip" data-goal="改善睡眠"><svg viewBox="0 0 24 24" width="22" height="22"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4 8.5 8.5 0 1 0 20 14.5z" fill="#93C5FD"/></svg>改善睡眠</button>
+              </div>
+              <p class="ob-note">不同目标会送你不同的起始植物哦</p>
+              <button class="btn-primary ob-next">继续</button>
+            </div>
+          </div>
+
+          <!-- 4 情绪初体验 -->
+          <div class="ob-slide" data-ob="3">
+            <div class="ob-first">
+              <h2 class="ob-title left">此刻的你，感觉怎么样？</h2>
+              <p class="ob-desc left">选一个最接近的情绪，种下第一株植物</p>
+              <div class="ob-emotion-grid" id="obEmotionGrid"></div>
+              <div class="ob-first-result" id="obFirstResult">
+                <div class="ofr-plant" id="obFirstPlant"></div>
+                <p>这就是你种下的第一株植物</p>
+              </div>
+              <button class="btn-primary ob-next" id="obFirstNext" disabled>继续</button>
+            </div>
+          </div>
+
+          <!-- 5 通知权限 -->
+          <div class="ob-slide" data-ob="4">
+            <div class="ob-notify">
+              <svg viewBox="0 0 120 120" width="110" height="110">
+                <circle cx="60" cy="60" r="52" fill="#E8F5E9"/>
+                <path d="M60 34c-8 0-14 6-14 14v10l-5 8h38l-5-8V48c0-8-6-14-14-14z" fill="#5BA68A"/>
+                <circle cx="60" cy="72" r="5" fill="#3D7A66"/>
+                <circle cx="82" cy="38" r="7" fill="#FBBF24" class="notify-dot"/>
+              </svg>
+              <h2 class="ob-title">晚间温柔提醒</h2>
+              <p class="ob-desc">每晚 21:30，轻轻问你一句：<br>「今天过得怎么样？」<br>不打扰，只是陪伴。</p>
+              <button class="btn-primary ob-next">允许通知</button>
+              <button class="ob-skip ob-next">稍后再说</button>
+            </div>
+          </div>
+
+          <!-- 6 完成 -->
+          <div class="ob-slide" data-ob="5">
+            <div class="ob-done">
+              <div class="ob-mini-garden">
+                <svg viewBox="0 0 300 150" width="100%">
+                  <linearGradient id="dsky" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FFE3C2"/><stop offset="100%" stop-color="#FFF6E8"/></linearGradient>
+                  <rect width="300" height="150" rx="20" fill="url(#dsky)"/>
+                  <ellipse cx="150" cy="150" rx="190" ry="42" fill="#BFE3C8"/>
+                  <circle cx="252" cy="36" r="15" fill="#FFE9A8"/>
+                  <g class="ob-hero-plant"><path d="M110 138 V112" stroke="#3D7A66" stroke-width="3.5" stroke-linecap="round"/><circle cx="110" cy="104" r="9" fill="#FBBF24"/><circle cx="110" cy="104" r="4.5" fill="#8D5A2B"/></g>
+                  <g class="ob-hero-plant" style="animation-delay:.25s"><path d="M150 140 V104" stroke="#3D7A66" stroke-width="3.5" stroke-linecap="round"/><path d="M150 112c0-9-7-13-16-12 1 9 7 13 16 12z" fill="#5BA68A"/><path d="M150 108c0-9 7-13 16-12-1 9-7 13-16 12z" fill="#7FBFA0"/></g>
+                  <g class="ob-hero-plant" style="animation-delay:.5s"><path d="M192 138 V114" stroke="#3D7A66" stroke-width="3.5" stroke-linecap="round"/><g fill="#93C5FD"><circle cx="192" cy="106" r="7"/><circle cx="184" cy="111" r="5.5"/><circle cx="200" cy="111" r="5.5"/></g></g>
+                </svg>
+              </div>
+              <h2 class="ob-title">你的花园已备好</h2>
+              <p class="ob-desc" id="obDoneDesc">从今天开始，每一次记录都会让它更繁茂。</p>
+              <button class="btn-primary" id="enterGarden">进入花园</button>
+            </div>
+          </div>
+
+          <div class="ob-dots" id="obDots"></div>
+        </div>
+
+        <!-- ════════ 主 App ════════ -->
+        <div class="screen" id="scr-app">
+
+          <!-- ── 页面1 花园 ── -->
+          <section class="page active" id="page-garden">
+            <div class="g-head anim">
+              <div>
+                <h2 class="greet" id="greetText">早安，Alex</h2>
+                <p class="date" id="gardenDate"></p>
+              </div>
+              <div class="g-actions">
+                <button class="icon-btn" id="wBtn" aria-label="天气"><svg viewBox="0 0 24 24" width="20" height="20"><circle cx="8" cy="9" r="4" fill="#FBBF24"/><path d="M9 19h8a4 4 0 0 0 .6-7.95A5.5 5.5 0 0 0 7.2 12.3 3.2 3.2 0 0 0 9 19z" fill="#D6D3D1"/></svg></button>
+                <button class="icon-btn" data-toast="今日花园卡片已生成，快去分享吧" aria-label="分享"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#78716C" stroke-width="1.8" stroke-linecap="round"><path d="M12 3v13M7 7l5-4 5 4M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg></button>
+                <button class="icon-btn" data-goto="page-me" aria-label="设置"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#78716C" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="3.2"/><path d="M19 12a7 7 0 0 0-.1-1.2l2-1.5-2-3.4-2.3 1a7 7 0 0 0-2-1.2L14.2 3h-4l-.4 2.5a7 7 0 0 0-2 1.2l-2.3-1-2 3.4 2 1.5a7 7 0 0 0 0 2.4l-2 1.5 2 3.4 2.3-1a7 7 0 0 0 2 1.2l.4 2.5h4l.4-2.5a7 7 0 0 0 2-1.2l2.3 1 2-3.4-2-1.5c.06-.4.1-.8.1-1.2z"/></svg></button>
+              </div>
+            </div>
+
+            <div class="weather-banner anim" data-toast="天气与花园联动：多云天的植物会微微低垂">
+              <svg viewBox="0 0 24 24" width="18" height="18" class="wb-ic"><path d="M6 18h11a4 4 0 0 0 .6-7.95A6 6 0 0 0 6 12.3 3.5 3.5 0 0 0 6 18z" fill="#A8A29E"/></svg>
+              <span>今天上海 18°C 多云 · 很适合散步</span>
+              <svg viewBox="0 0 24 24" width="16" height="16" class="wb-leaf"><path d="M12 20C12 12 7 7 2 8c1 7 6 11 10 12z" fill="#5BA68A"/><path d="M12 20c0-8 5-13 10-12-1 7-6 11-10 12z" fill="#7FBFA0"/></svg>
+            </div>
+
+            <!-- 主花园场景 -->
+            <div class="scene anim" id="scene">
+              <div class="sky-layer" id="skyLayer"></div>
+              <div class="stars" id="stars"></div>
+              <div class="celestial" id="celestial"></div>
+              <svg class="mtn" viewBox="0 0 393 110" preserveAspectRatio="none">
+                <path d="M0 110 L60 55 L120 90 L190 40 L260 85 L330 50 L393 95 L393 110 Z" class="mtn-far"/>
+                <path d="M0 110 L45 80 L110 100 L180 65 L250 100 L320 72 L393 102 L393 110 Z" class="mtn-near"/>
+              </svg>
+              <div class="cloud cl1"></div><div class="cloud cl2"></div><div class="cloud cl3"></div>
+              <div id="petals"></div>
+              <div class="ground" id="ground"></div>
+              <div class="g-path"></div>
+              <div class="scene-plants" id="scenePlants"></div>
+              <div class="today-plant" id="todayPlant"></div>
+              <div class="day-tag" id="dayTag"></div>
+              <button class="scene-arrow left" id="prevDay" aria-label="前一天"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg></button>
+              <button class="scene-arrow right" id="nextDay" aria-label="后一天"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M9 5l7 7-7 7"/></svg></button>
+            </div>
+
+            <!-- 状态仪表盘 -->
+            <div class="dash anim">
+              <button class="dash-item" data-toast="连续记录 12 天 · 再坚持 2 天可获「7 天连击·进阶」徽章">
+                <span class="dash-ic" style="background:#FFF3E0"><svg viewBox="0 0 24 24" width="18" height="18"><path d="M12 22c4.4 0 7.5-3 7.5-7.2 0-5-4.4-7.6-6-11.3-1 2-1.5 3.6-1.3 5.7-1.2-.6-2.2-1.7-2.7-3.2C7.3 8 4.5 10.6 4.5 14.8 4.5 19 7.6 22 12 22z" fill="#F97316"/></svg></span>
+                <span class="dash-num" id="streakNum">12</span><span class="dash-label">连续记录</span>
+              </button>
+              <button class="dash-item" data-toast="今日情绪指数 8.2 · 比昨日 +0.6，状态不错">
+                <span class="dash-ic" style="background:#FFF8DC"><svg viewBox="0 0 24 24" width="18" height="18"><circle cx="12" cy="12" r="9" fill="#FBBF24"/><circle cx="9" cy="10" r="1.4" fill="#292524"/><circle cx="15" cy="10" r="1.4" fill="#292524"/><path d="M8 14c1.2 1.6 2.6 2.4 4 2.4s2.8-.8 4-2.4" stroke="#292524" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg></span>
+                <span class="dash-num">8.2</span><span class="dash-label">今日指数</span>
+              </button>
+              <button class="dash-item" data-toast="花园健康度 76% · 记得给植物浇水哦">
+                <span class="dash-ic" style="background:#E3F2FD"><svg viewBox="0 0 24 24" width="18" height="18"><path d="M12 21c-3.9 0-6.5-2.7-6.5-6.2C5.5 10 9.5 5.5 12 3c2.5 2.5 6.5 7 6.5 11.8 0 3.5-2.6 6.2-6.5 6.2z" fill="#7DD3FC"/></svg></span>
+                <span class="dash-num"><span id="healthNum">76</span><i class="unit">%</i></span><span class="dash-label">健康度</span>
+                <span class="mini-bar"><span id="healthBar" style="width:76%"></span></span>
+              </button>
+              <button class="dash-item" data-toast="本周主导情绪：快乐 · 你的花园向日葵开得正好">
+                <span class="dash-ic" style="background:#F0FDF4"><svg viewBox="0 0 24 24" width="18" height="18"><circle cx="12" cy="12" r="5" fill="#FBBF24"/><g stroke="#FBBF24" stroke-width="2" stroke-linecap="round"><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M19.1 4.9l-1.8 1.8M6.7 17.3l-1.8 1.8"/></g></svg></span>
+                <span class="dash-num small">快乐</span><span class="dash-label">本周主导</span>
+              </button>
+            </div>
+
+            <!-- 今日情绪卡片 -->
+            <div class="today-card anim" id="todayCard">
+              <div class="tc-main" id="todayCardMain">
+                <div class="tc-emoji" id="tcEmoji"></div>
+                <div class="tc-info">
+                  <div class="tc-top"><span class="tc-mood" id="tcMood">快乐</span><span class="tc-intensity" id="tcIntensity">强度 8/10</span></div>
+                  <p class="tc-feedback" id="tcFeedback">「今天在项目评审中表现出色，这份成就感值得被记住。」</p>
+                  <div class="tc-tags" id="tcTags"><span>工作</span><span>成就感</span><span>被认可</span></div>
+                </div>
+                <svg class="tc-chev" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#A8A29E" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>
+              </div>
+              <div class="tc-expand" id="todayExpand">
+                <div class="tc-full">
+                  <p class="tc-full-text">「上午的项目评审很顺利，老板当场表扬了我的方案。中午和同事去楼下散步，阳光很好。下午虽然有点累，但整体是充实的一天。」</p>
+                  <div class="tc-meta"><span>语音转文字 · 12:47</span><span>AI 已安抚 ✓</span></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 快捷操作 -->
+            <div class="quick-bar anim">
+              <button class="btn-primary quick-record" data-goto="page-record">
+                <svg viewBox="0 0 24 24" width="18" height="18"><path d="M12 20C12 12 7 7 2 8c1 7 6 11 10 12z" fill="#fff"/><path d="M12 20c0-8 5-13 10-12-1 7-6 11-10 12z" fill="#E8F5E9"/></svg>
+                记录情绪
+              </button>
+              <button class="quick-round" id="waterBtn" aria-label="浇水">
+                <svg viewBox="0 0 24 24" width="20" height="20"><path d="M12 21c-3.9 0-6.5-2.7-6.5-6.2C5.5 10 9.5 5.5 12 3c2.5 2.5 6.5 7 6.5 11.8 0 3.5-2.6 6.2-6.5 6.2z" fill="#7DD3FC"/></svg>
+                <span>浇水</span>
+              </button>
+              <button class="quick-round" data-toast="正在播放：雨后森林 · 白噪音" aria-label="听音乐">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#A78BFA" stroke-width="2" stroke-linecap="round"><path d="M9 18V6l10-2v11"/><circle cx="6.5" cy="18" r="2.5" fill="#A78BFA" stroke="none"/><circle cx="16.5" cy="15" r="2.5" fill="#A78BFA" stroke="none"/></svg>
+                <span>听音乐</span>
+              </button>
+              <button class="quick-round" id="breathBtn" aria-label="深呼吸">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#5BA68A" stroke-width="2"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3.5" fill="#5BA68A" stroke="none"/></svg>
+                <span>深呼吸</span>
+              </button>
+            </div>
+
+            <div class="section-title anim"><h3>近期花园动态</h3><span class="st-more" data-toast="完整花园日历开发中">查看全部</span></div>
+            <div class="week-row anim" id="weekRow"></div>
+
+            <div class="section-title anim"><h3>他们今天种了什么</h3><span class="st-more" data-goto="page-discover">去社区看看</span></div>
+            <div class="friends-row anim" id="friendsRow"></div>
+            <div class="bottom-pad"></div>
+          </section>
+
+          <!-- ── 页面2 记录 ── -->
+          <section class="page" id="page-record">
+            <h2 class="page-title anim">记录此刻</h2>
+            <p class="page-sub anim" id="recordSub">此刻的你，感觉怎么样？</p>
+
+            <div class="wheel-wrap anim" id="wheelWrap">
+              <div class="wheel-tint" id="wheelTint"></div>
+              <div class="wheel" id="wheel"></div>
+              <div class="wheel-center" id="wheelCenter"><span>转动<br>选择情绪</span></div>
+            </div>
+
+            <div class="intensity anim">
+              <div class="intensity-head"><span class="label">情绪强度</span><span class="intensity-val" id="intensityVal">7</span></div>
+              <input type="range" min="1" max="10" value="7" id="intensityRange">
+              <div class="intensity-scale"><span>轻微</span><span>中等</span><span>强烈</span></div>
+            </div>
+
+            <div class="mix anim">
+              <div class="label-row"><span class="label">混合情绪</span><span class="label-hint">可选 · 生成复合植物</span></div>
+              <div class="mix-chips" id="mixChips"></div>
+              <p class="mix-hint" id="mixHint"></p>
+            </div>
+
+            <div class="voice anim">
+              <div class="label-row"><span class="label">说说今天</span><span class="label-hint">语音自动转文字</span></div>
+              <div class="voice-box">
+                <button class="voice-btn" id="voiceBtn" aria-label="按住说话">
+                  <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3" fill="#fff" stroke="none"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>
+                </button>
+                <div class="wave" id="wave"></div>
+                <p class="voice-tip" id="voiceTip">点击开始说话</p>
+              </div>
+              <div class="transcript" id="transcript" contenteditable="true" data-placeholder="你的语音会转写成文字，也可以直接输入…"></div>
+              <button class="add-photo" data-toast="已打开相册（原型演示）">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#78716C" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="3"/><circle cx="9" cy="10" r="1.8" fill="#78716C" stroke="none"/><path d="M3 16l5-4 4 3 4-4 5 5"/></svg>
+                添加一张配图
+              </button>
+            </div>
+
+            <div class="triggers anim">
+              <div class="label-row"><span class="label">是什么触发了这份情绪？</span><span class="label-hint">影响植物细节</span></div>
+              <div class="tag-grid" id="triggerGrid"></div>
+            </div>
+
+            <div class="three-things anim">
+              <div class="label-row"><span class="label">今日三件小事</span><span class="label-hint">可选</span></div>
+              <input class="tt-input" placeholder="1. 今天发生的一件小事…">
+              <input class="tt-input" placeholder="2. 还有一件…">
+              <input class="tt-input" placeholder="3. 最后一件…">
+            </div>
+
+            <div class="ai-feedback anim" id="aiFeedback">
+              <div class="ai-face" id="aiFace"></div>
+              <div>
+                <div class="ai-title" id="aiTitle">AI 花园守护者</div>
+                <p class="ai-text" id="aiText">选择情绪后，我会给你一句温柔的回应。</p>
+              </div>
+            </div>
+
+            <button class="btn-primary generate anim" id="generateBtn" disabled>
+              <svg viewBox="0 0 24 24" width="18" height="18"><path d="M12 21V9" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/><path d="M12 12C12 7 8 4 3 5c1 5 5 8 9 7z" fill="#fff"/><path d="M12 10c0-5 4-8 9-7-1 5-5 8-9 7z" fill="#E8F5E9"/></svg>
+              生成今日植物
+            </button>
+            <div class="bottom-pad"></div>
+          </section>
+
+          <!-- ── 页面3 洞察 ── -->
+          <section class="page" id="page-insight">
+            <h2 class="page-title anim">洞察</h2>
+            <div class="segment anim" id="segment">
+              <button class="seg active" data-seg="周">周</button>
+              <button class="seg" data-seg="月">月</button>
+              <button class="seg" data-seg="季">季</button>
+              <button class="seg" data-seg="年">年</button>
+            </div>
+
+            <div class="weather-card anim">
+              <div class="wc-illu" id="wcIllu"></div>
+              <div class="wc-body">
+                <div class="wc-top"><span class="wc-title" id="wcTitle">本周情绪天气 · 多云转晴</span><span class="wc-badge" id="wcBadge">优于上周</span></div>
+                <p class="wc-desc" id="wcDesc">前半周有些阴郁，周四开始放晴。你的花园正在恢复生机。</p>
+              </div>
+            </div>
+
+            <div class="card anim">
+              <div class="card-head"><h3>情绪趋势</h3><span class="card-hint">点击节点查看当天植物</span></div>
+              <div class="trend-wrap" id="trendWrap"></div>
+            </div>
+
+            <div class="insight-2col anim">
+              <div class="card">
+                <div class="card-head"><h3>情绪分布</h3></div>
+                <div class="donut-wrap" id="donutWrap"></div>
+              </div>
+              <div class="card">
+                <div class="card-head"><h3>关键词云</h3></div>
+                <div class="cloud-words" id="cloudWords"></div>
+              </div>
+            </div>
+
+            <div class="card anim">
+              <div class="card-head"><h3>情绪触发分析</h3><span class="card-hint">本周 TOP 3</span></div>
+              <div class="trigger-rank" id="triggerRank"></div>
+            </div>
+
+            <div class="section-title anim"><h3>AI 周期洞察</h3></div>
+            <div class="ai-insights anim" id="aiInsights"></div>
+
+            <div class="card anim timeline-card">
+              <div class="card-head"><h3>花园演变时间轴</h3><span class="card-hint">2026</span></div>
+              <div class="timeline" id="timeline"></div>
+              <button class="btn-ghost" data-toast="「我的年度花园」总结视频生成中…">
+                <svg viewBox="0 0 24 24" width="16" height="16"><path d="M8 5.5v13l11-6.5z" fill="#5BA68A"/></svg>
+                播放花园演变动画
+              </button>
+            </div>
+
+            <div class="card anim">
+              <div class="card-head"><h3>健康数据联动</h3><span class="card-hint">来自 Apple Health</span></div>
+              <div class="health-row"><span class="health-ic" style="background:#EDE9FE"><svg viewBox="0 0 24 24" width="19" height="19"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4 8.5 8.5 0 1 0 20 14.5z" fill="#A78BFA"/></svg></span><div class="health-info"><b>睡眠与情绪</b><p>睡眠 ≥7h 的日子，情绪指数平均高 1.8 分</p></div><span class="health-val up">+1.8</span></div>
+              <div class="health-row"><span class="health-ic" style="background:#FEF3C7"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="#D97706" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 3c-.5 3-2 4.5-3 6l-2.5 3A6 6 0 1 0 17 15c.8-1.5 1-3.5 1-5-1.2.5-2.3.6-3.4.3C15.6 8 14.8 5.4 13 3z"/></svg></span><div class="health-info"><b>步数与情绪</b><p>步行 8000+ 步后，快乐出现概率提升 24%</p></div><span class="health-val up">+24%</span></div>
+              <div class="bottom-pad"></div>
+            </div>
+          </section>
+
+          <!-- ── 页面4 发现 ── -->
+          <section class="page" id="page-discover">
+            <h2 class="page-title anim">发现</h2>
+            <div class="search-bar anim" data-toast="搜索「呼吸」「睡眠」「焦虑」试试">
+              <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="#A8A29E" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+              <span>搜索练习、音频、文章、话题</span>
+            </div>
+
+            <div class="section-title anim"><h3>情绪急救工具箱</h3></div>
+            <div class="toolbox anim">
+              <button class="tool" id="toolBreath"><span class="tool-ic" style="background:#E8F5E9"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#5BA68A" stroke-width="2"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4" fill="#5BA68A" stroke="none" opacity=".6"/></svg></span><b>呼吸练习</b><span>478 · 盒式 · 自然</span></button>
+              <button class="tool" id="toolNoise"><span class="tool-ic" style="background:#E3F2FD"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#7DD3FC" stroke-width="2" stroke-linecap="round"><path d="M4 10v4M8 7v10M12 4v16M16 7v10M20 10v4"/></svg></span><b>白噪音</b><span>雨声 · 森林 · 海浪</span></button>
+              <button class="tool" data-toast="Grounding 五感练习：说出 5 个你看到的、4 个听到的…"><span class="tool-ic" style="background:#F3E8FF"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#A78BFA" stroke-width="2" stroke-linecap="round"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/></svg></span><b>五感着陆</b><span>Grounding</span></button>
+              <button class="tool" data-toast="身体扫描冥想：从脚趾到头顶，逐一放松…"><span class="tool-ic" style="background:#FFF3E0"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#F97316" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="6" r="2.6"/><path d="M12 9v6M8 13l4-2 4 2M9 21l3-4 3 4"/></svg></span><b>身体扫描</b><span>10 分钟</span></button>
+              <button class="tool" data-toast="今日小练习：写下 3 件值得感恩的小事"><span class="tool-ic" style="background:#FEF9C3"><svg viewBox="0 0 24 24" width="22" height="22"><path d="M12 21s-7.5-4.6-9.5-9A5.4 5.4 0 0 1 12 6.2 5.4 5.4 0 0 1 21.5 12c-2 4.4-9.5 9-9.5 9z" fill="#FBBF24"/></svg></span><b>积极练习</b><span>感恩 · 优势</span></button>
+            </div>
+
+            <div class="section-title anim"><h3>冥想音频库</h3><span class="st-more" data-toast="全部分类：助眠 / 减压 / 专注 / 焦虑 / 自信">全部分类</span></div>
+            <div class="med-list anim" id="medList"></div>
+
+            <div class="section-title anim"><h3>今日专题</h3></div>
+            <div class="topic-row anim">
+              <button class="topic-card t1" data-toast="已加入「7 天感恩挑战」· 完成可获限定向日葵"><b>7 天感恩挑战</b><span>12.4w 人参与 · 赢限定植物</span></button>
+              <button class="topic-card t2" data-toast="「春季花园焕新」主题已加入愿望单"><b>春季花园焕新</b><span>限定主题 · 樱花季</span></button>
+              <button class="topic-card t3" data-toast="「焦虑急救包」已打开"><b>焦虑急救包</b><span>5 个即时练习</span></button>
+            </div>
+
+            <div class="section-title anim"><h3>社区花园</h3><span class="st-more" data-toast="话题：#今天也有好好记录 #我的花园开花了 #雨天植物园">热门话题</span></div>
+            <div class="community-row anim" id="communityRow"></div>
+
+            <div class="section-title anim"><h3>植物图鉴</h3><span class="st-more" data-goto="page-me">已收集 24/56</span></div>
+            <div class="dex-grid anim" id="dexGrid"></div>
+
+            <div class="section-title anim"><h3>花园主题商店</h3><span class="st-more">Pro 解锁全部</span></div>
+            <div class="theme-row anim" id="themeRow"></div>
+
+            <div class="daily-quote anim">
+              <div class="dq-tag">每日治愈</div>
+              <p class="dq-text">「情绪像天气，会来，也会走。你只需照顾自己，等云散开。」</p>
+              <div class="dq-actions">
+                <button class="dq-btn" data-toast="分享卡片已生成，可保存到相册">生成分享卡片</button>
+                <button class="dq-btn ghost" data-toast="已收藏这句语录">收藏</button>
+              </div>
+            </div>
+
+            <div class="section-title anim"><h3>心理科普 · 3 分钟阅读</h3></div>
+            <div class="article-list anim">
+              <button class="article" data-toast="《为什么记录情绪能治愈自己》已打开"><span class="art-tag" style="color:#5BA68A">情绪管理</span><b>为什么记录情绪能治愈自己？</b><span class="art-meta">3 分钟 · 1.2w 阅读</span></button>
+              <button class="article" data-toast="《睡前 10 分钟的放松仪式》已打开"><span class="art-tag" style="color:#A78BFA">睡眠</span><b>睡前 10 分钟的放松仪式</b><span class="art-meta">3 分钟 · 8.6k 阅读</span></button>
+              <button class="article" data-toast="《焦虑来临时，先照顾身体》已打开"><span class="art-tag" style="color:#F97316">焦虑</span><b>焦虑来临时，先照顾身体</b><span class="art-meta">4 分钟 · 9.3k 阅读</span></button>
+            </div>
+            <div class="bottom-pad"></div>
+          </section>
+
+          <!-- ── 页面5 我的 ── -->
+          <section class="page" id="page-me">
+            <div class="me-cover anim">
+              <div class="me-cover-scene" id="meCoverScene"></div>
+              <div class="me-avatar">A</div>
+            </div>
+            <div class="me-profile anim">
+              <h2>Alex</h2>
+              <p class="me-sign">「慢慢记录，慢慢开花」</p>
+              <p class="me-join">加入花园第 128 天</p>
+            </div>
+            <div class="me-stats anim">
+              <div><b id="meStreakNum">12</b><span>连续记录</span></div>
+              <div><b>86</b><span>植物总数</span></div>
+              <div><b>15</b><span>徽章</span></div>
+              <div><b>9</b><span>好友</span></div>
+            </div>
+
+            <button class="pro-card anim" data-toast="Mood Garden Pro · 高级植物 + AI 深度报告 + 无限主题">
+              <div class="pro-left">
+                <span class="pro-crown"><svg viewBox="0 0 24 24" width="18" height="18"><path d="M3 8l4.5 4L12 5l4.5 7L21 8l-2 10H5z" fill="#FFE9A8"/></svg></span>
+                <div><b>Mood Garden Pro</b><p>高级植物 · AI 深度报告 · 无限主题</p></div>
+              </div>
+              <span class="pro-cta">升级</span>
+            </button>
+
+            <div class="section-title anim"><h3>成就徽章墙</h3><span class="st-more" data-toast="15/32 已点亮">15/32</span></div>
+            <div class="badge-wall anim" id="badgeWall"></div>
+
+            <div class="me-list anim">
+              <button class="me-row" data-goto="page-discover">
+                <span class="mr-ic" style="background:#E8F5E9"><svg viewBox="0 0 24 24" width="18" height="18"><path d="M12 21V9" stroke="#3D7A66" stroke-width="2" stroke-linecap="round"/><path d="M12 12C12 7 8 4 3 5c1 5 5 8 9 7z" fill="#5BA68A"/><path d="M12 10c0-5 4-8 9-7-1 5-5 8-9 7z" fill="#7FBFA0"/></svg></span>
+                <span class="mr-label">植物图鉴</span><span class="mr-val">24/56</span><span class="mr-chev">›</span>
+              </button>
+              <button class="me-row" data-toast="好友花园：今天小满种下了向日葵，去送水吧">
+                <span class="mr-ic" style="background:#FFF3E0"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#F97316" stroke-width="2" stroke-linecap="round"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 20c.6-3.4 2.9-5 5.5-5s4.9 1.6 5.5 5"/><circle cx="17" cy="9" r="2.6"/><path d="M15.5 14.6c2.6.1 4.4 1.7 5 4.4"/></svg></span>
+                <span class="mr-label">好友花园</span><span class="mr-val">3 位有新动态</span><span class="mr-chev">›</span>
+              </button>
+            </div>
+
+            <div class="section-title anim"><h3>提醒设置</h3></div>
+            <div class="me-list anim">
+              <div class="me-row"><span class="mr-ic" style="background:#E3F2FD"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#7DD3FC" stroke-width="2" stroke-linecap="round"><path d="M12 5a6 6 0 0 0-6 6v3l-2 3h16l-2-3v-3a6 6 0 0 0-6-6z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg></span><span class="mr-label">每日记录提醒</span><span class="mr-val">21:30</span><span class="switch on" data-switch></span></div>
+              <div class="me-row"><span class="mr-ic" style="background:#EDE9FE"><svg viewBox="0 0 24 24" width="18" height="18"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4 8.5 8.5 0 1 0 20 14.5z" fill="#A78BFA"/></svg></span><span class="mr-label">睡前放松提醒</span><span class="mr-val">23:00</span><span class="switch on" data-switch></span></div>
+              <div class="me-row"><span class="mr-ic" style="background:#F0FDF4"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#5BA68A" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M3 9h18M8 2v4M16 2v4"/></svg></span><span class="mr-label">每周情绪报告</span><span class="mr-val">周日 20:00</span><span class="switch" data-switch></span></div>
+            </div>
+
+            <div class="section-title anim"><h3>数据与隐私</h3></div>
+            <div class="me-list anim">
+              <button class="me-row" data-toast="情绪数据导出中（PDF / CSV）"><span class="mr-ic" style="background:#FEF3C7"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#D97706" stroke-width="2" stroke-linecap="round"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg></span><span class="mr-label">导出情绪数据</span><span class="mr-chev">›</span></button>
+              <button class="me-row" data-toast="已开启云端加密备份"><span class="mr-ic" style="background:#E3F2FD"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#7DD3FC" stroke-width="2" stroke-linecap="round"><path d="M7 18h10a4 4 0 0 0 .7-7.9A5.5 5.5 0 0 0 7 8.6 3.6 3.6 0 0 0 7 18z"/><path d="M12 11v4M10 13h4"/></svg></span><span class="mr-label">云端备份</span><span class="mr-val">已开启</span><span class="mr-chev">›</span></button>
+              <button class="me-row" data-toast="隐私设置：动态默认仅自己可见"><span class="mr-ic" style="background:#F0FDF4"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#5BA68A" stroke-width="2" stroke-linecap="round"><path d="M12 3l8 3v6c0 4.5-3.2 7.6-8 9-4.8-1.4-8-4.5-8-9V6z"/><path d="M9 12l2 2 4-4"/></svg></span><span class="mr-label">隐私设置</span><span class="mr-chev">›</span></button>
+              <button class="me-row" data-toast="外观：浅色模式 · 字体标准"><span class="mr-ic" style="background:#F3E8FF"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#A78BFA" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M19.1 4.9l-1.4 1.4M6.3 17.7l-1.4 1.4"/></svg></span><span class="mr-label">外观设置</span><span class="mr-chev">›</span></button>
+              <button class="me-row" data-toast="帮助中心 · FAQ · 联系客服"><span class="mr-ic" style="background:#FEE2E2"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#FCA5A5" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5A2.5 2.5 0 1 1 12 12v1.5"/><circle cx="12" cy="16.5" r=".8" fill="#FCA5A5"/></svg></span><span class="mr-label">帮助与反馈</span><span class="mr-chev">›</span></button>
+            </div>
+            <p class="me-version anim">Mood Garden 2.4.0 · 用爱浇灌的产品</p>
+            <div class="bottom-pad"></div>
+          </section>
+        </div>
+      </main>
+
+      <!-- Tab Bar -->
+      <nav class="tabbar" id="tabbar">
+        <button class="tab active" data-tab="page-garden">
+          <svg viewBox="0 0 24 24" width="23" height="23" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M7 21h10M8 21l-1-6h10l-1 6M12 15V8"/><path d="M12 9c0-3.4-2.6-5.4-6.5-5 .5 3.4 3 5.4 6.5 5z" fill="currentColor" stroke="none" opacity=".85"/><path d="M12 7.5C12 4.1 14.6 2.1 18.5 2.5c-.5 3.4-3 5.4-6.5 5z" fill="currentColor" stroke="none"/></svg>
+          <span>花园</span>
+        </button>
+        <button class="tab" data-tab="page-record">
+          <svg viewBox="0 0 24 24" width="23" height="23" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M12 20V9"/><path d="M12 11c0-4-3-6.4-7.5-6 .7 4 3.7 6.4 7.5 6z" fill="currentColor" stroke="none" opacity=".85"/><path d="M12 8.5C12 4.5 15 2.1 19.5 2.5c-.7 4-3.7 6.4-7.5 6z" fill="currentColor" stroke="none"/></svg>
+          <span>记录</span>
+        </button>
+        <button class="tab-center" id="tabCenter" aria-label="快速记录">
+          <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3" fill="#fff" stroke="none"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>
+        </button>
+        <button class="tab" data-tab="page-insight">
+          <svg viewBox="0 0 24 24" width="23" height="23" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z" fill="currentColor" stroke="none"/></svg>
+          <span>洞察</span>
+        </button>
+        <button class="tab" data-tab="page-discover">
+          <svg viewBox="0 0 24 24" width="23" height="23" fill="currentColor"><path d="M12 3c1.8 0 3 1.4 3 3 1.6 0 3 1.2 3 3 0 1.5-1 2.7-2.4 3 .6.3 1.1.9 1.4 1.6.4 1.2-.2 2.5-1.4 3-.5.2-1 .2-1.6 0V21h-4v-4.4c-.5.2-1 .2-1.6 0-1.2-.5-1.8-1.8-1.4-3 .3-.7.8-1.3 1.4-1.6C5 11.7 4 10.5 4 9c0-1.8 1.4-3 3-3 0-1.6 1.2-3 3-3h2z" opacity=".9"/></svg>
+          <span>发现</span>
+        </button>
+        <button class="tab" data-tab="page-me">
+          <svg viewBox="0 0 24 24" width="23" height="23" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="8" r="3.6"/><path d="M5 20c.8-3.8 3.6-5.6 7-5.6s6.2 1.8 7 5.6"/></svg>
+          <span>我的</span>
+        </button>
+      </nav>
+      <div class="home-indicator"></div>
+
+      <!-- 全屏遮罩层 -->
+      <div class="overlay" id="growOverlay">
+        <div class="grow-stage">
+          <div class="grow-sky"></div>
+          <div class="grow-soil"></div>
+          <div class="grow-seed" id="growSeed"></div>
+          <div class="grow-plant" id="growPlant"></div>
+          <div class="grow-text" id="growText">种子落下…</div>
+        </div>
+        <div class="grow-result" id="growResult">
+          <div class="gr-plant" id="grPlant"></div>
+          <h3 id="grTitle">你的向日葵开花了</h3>
+          <p id="grDesc">快乐 × 强度 8 · 带着阳光的味道</p>
+          <div class="gr-actions">
+            <button class="btn-primary" id="plantToGarden">种入花园</button>
+            <button class="btn-ghost" id="regenPlant">重新生成</button>
+            <button class="btn-ghost" data-toast="植物卡片已生成，快去分享吧">分享</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="overlay" id="breatheModal">
+        <button class="bm-close" id="bmClose"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#78716C" stroke-width="2.4" stroke-linecap="round"><path d="M5 5l14 14M19 5L5 19"/></svg></button>
+        <p class="bm-title" id="bmTitle">478 呼吸法</p>
+        <div class="bm-ring-wrap">
+          <div class="bm-ring" id="bmRing"></div>
+          <div class="bm-core"></div>
+          <div class="bm-text" id="bmText">吸气</div>
+        </div>
+        <p class="bm-hint">跟随圆环 · 吸气 4s · 屏息 7s · 呼气 8s</p>
+        <button class="btn-ghost" id="bmDone">结束练习</button>
+      </div>
+
+      <div class="overlay" id="achieveOverlay">
+        <div class="ach-burst" id="achBurst"></div>
+        <div class="ach-card">
+          <div class="ach-star" id="achIcon"></div>
+          <h3 id="achTitle">连续记录 7 天</h3>
+          <p id="achDesc">获得徽章「7 天连击」</p>
+          <button class="btn-primary" id="achClose">太棒了</button>
+        </div>
+      </div>
+
+      <div class="toast-wrap" id="toastWrap"></div>
+    </div>
+
+    <!-- 标注侧栏 -->
+    <aside class="annotations">
+      <h4>微交互标注</h4>
+      <ul id="annoList">
+        <li data-anno="garden">页面进入 · 元素错落淡入上滑 24px，stagger 50ms</li>
+        <li data-anno="tab">Tab 切换 · 图标弹簧弹跳 + 内容淡入</li>
+        <li data-anno="press">卡片按压 · scale 0.96 + 阴影加深</li>
+        <li data-anno="water">浇水 · 水滴下落 → 土壤涟漪 → 植物上弹 + 光晕</li>
+        <li data-anno="wheel">情绪选择 · 表情放大 1.25→1.0 + 粒子喷发</li>
+        <li data-anno="grow">植物生长 · 种子→破土→抽芽→展叶→开花 1.2s+</li>
+        <li data-anno="breath">呼吸练习 · 圆环缩放循环 + 文字淡入淡出</li>
+        <li data-anno="sky">天空 · 随真实时间变化（晨/午/暮/夜）+ 云层 8s 漂移</li>
+        <li data-anno="achieve">连击成就 · 星星放大 + 粒子爆发 + 全屏暗遮</li>
+      </ul>
+      <div class="token-strip">
+        <span style="background:#5BA68A"></span><span style="background:#FBBF24"></span><span style="background:#7DD3FC"></span><span style="background:#A78BFA"></span><span style="background:#93C5FD"></span><span style="background:#FCA5A5"></span><span style="background:#F97316"></span><span style="background:#A8A29E"></span>
+      </div>
+      <p class="token-note">PingFang SC / SF Pro Rounded · 间距 4-48 · 圆角 8/12/20/999</p>
+    </aside>
+  </div>
+</div>
+
+<script src="./mood-garden.js"></script>
+</body>
+</html>

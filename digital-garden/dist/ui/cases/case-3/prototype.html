@@ -1,0 +1,2075 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+<title>梦屿 Dream Bank — 你的梦，值得被记住</title>
+<script src="./js/tailwindcss.js"></script>
+<script>
+  /* Tailwind 主题扩展：梦境色板 */
+  tailwind.config = { theme: { extend: { colors: {
+    space:'#0B1026', midnight:'#1E1B4B', aurora:'#8B5CF6', nebula:'#EC4899',
+    dreamcyan:'#06B6D4', moon:'#F8FAFC', gold:'#FBBF24'
+  }}}};
+</script>
+<style>
+/* ============================================================
+   梦屿 Dream Bank · 设计令牌与全局动效
+   ============================================================ */
+:root{
+  --bg:#0B1026; --bg2:#1E1B4B;
+  --aurora:#8B5CF6; --nebula:#EC4899; --cyan:#06B6D4; --moon:#F8FAFC; --gold:#FBBF24;
+  --fear:#7C3AED; --excite:#F472B6; --confuse:#94A3B8; --calm:#34D399; --sad:#60A5FA; --anger:#F87171; --warm:#FBBF24;
+  --ink:#F8FAFC; --ink-sub:rgba(226,232,240,.62);
+  --glass:rgba(255,255,255,.06); --glass-brd:rgba(255,255,255,.12);
+  --hue-tint:rgba(139,92,246,.10); /* 情绪染色层，随记录页选择变化 */
+}
+*{ -webkit-tap-highlight-color:transparent; box-sizing:border-box; }
+html,body{ height:100%; }
+body{
+  margin:0; background:#05070f; color:var(--ink);
+  font-family:"PingFang SC","HarmonyOS Sans SC","Microsoft YaHei",-apple-system,sans-serif;
+  display:flex; align-items:center; justify-content:center; overflow:hidden;
+}
+.font-display{ font-family:'Unbounded','Montserrat','Arial Black','PingFang SC',sans-serif; }
+.font-poem{ font-family:'Noto Serif SC','Source Han Serif SC','STSong','SimSun',serif; }
+
+/* ---------- 手机外框（桌面端居中，移动端铺满） ---------- */
+.phone{
+  position:relative; width:min(430px,100vw); height:min(932px,100vh); height:min(932px,100dvh);
+  background:radial-gradient(120% 90% at 50% 0%, var(--bg2) 0%, var(--bg) 55%, #070a1a 100%);
+  overflow:hidden; isolation:isolate;
+  transition:background 1.2s ease;
+}
+@media (min-width:480px){
+  .phone{ border-radius:44px; border:1px solid rgba(255,255,255,.14);
+    box-shadow:0 0 0 10px #10131f, 0 0 0 12px rgba(255,255,255,.06), 0 40px 120px rgba(0,0,0,.8), 0 0 90px rgba(139,92,246,.25); }
+}
+/* 明亮模式（渐变过渡，不生硬切换） */
+.phone.light{
+  --ink:#1E1B4B; --ink-sub:rgba(30,27,75,.6);
+  --glass:rgba(255,255,255,.55); --glass-brd:rgba(30,27,75,.10);
+  background:radial-gradient(120% 90% at 50% 0%, #e0e7ff 0%, #f5f3ff 55%, #fdf4ff 100%);
+}
+.phone, .phone *{ transition-property:background-color,border-color,color; transition-duration:.5s; }
+
+/* ---------- 极光流动背景 + 粒子画布 ---------- */
+.aurora-bg{ position:absolute; inset:0; z-index:0; overflow:hidden; pointer-events:none; }
+.aurora-bg i{
+  position:absolute; width:130%; height:60%; border-radius:50%;
+  filter:blur(70px); opacity:.5; mix-blend-mode:screen;
+  animation:auroraDrift 26s ease-in-out infinite alternate;
+}
+.aurora-bg i:nth-child(1){ left:-30%; top:-15%; background:radial-gradient(closest-side,#8B5CF6,transparent 70%); }
+.aurora-bg i:nth-child(2){ right:-40%; top:20%; background:radial-gradient(closest-side,#06B6D4,transparent 70%); animation-duration:32s; animation-delay:-8s; }
+.aurora-bg i:nth-child(3){ left:-20%; bottom:-25%; background:radial-gradient(closest-side,#EC4899,transparent 70%); animation-duration:38s; animation-delay:-16s; opacity:.35; }
+@keyframes auroraDrift{
+  0%{ transform:translate3d(0,0,0) rotate(0deg) scale(1); }
+  50%{ transform:translate3d(8%,6%,0) rotate(8deg) scale(1.12); }
+  100%{ transform:translate3d(-6%,-4%,0) rotate(-6deg) scale(.95); }
+}
+#particles{ position:absolute; inset:0; z-index:1; pointer-events:none; }
+.tint-layer{ position:absolute; inset:0; z-index:1; pointer-events:none; background:var(--hue-tint); transition:background 1s ease; }
+
+/* ---------- 毛玻璃 / 卡片 ---------- */
+.glass{ background:var(--glass); backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px);
+  border:1px solid var(--glass-brd); border-radius:20px; }
+.card-float{ animation:floatY 7s ease-in-out infinite; }
+@keyframes floatY{ 0%,100%{ transform:translateY(0);} 50%{ transform:translateY(-7px);} }
+.hoverable{ transition:transform .35s cubic-bezier(.34,1.56,.64,1), box-shadow .35s ease, filter .35s ease; }
+.hoverable:hover{ transform:scale(1.03); box-shadow:0 12px 40px rgba(139,92,246,.28), 0 0 24px rgba(139,92,246,.18); }
+.pressable{ transition:transform .18s cubic-bezier(.34,1.56,.64,1); position:relative; overflow:hidden; }
+.pressable:active{ transform:scale(.95); }
+
+/* 点击涟漪 */
+.ripple{ position:absolute; border-radius:50%; background:radial-gradient(circle,rgba(255,255,255,.5),transparent 65%);
+  transform:scale(0); animation:ripple .7s ease-out forwards; pointer-events:none; }
+@keyframes ripple{ to{ transform:scale(3.2); opacity:0; } }
+
+/* ---------- 通用 keyframes ---------- */
+@keyframes twinkle{ 0%,100%{ opacity:.15; transform:scale(.7);} 50%{ opacity:1; transform:scale(1.15);} }
+@keyframes breathe{ 0%,100%{ filter:drop-shadow(0 0 8px rgba(139,92,246,.5)); transform:scale(1);} 50%{ filter:drop-shadow(0 0 26px rgba(236,72,153,.85)); transform:scale(1.04);} }
+@keyframes breatheBtn{ 0%,100%{ box-shadow:0 0 0 0 rgba(139,92,246,.55), 0 0 22px rgba(139,92,246,.6);} 50%{ box-shadow:0 0 0 14px rgba(139,92,246,0), 0 0 40px rgba(236,72,153,.75);} }
+@keyframes spinSlow{ to{ transform:rotate(360deg);} }
+@keyframes floatX{ 0%,100%{ transform:translate(0,0) rotate(var(--r,0deg)); } 33%{ transform:translate(10px,-16px) rotate(calc(var(--r,0deg) + 5deg)); } 66%{ transform:translate(-12px,-6px) rotate(calc(var(--r,0deg) - 5deg)); } }
+@keyframes pulseRing{ 0%{ box-shadow:0 0 0 0 rgba(251,191,36,.6);} 100%{ box-shadow:0 0 0 12px rgba(251,191,36,0);} }
+@keyframes popIn{ 0%{ transform:scale(.5) translateY(30px); opacity:0;} 70%{ transform:scale(1.05) translateY(-4px);} 100%{ transform:scale(1) translateY(0); opacity:1;} }
+@keyframes fadeUp{ from{ opacity:0; transform:translateY(26px);} to{ opacity:1; transform:translateY(0);} }
+@keyframes shimmer{ 0%{ transform:translateX(-120%);} 100%{ transform:translateX(320%);} }
+@keyframes shakeX{ 0%,100%{ transform:translateX(0) rotate(0);} 20%{ transform:translateX(-3px) rotate(-2deg);} 40%{ transform:translateX(3px) rotate(2deg);} 60%{ transform:translateX(-2px) rotate(-1deg);} 80%{ transform:translateX(2px) rotate(1deg);} }
+@keyframes wiggle{ 0%,100%{ transform:rotate(-4deg);} 50%{ transform:rotate(4deg);} }
+@keyframes jelly{ 0%{ transform:scale(1,1);} 30%{ transform:scale(1.25,.75);} 45%{ transform:scale(.8,1.2);} 60%{ transform:scale(1.12,.9);} 75%{ transform:scale(.95,1.05);} 100%{ transform:scale(1,1);} }
+@keyframes fireJump{ 0%,100%{ transform:translateY(0) scale(1);} 30%{ transform:translateY(-6px) scale(1.25) rotate(-8deg);} 60%{ transform:translateY(1px) scale(.92);} }
+@keyframes toastIn{ from{ transform:translateY(-120%); opacity:0;} to{ transform:translateY(0); opacity:1;} }
+@keyframes sheetUp{ from{ transform:translateY(105%);} to{ transform:translateY(0);} }
+@keyframes sheetDown{ from{ transform:translateY(0);} to{ transform:translateY(105%);} }
+@keyframes fadeIn{ from{ opacity:0;} to{ opacity:1;} }
+@keyframes fadeOut{ from{ opacity:1;} to{ opacity:0;} }
+@keyframes blinkCaret{ 50%{ opacity:0;} }
+@keyframes waveBar{ 0%,100%{ transform:scaleY(.25);} 50%{ transform:scaleY(1);} }
+@keyframes confettiFall{ 0%{ transform:translateY(-10vh) rotate(0); opacity:1;} 100%{ transform:translateY(105vh) rotate(720deg); opacity:0;} }
+@keyframes heartFly{ 0%{ transform:translate(0,0) scale(.5); opacity:1;} 100%{ transform:translate(var(--dx),var(--dy)) scale(1.3); opacity:0;} }
+@keyframes burstP{ 0%{ transform:translate(0,0) scale(1); opacity:1;} 100%{ transform:translate(var(--dx),var(--dy)) scale(0); opacity:0;} }
+@keyframes netCatch{ 0%{ transform:scale(1) rotate(0); opacity:1;} 60%{ transform:scale(.2) rotate(300deg); opacity:.9;} 100%{ transform:scale(0) rotate(420deg); opacity:0;} }
+@keyframes flashOnce{ 0%{ opacity:0;} 30%{ opacity:1;} 100%{ opacity:0;} }
+@keyframes lineDraw{ to{ stroke-dashoffset:0; } }
+@keyframes tearHalf{ to{ transform:translate(var(--tx),26px) rotate(var(--tr)); opacity:0; } }
+@keyframes boxShake{ 0%,100%{ transform:rotateX(0) rotateY(0) translateY(0);} 15%{ transform:rotateX(9deg) rotateY(-9deg) translateY(-7px);} 30%{ transform:rotateX(-8deg) rotateY(8deg) translateY(2px);} 45%{ transform:rotateX(7deg) rotateY(-6deg) translateY(-6px);} 60%{ transform:rotateX(-6deg) rotateY(5deg) translateY(1px);} 75%{ transform:rotateX(4deg) rotateY(-3deg) translateY(-3px);} }
+@keyframes glowSweep{ 0%{ transform:translateX(-140%) skewX(-18deg);} 100%{ transform:translateX(340%) skewX(-18deg);} }
+@keyframes tabBounce{ 0%{ transform:translateY(0) scale(1);} 40%{ transform:translateY(-7px) scale(1.18);} 70%{ transform:translateY(1px) scale(.94);} 100%{ transform:translateY(0) scale(1);} }
+@keyframes skeleton{ 0%{ background-position:-200px 0;} 100%{ background-position:200px 0;} }
+@keyframes driftWord{ 0%,100%{ transform:translate(0,0);} 50%{ transform:translate(var(--wx,6px),var(--wy,-8px));} }
+@keyframes newDreamBar{ 0%{ transform:translateY(-110%);} 12%,88%{ transform:translateY(0);} 100%{ transform:translateY(-110%);} }
+
+/* ---------- 启动页 ---------- */
+#splash{ position:absolute; inset:0; z-index:60; display:flex; flex-direction:column; align-items:center; justify-content:center;
+  background:radial-gradient(130% 100% at 50% 110%, #1E1B4B 0%, #0B1026 55%, #05070f 100%);
+  animation:splashFall 2.2s cubic-bezier(.22,1,.36,1) both; transition:opacity .9s ease, transform .9s ease; }
+@keyframes splashFall{ from{ clip-path:circle(0% at 50% 40%);} to{ clip-path:circle(140% at 50% 40%);} }
+#splash.leaving{ opacity:0; transform:scale(1.14); pointer-events:none; }
+.splash-star{ position:absolute; border-radius:50%; background:#fff; animation:twinkle var(--tw,3s) ease-in-out infinite; }
+.splash-elem{ position:absolute; font-size:var(--sz,26px); opacity:.75; filter:drop-shadow(0 0 10px rgba(139,92,246,.6));
+  animation:floatX var(--dur,11s) ease-in-out infinite; will-change:transform; }
+.logo-breathe{ animation:breathe 3.2s ease-in-out infinite; }
+
+/* ---------- 底部 Tab ---------- */
+#tabbar{ position:absolute; left:14px; right:14px; bottom:calc(12px + env(safe-area-inset-bottom)); z-index:40;
+  display:flex; justify-content:space-around; padding:9px 6px;
+  background:rgba(15,18,40,.6); backdrop-filter:blur(22px); -webkit-backdrop-filter:blur(22px);
+  border:1px solid rgba(255,255,255,.12); border-radius:26px;
+  box-shadow:0 14px 40px rgba(0,0,0,.45); }
+.phone.light #tabbar{ background:rgba(255,255,255,.65); }
+.tab-item{ display:flex; flex-direction:column; align-items:center; gap:2px; width:60px; padding:4px 0;
+  color:var(--ink-sub); font-size:10px; cursor:pointer; position:relative; border-radius:16px;
+  transition:color .3s; background:none; border:none; }
+.tab-item .ti{ font-size:20px; line-height:1; transition:transform .3s; display:inline-block; }
+.tab-item.active{ color:var(--ink); }
+.tab-item.active .ti{ animation:tabBounce .55s cubic-bezier(.34,1.56,.64,1); }
+.tab-item.active::after{ content:""; position:absolute; top:-8px; width:22px; height:3.5px; border-radius:99px;
+  background:linear-gradient(90deg,var(--aurora),var(--nebula)); box-shadow:0 0 12px var(--aurora); }
+
+/* ---------- 页面切换 ---------- */
+.page{ position:absolute; inset:0; overflow-y:auto; overflow-x:hidden; z-index:10;
+  padding:18px 18px 118px; opacity:0; transform:translateY(22px); pointer-events:none;
+  transition:opacity .32s cubic-bezier(.22,1,.36,1), transform .32s cubic-bezier(.22,1,.36,1);
+  scrollbar-width:none; }
+.page::-webkit-scrollbar{ display:none; }
+.page.current{ opacity:1; transform:translateY(0); pointer-events:auto; }
+.page.enter{ animation:fadeUp .36s cubic-bezier(.22,1,.36,1); }
+
+/* ---------- 情绪泡泡 ---------- */
+.bubble{ position:absolute; border-radius:50%; display:flex; align-items:center; justify-content:center;
+  font-size:22px; cursor:pointer; user-select:none; will-change:transform;
+  background:radial-gradient(circle at 32% 28%, rgba(255,255,255,.5), var(--bc,rgba(139,92,246,.35)) 62%, transparent 78%);
+  border:1px solid rgba(255,255,255,.35); backdrop-filter:blur(4px);
+  box-shadow:inset 0 0 18px rgba(255,255,255,.14), 0 6px 22px rgba(0,0,0,.25);
+  transition:box-shadow .3s; }
+.bubble:hover{ box-shadow:inset 0 0 22px rgba(255,255,255,.25), 0 6px 30px var(--bc,rgba(139,92,246,.5)); }
+
+/* ---------- 明信片卡片 ---------- */
+.postcard{ position:relative; border-radius:18px; padding:16px 16px 14px; cursor:pointer;
+  background:linear-gradient(135deg, rgba(255,255,255,.09), rgba(255,255,255,.03));
+  border:1px solid rgba(255,255,255,.13); backdrop-filter:blur(14px);
+  box-shadow:0 10px 28px rgba(0,0,0,.35); overflow:hidden;
+  transition:transform .5s cubic-bezier(.22,1,.36,1), box-shadow .4s, opacity .5s; }
+.postcard::before{ content:""; position:absolute; inset:0 auto 0 0; width:5px; background:var(--ec,var(--aurora)); opacity:.9; }
+.postcard .swatch{ position:absolute; right:-26px; top:-26px; width:104px; height:104px; border-radius:50%;
+  background:radial-gradient(circle, var(--ec,var(--aurora)) 0%, transparent 70%); opacity:.4; filter:blur(4px); }
+.postcard.swiped{ transform:translateX(var(--swx,0)); }
+.postcard.new-in{ animation:popIn .7s cubic-bezier(.34,1.56,.64,1) both; }
+
+/* ---------- 捕梦网录音钮 ---------- */
+.net-ring{ position:absolute; inset:-14px; border-radius:50%;
+  background:
+    repeating-conic-gradient(from 0deg, rgba(139,92,246,.0) 0deg 14deg, rgba(139,92,246,.5) 14deg 15.5deg),
+    radial-gradient(circle, transparent 58%, rgba(139,92,246,.45) 60%, transparent 63%, rgba(6,182,212,.4) 74%, transparent 77%);
+  -webkit-mask:radial-gradient(circle, transparent 54%, #000 55%);
+          mask:radial-gradient(circle, transparent 54%, #000 55%);
+  transition:transform 1s ease; }
+.recording .net-ring{ animation:spinSlow 7s linear infinite; }
+.rec-wave{ position:absolute; inset:-14px; border-radius:50%; border:2px solid rgba(139,92,246,.6);
+  opacity:0; pointer-events:none; }
+.recording .rec-wave{ animation:recRipple 1.8s ease-out infinite; }
+.recording .rec-wave:nth-child(2){ animation-delay:.6s; } .recording .rec-wave:nth-child(3){ animation-delay:1.2s; }
+@keyframes recRipple{ 0%{ transform:scale(1); opacity:.8;} 100%{ transform:scale(1.9); opacity:0;} }
+
+/* ---------- 诗歌翻转卡 ---------- */
+.flip-card{ perspective:1200px; }
+.flip-inner{ position:relative; width:100%; height:100%; transform-style:preserve-3d;
+  transition:transform .9s cubic-bezier(.22,1,.36,1); }
+.flip-card.flipped .flip-inner{ transform:rotateY(180deg); }
+.flip-face{ position:absolute; inset:0; backface-visibility:hidden; -webkit-backface-visibility:hidden; border-radius:20px; }
+.flip-back{ transform:rotateY(180deg); }
+
+/* ---------- 图表 ---------- */
+.donut-seg{ transition:stroke-width .3s, opacity .3s, filter .3s; cursor:pointer; }
+.donut-seg:hover,.donut-seg.sel{ stroke-width:26; filter:drop-shadow(0 0 8px currentColor); }
+.bar-fill{ position:relative; overflow:hidden; }
+.bar-fill::after{ content:""; position:absolute; inset:0; width:38%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.55),transparent);
+  animation:shimmer 2.6s ease-in-out infinite; }
+.grid-flow{ animation:shimmer 3.4s linear infinite; }
+
+/* ---------- 词云 ---------- */
+.cloud-wrap{ position:relative; }
+.cloud-w{ position:absolute; cursor:pointer; white-space:nowrap; animation:driftWord var(--wd,6s) ease-in-out infinite;
+  transition:color .3s, text-shadow .3s; will-change:transform; }
+.cloud-w:hover{ color:#fff !important; text-shadow:0 0 14px var(--aurora); }
+
+/* ---------- 开关（果冻动画） ---------- */
+.switch{ width:50px; height:28px; border-radius:99px; background:rgba(255,255,255,.15); position:relative; cursor:pointer;
+  transition:background .35s; border:1px solid var(--glass-brd); flex:none; }
+.switch::after{ content:""; position:absolute; top:2.5px; left:3px; width:21px; height:21px; border-radius:50%;
+  background:#fff; transition:transform .4s cubic-bezier(.34,1.8,.5,1); box-shadow:0 2px 8px rgba(0,0,0,.35); }
+.switch.on{ background:linear-gradient(90deg,var(--aurora),var(--nebula)); }
+.switch.on::after{ transform:translateX(21px); }
+.switch.jelly::after{ animation:jelly .6s ease; }
+
+/* ---------- 弹窗 / Toast / 骨架屏 ---------- */
+.sheet-mask{ position:absolute; inset:0; z-index:70; background:rgba(5,7,15,.55); backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px); animation:fadeIn .35s ease; display:flex; align-items:flex-end; }
+.sheet-mask.closing{ animation:fadeOut .3s ease forwards; }
+.sheet{ width:100%; max-height:82%; overflow-y:auto; border-radius:28px 28px 0 0; padding:22px 20px calc(28px + env(safe-area-inset-bottom));
+  background:linear-gradient(180deg, rgba(30,27,75,.92), rgba(11,16,38,.96));
+  border:1px solid rgba(255,255,255,.14); border-bottom:none;
+  animation:sheetUp .5s cubic-bezier(.22,1,.36,1); scrollbar-width:none; }
+.sheet::-webkit-scrollbar{ display:none; }
+.sheet-mask.closing .sheet{ animation:sheetDown .38s cubic-bezier(.5,0,.75,0) forwards; }
+.center-mask{ align-items:center; justify-content:center; padding:26px; }
+.center-mask .sheet{ border-radius:26px; border-bottom:1px solid rgba(255,255,255,.14); animation:popIn .5s cubic-bezier(.34,1.56,.64,1); max-height:78%; }
+#toast-wrap{ position:absolute; top:calc(14px + env(safe-area-inset-top)); left:0; right:0; z-index:90; display:flex; flex-direction:column; align-items:center; gap:8px; pointer-events:none; }
+.toast{ padding:10px 20px; border-radius:99px; font-size:13px; color:var(--ink);
+  background:rgba(20,24,52,.72); backdrop-filter:blur(16px); border:1px solid rgba(255,255,255,.18);
+  box-shadow:0 10px 30px rgba(0,0,0,.4), 0 0 18px rgba(139,92,246,.25);
+  animation:toastIn .45s cubic-bezier(.34,1.56,.64,1); }
+.toast.out{ animation:fadeOut .4s ease forwards, slideUpOut .4s ease forwards; }
+@keyframes slideUpOut{ to{ transform:translateY(-16px);} }
+.skl{ border-radius:14px; background:linear-gradient(90deg, rgba(255,255,255,.05) 25%, rgba(255,255,255,.13) 50%, rgba(255,255,255,.05) 75%);
+  background-size:400px 100%; animation:skeleton 1.3s linear infinite; }
+
+/* ---------- 盲盒 ---------- */
+.gift-3d{ width:150px; height:150px; margin:0 auto; position:relative; transform-style:preserve-3d; animation:boxShake 1.1s ease-in-out infinite; }
+.gift-face{ position:absolute; inset:0; border-radius:20px;
+  background:linear-gradient(145deg,#8B5CF6,#5B21B6); border:1px solid rgba(255,255,255,.3);
+  box-shadow:inset 0 0 30px rgba(255,255,255,.15); display:flex; align-items:center; justify-content:center; font-size:52px; }
+.rarity-common{ box-shadow:0 0 30px rgba(148,163,184,.5); }
+.rarity-rare{ box-shadow:0 0 40px rgba(6,182,212,.75); }
+.rarity-legend{ box-shadow:0 0 55px rgba(251,191,36,.85), 0 0 110px rgba(236,72,153,.5); }
+
+/* ---------- 音频波形 ---------- */
+.wave{ display:flex; align-items:center; gap:3px; height:34px; }
+.wave i{ width:3.5px; border-radius:99px; background:linear-gradient(180deg,var(--cyan),var(--aurora)); height:100%; transform-origin:center; }
+.playing .wave i{ animation:waveBar var(--wb,.9s) ease-in-out infinite; }
+
+/* ---------- 时间胶囊 ---------- */
+.capsule{ border-radius:99px; padding:12px 18px; position:relative; overflow:hidden; }
+.capsule::before{ content:""; position:absolute; inset:0; background:linear-gradient(90deg,transparent,rgba(255,255,255,.14),transparent);
+  transform:translateX(-120%); animation:shimmer 3.8s ease-in-out infinite; }
+
+/* ---------- 图鉴 ---------- */
+.dex-item{ aspect-ratio:1; border-radius:16px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px;
+  cursor:pointer; transition:transform .3s cubic-bezier(.34,1.56,.64,1); }
+.dex-item:hover{ transform:scale(1.08); }
+.dex-item.locked{ filter:grayscale(1); opacity:.4; }
+
+/* ---------- 杂项 ---------- */
+.hide{ display:none !important; }
+.shake-anim{ animation:shakeX .5s ease; }
+.wiggle-anim{ animation:wiggle 2.6s ease-in-out infinite; }
+.fire-jump{ display:inline-block; animation:fireJump .7s cubic-bezier(.34,1.56,.64,1); }
+.caret::after{ content:"▍"; animation:blinkCaret .9s steps(1) infinite; color:var(--cyan); }
+.pulse-dot{ animation:pulseRing 1.6s ease-out infinite; }
+.chip{ padding:6px 13px; border-radius:99px; font-size:12px; border:1px solid var(--glass-brd);
+  background:rgba(255,255,255,.05); color:var(--ink-sub); cursor:pointer; white-space:nowrap;
+  transition:all .3s cubic-bezier(.34,1.56,.64,1); }
+.chip.sel{ background:linear-gradient(90deg,rgba(139,92,246,.4),rgba(236,72,153,.35)); color:#fff;
+  border-color:rgba(139,92,246,.7); box-shadow:0 0 14px rgba(139,92,246,.4); transform:translateY(-3px) scale(1.05); }
+.emo-tag{ transition:all .28s cubic-bezier(.34,1.56,.64,1); cursor:pointer; }
+.emo-tag.sel{ transform:scale(1.12) translateY(-3px); box-shadow:0 0 18px var(--c), 0 0 18px rgba(139,92,246,.55); border-color:var(--c); background:rgba(255,255,255,.12); color:#fff; }
+.star-rate{ cursor:pointer; transition:transform .25s cubic-bezier(.34,1.56,.64,1), filter .3s; filter:grayscale(1) opacity(.35); display:inline-block; }
+.star-rate.lit{ filter:none; transform:scale(1.15); text-shadow:0 0 12px var(--gold); animation:jelly .5s ease; }
+.list-arrow{ transition:transform .3s; }
+.list-row:hover .list-arrow{ transform:translateX(5px); }
+.list-row{ transition:background .3s; cursor:pointer; }
+.list-row:hover{ background:rgba(255,255,255,.07); }
+.poem-line{ opacity:0; animation:fadeUp .9s ease forwards; }
+.progress-glow{ position:relative; overflow:hidden; }
+.progress-glow::after{ content:""; position:absolute; inset:0; width:40%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.5),transparent); animation:glowSweep 2.4s ease-in-out infinite; }
+.newdream-bar{ animation:newDreamBar 3.4s cubic-bezier(.22,1,.36,1) both; }
+.scroll-h{ display:flex; gap:12px; overflow-x:auto; scrollbar-width:none; padding:4px 2px 10px; }
+.scroll-h::-webkit-scrollbar{ display:none; }
+</style>
+</head>
+<body>
+<div class="phone" id="phone">
+  <div class="aurora-bg"><i></i><i></i><i></i></div>
+  <canvas id="particles"></canvas>
+  <div class="tint-layer" id="tintLayer"></div>
+
+  <!-- ============ 启动页：从星空云层中缓缓下落 ============ -->
+  <section id="splash">
+    <div id="splashStars" class="absolute inset-0"></div>
+    <div id="splashElems" class="absolute inset-0"></div>
+    <div class="relative z-10 flex flex-col items-center px-8 text-center" style="animation:fadeUp 1.4s .5s ease both">
+      <div class="logo-breathe font-display font-black text-6xl tracking-widest bg-clip-text text-transparent"
+           style="background-image:linear-gradient(135deg,#F8FAFC 10%,#8B5CF6 55%,#EC4899 90%)">梦屿</div>
+      <div class="font-display font-light tracking-[.5em] text-[13px] mt-4" style="color:rgba(226,232,240,.75)">DREAM&nbsp;BANK</div>
+      <div class="mt-7 text-sm tracking-[.25em]" style="color:rgba(226,232,240,.6)">你的梦，值得被记住</div>
+      <div class="mt-1.5 text-[11px] tracking-[.2em]" style="color:rgba(226,232,240,.35)">每晚都是一场私人电影</div>
+      <button id="enterBtn" class="pressable magnetic mt-14 px-10 py-3.5 rounded-full text-sm tracking-[.3em] font-medium text-white"
+        style="background:linear-gradient(90deg,#8B5CF6,#EC4899); animation:breatheBtn 2.6s ease-in-out infinite; border:none; cursor:pointer;">
+        进入梦境
+      </button>
+    </div>
+  </section>
+
+  <!-- ============ 主应用 ============ -->
+  <div id="app" class="hide absolute inset-0 z-10">
+    <!-- 梦境盲盒全局悬浮入口（持续轻微抖动吸引点击） -->
+    <button id="blindFab" class="wiggle-anim pressable absolute z-40 flex items-center gap-1.5 pl-2.5 pr-3.5 py-2 rounded-full text-xs text-white"
+      style="top:calc(16px + env(safe-area-inset-top)); right:14px; border:1px solid rgba(251,191,36,.5); cursor:pointer;
+             background:linear-gradient(135deg,rgba(251,191,36,.28),rgba(236,72,153,.28)); backdrop-filter:blur(14px);
+             box-shadow:0 6px 22px rgba(251,191,36,.28);">
+      <span class="text-base">🎁</span> 梦境盲盒
+    </button>
+
+    <main id="pages" class="absolute inset-0">
+      <section class="page" data-page="home"></section>
+      <section class="page" data-page="record"></section>
+      <section class="page" data-page="analyze"></section>
+      <section class="page" data-page="community"></section>
+      <section class="page" data-page="profile"></section>
+      <section class="page" data-page="train"></section>
+    </main>
+
+    <!-- 底部 Tab：图标弹跳 + 发光指示器 -->
+    <nav id="tabbar">
+      <button class="tab-item" data-tab="home"><span class="ti">🏠</span>首页</button>
+      <button class="tab-item" data-tab="record"><span class="ti">🎙️</span>记录</button>
+      <button class="tab-item" data-tab="analyze"><span class="ti">📊</span>分析</button>
+      <button class="tab-item" data-tab="community"><span class="ti">🌐</span>社区</button>
+      <button class="tab-item" data-tab="profile"><span class="ti">👤</span>我的</button>
+    </nav>
+  </div>
+
+  <div id="toast-wrap"></div>
+  <div id="modal-root"></div>
+  <div id="fx-root" class="absolute inset-0 z-[80] pointer-events-none"></div>
+</div>
+
+<script>
+/* ============================================================
+   梦屿 Dream Bank · 状态 / Mock 数据 / 工具 / 路由
+   （纯前端原型：所有数据为内置 mock，无真实后端）
+   ============================================================ */
+
+/* ---------- 情绪元数据：颜色随情绪微妙变化 ---------- */
+const EMO = {
+  '恐惧':{c:'#7C3AED',e:'😱'}, '兴奋':{c:'#F472B6',e:'😄'}, '困惑':{c:'#94A3B8',e:'😕'},
+  '平静':{c:'#34D399',e:'😌'}, '悲伤':{c:'#60A5FA',e:'😢'}, '愤怒':{c:'#F87171',e:'😠'},
+  '温暖':{c:'#FBBF24',e:'🥰'}, '焦虑':{c:'#A78BFA',e:'😰'}, '迷茫':{c:'#94A3B8',e:'😕'}, '治愈':{c:'#34D399',e:'🌿'}
+};
+const emoC = n => (EMO[n]||EMO['困惑']).c, emoE = n => (EMO[n]||EMO['困惑']).e;
+
+/* ---------- Mock：示例梦境（需求预置 5 条 + 补充） ---------- */
+const DB = {
+  dreams: [
+    {id:1, title:'漂浮的城市', date:'8月25日', emo:'困惑', tags:['城市','飞翔'],
+     text:'我梦见整座城市像气球一样飘在空中，街道在云层之间弯曲。',
+     poem:['城市学会了呼吸','街道是它柔软的血管','我在云层的褶皱里','寻找一扇不存在的门']},
+    {id:2, title:'没有尽头的考试', date:'8月23日', emo:'焦虑', tags:['考试','压力'],
+     text:'考卷越写越多，怎么翻都翻不到最后一页。',
+     poem:['白纸长出白色的森林','笔尖在迷宫里走失','我数着页码','却越数越年轻']},
+    {id:3, title:'深海里的光', date:'8月21日', emo:'平静', tags:['水','治愈'],
+     text:'我潜入一片深蓝色的海，海底有一扇门在发光。',
+     poem:['海水是蓝色的沉默','门后藏着没有名字的清晨','我敲门','回声替我回答']},
+    {id:4, title:'迷路在熟悉的街道', date:'8月19日', emo:'迷茫', tags:['迷路','故人'],
+     text:'明明是我家楼下，却怎么都找不到回家的路。',
+     poem:['每扇门都记得我','却都不肯承认','路灯把影子拉长','像一条回不去的河']},
+    {id:5, title:'牙齿一颗颗掉落', date:'8月17日', emo:'恐惧', tags:['牙齿','恐惧'],
+     text:'我在梦里摸到自己的牙齿松了，然后一颗颗掉下来。',
+     poem:['白色的果实从嘴里成熟','落在掌心变成珍珠','我捧着它们','像捧着不敢说出口的话']},
+    {id:6, title:'倒着流的瀑布', date:'8月14日', emo:'兴奋', tags:['水','飞翔'],
+     text:'瀑布从海里往天上流，我踩着水花一路走到云的顶端。',
+     poem:['水忘记了自己的方向','把天空当作入海口','我逆着所有坠落的东西','走向一场蓝色的黎明']},
+  ],
+  /* 梦境天气库 */
+  weather: [
+    {icon:'🌌', name:'奇幻极光', desc:'你最近的梦充满想象力，适合尝试清醒梦训练。', cls:'#8B5CF6'},
+    {icon:'☁️', name:'局部焦虑多云', desc:'梦境里有几朵压力的小云，睡前试试深呼吸。', cls:'#94A3B8'},
+    {icon:'🌤️', name:'治愈晴', desc:'潜意识正在晒被子，今晚大概率是好梦。', cls:'#34D399'},
+    {icon:'🌧️', name:'怀旧细雨', desc:'故人入梦，像一场温柔的毛毛雨。', cls:'#60A5FA'},
+    {icon:'🌪️', name:'剧情龙卷风', desc:'你的梦比连续剧还精彩，记得存进梦境银行。', cls:'#EC4899'},
+  ],
+  /* 快速标签云 */
+  quickTags:['飞翔','坠落','考试','迷路','被追','水','城市','动物','故人','牙齿','死亡','追逐','迟到','裸露'],
+  /* 重复符号 TOP5 */
+  topSymbols:[ {n:'飞翔',t:7},{n:'考试',t:5},{n:'水',t:4},{n:'迷路',t:3},{n:'被追',t:2} ],
+  /* 7 天情绪曲线（0-10 情绪积极度） */
+  weekMood:[{d:'周三',v:4},{d:'周四',v:6},{d:'周五',v:3},{d:'周六',v:7},{d:'周日',v:5},{d:'周一',v:8},{d:'今天',v:6}],
+  weekDist:{ '恐惧':2,'兴奋':3,'困惑':4,'平静':6,'悲伤':1,'愤怒':1,'温暖':2 },
+  /* 梦境连续剧 */
+  series:[
+    {title:'深海系列', count:4, arc:'恐惧 → 平静', desc:'你已梦到 4 次海洋，情绪从恐惧变为平静。潜意识好像终于学会了游泳。', icon:'🌊'},
+    {title:'考场轮回', count:3, arc:'焦虑 → 困惑', desc:'「考试」连续 3 周出现，卷子永远写不完，但你已经没那么怕了。', icon:'📝'},
+  ],
+  /* 词云 */
+  wordCloud:[['飞翔',34],['考试',28],['水',26],['迷路',20],['牙齿',18],['城市',16],['被追',15],['故人',13],['坠落',12],['动物',11],['门',10],['云',9],['时钟',8],['羽毛',8],['钥匙',7]],
+  /* 社区梦境流 */
+  posts:[
+    {id:1, nick:'云端捕梦人', avatar:'🦉', title:'我在梦里给月亮充了一次电', tags:['离奇','治愈'], likes:128,
+     text:'月亮没电了悬在半空，我搬来梯子，用星星碎片给它换上新电池。它亮起来的瞬间，整个夜空像被重新开机。'},
+    {id:2, nick:'第 47 号梦境', avatar:'🐙', title:'电梯没有 13 层，但它停在了 13 层', tags:['细思极恐','电影感'], likes:96,
+     text:'门打开是一条很长的走廊，两边的房间都住着我的童年。走廊尽头有人喊我的名字，声音和我一模一样。'},
+    {id:3, nick:'深海漫游者', avatar:'🐋', title:'又梦到那片海，这次门开了', tags:['连续剧','似曾相识'], likes:210,
+     text:'第四次潜入同一片海。海底的门终于开了，里面不是房间，是另一片更浅的海，像梦的 nested 文件夹。'},
+    {id:4, nick:'失眠宇航员', avatar:'🪐', title:'全宇宙只剩我一家便利店', tags:['离奇'], likes:77,
+     text:'我在太空站开便利店，客人都是路过的彗星。它们用光年结账，我找不开，就送它们一句晚安。'},
+    {id:5, nick:'梦游诗人', avatar:'🕊️', title:'把坠落梦写成了诗', tags:['诗歌','治愈'], likes:154,
+     text:'「我一直在下落 / 直到风接住了我 / 原来大地迟到了 / 天空就先做了我的床。」——AI 说这是我的第 9 个坠落梦。'},
+  ],
+  chain:[ '最初的梦：我在一条没有尽头的长廊里走。','@风继续吹：长廊尽头有一架钢琴，自己会弹。','@雾中信箱：琴声引来一群发光的鱼，在空气里游。','@月球背面：鱼群拼成一句话——「轮到你了」。' ],
+  /* 盲盒陌生人梦境 */
+  blindbox:[
+    {r:'传说', nick:'匿名梦境 #042', text:'我梦见所有的钟都倒着走，我在葬礼上遇见了自己小时候，他问我：后来你快乐吗？'},
+    {r:'稀有', nick:'匿名梦境 #317', text:'梦见下了一场很慢的雪，每片雪花里都住着一个小小的房间，我挑了一间住了进去。'},
+    {r:'普通', nick:'匿名梦境 #556', text:'梦见自己在考试，题目是「请描述风的形状」，我写：风是云伸了个懒腰。'},
+    {r:'稀有', nick:'匿名梦境 #233', text:'梦里的我开了一家记忆当铺，有人用一段童年的蝉鸣，换走了一场大雨。'},
+    {r:'普通', nick:'匿名梦境 #891', text:'梦见猫带我去参观它的梦，里面全是会飞的鱼缸和永远晒得到太阳的窗台。'},
+  ],
+  /* 图鉴 */
+  dex:[
+    {n:'飞翔',icon:'🕊️',got:true,times:7,desc:'自由与掌控感的象征，常出现在压力释放期。'},
+    {n:'考试',icon:'📝',got:true,times:5,desc:'经典的压力符号，与被评价焦虑有关。'},
+    {n:'水',icon:'💧',got:true,times:4,desc:'情绪的镜子。深水=潜意识，清水=治愈。'},
+    {n:'迷路',icon:'🧭',got:true,times:3,desc:'方向感的迷失，多出现在人生过渡期。'},
+    {n:'牙齿',icon:'🦷',got:true,times:2,desc:'失控感与外貌焦虑的经典意象。'},
+    {n:'城市',icon:'🏙️',got:true,times:2,desc:'自我在人群中的位置。'},
+    {n:'动物',icon:'🦊',got:true,times:2,desc:'本能与直觉的化身。'},
+    {n:'追逐',icon:'🏃',got:true,times:2,desc:'被追赶的不是别人，往往是被推迟的事。'},
+    {n:'坠落',icon:'🪂',got:false},{n:'死亡',icon:'🌑',got:false},{n:'迟到',icon:'⏰',got:false},{n:'故人',icon:'🕯️',got:false},
+  ],
+  /* 徽章 */
+  badges:[
+    {n:'第一次记录',icon:'🌱',got:true,desc:'存下第一个梦的那天'},
+    {n:'连续 7 天',icon:'🔥',got:true,desc:'连续捕梦 7 天'},
+    {n:'第一次清醒梦',icon:'👁️',got:true,desc:'在梦里意识到「这是梦」'},
+    {n:'收集 10 个符号',icon:'🧩',got:false,desc:'图鉴解锁 10/20'},
+    {n:'梦境诗人',icon:'🪶',got:true,desc:'AI 为你写了 5 首诗'},
+    {n:'盲盒收藏家',icon:'🎁',got:false,desc:'拆开 10 个梦境盲盒'},
+  ],
+  /* 助眠音频 */
+  audios:[ ['雨声','🌧️'],['海浪','🌊'],['白噪音','📻'],['篝火','🔥'],['太空','🛸'],['森林','🌲'],['梦境频率','🧠'] ],
+  /* 时间胶囊 */
+  capsules:[
+    {title:'写给 2027 年的自己', openAt:'2027-01-01 00:00', opened:false, watchers:45, mine:true},
+    {title:'封存：那个关于外婆的梦', openAt:'2026-12-24 00:00', opened:false, watchers:12, mine:true},
+    {title:'匿名胶囊 #077', openAt:'2026-09-13 00:00', opened:false, watchers:318, mine:false},
+    {title:'18 岁生日存的梦', openAt:'2026-06-01 00:00', opened:true, watchers:96, mine:true},
+  ],
+  weeklyChallenge:{ title:'本周挑战：在梦中看见一种颜色', target:3, done:1 },
+};
+
+/* ---------- 全局状态（localStorage 持久化碎片/ streak） ---------- */
+const S = {
+  page:'home', prevPage:null,
+  fragments: +(localStorage.getItem('db_frag') ?? 328),
+  streak: +(localStorage.getItem('db_streak') ?? 12),
+  likes:{}, weatherIdx:0, playingAudio:null, recordData:null,
+  dreaming:{ emotion:null, clarity:3, tags:[], text:'', poem:null },
+};
+const save = () => { localStorage.setItem('db_frag', S.fragments); localStorage.setItem('db_streak', S.streak); };
+
+/* ---------- 工具函数 ---------- */
+const $  = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const delay = ms => new Promise(r => setTimeout(r, ms));
+const rand = (a,b) => a + Math.random()*(b-a);
+const pick = arr => arr[Math.floor(Math.random()*arr.length)];
+const esc = s => s.replace(/</g,'&lt;');
+
+/* Toast：顶部滑入，毛玻璃 */
+function toast(msg, icon='✨'){
+  const t = document.createElement('div');
+  t.className = 'toast'; t.innerHTML = `${icon} ${msg}`;
+  $('#toast-wrap').appendChild(t);
+  setTimeout(()=>{ t.classList.add('out'); setTimeout(()=>t.remove(), 420); }, 2400);
+}
+
+/* 数字滚动动画 */
+function countUp(el, to, {dur=900, suffix=''}={}){
+  const from = +el.dataset.v || 0; const t0 = performance.now();
+  (function tick(t){
+    const p = Math.min(1,(t-t0)/dur), e = 1-Math.pow(1-p,3);
+    el.textContent = Math.round(from+(to-from)*e) + suffix;
+    if(p<1) requestAnimationFrame(tick); else el.dataset.v = to;
+  })(t0);
+}
+
+/* 按钮涟漪 + 按压反馈（事件委托，全局生效） */
+document.addEventListener('pointerdown', e=>{
+  const b = e.target.closest('.pressable'); if(!b) return;
+  const r = b.getBoundingClientRect(), d = Math.max(r.width,r.height);
+  const rp = document.createElement('span'); rp.className = 'ripple';
+  rp.style.cssText = `width:${d}px;height:${d}px;left:${e.clientX-r.left-d/2}px;top:${e.clientY-r.top-d/2}px`;
+  b.appendChild(rp); setTimeout(()=>rp.remove(), 700);
+});
+/* 重要操作震动反馈模拟 */
+const shakeEl = el => { el.classList.remove('shake-anim'); void el.offsetWidth; el.classList.add('shake-anim'); };
+
+/* 磁吸按钮：指针靠近时向光标轻微移动 */
+function bindMagnetic(scope=document){
+  scope.querySelectorAll('.magnetic').forEach(btn=>{
+    btn.onpointermove = e=>{
+      const r = btn.getBoundingClientRect();
+      const dx = e.clientX-(r.left+r.width/2), dy = e.clientY-(r.top+r.height/2);
+      btn.style.transform = `translate(${dx*.16}px, ${dy*.22}px)`;
+    };
+    btn.onpointerleave = ()=>{ btn.style.transition='transform .5s cubic-bezier(.34,1.56,.64,1)'; btn.style.transform='';
+      setTimeout(()=>btn.style.transition='',500); };
+  });
+}
+
+/* ---------- 弹窗（底部滑入 / 居中弹入） ---------- */
+function openSheet(html, {center=false}={}){
+  const mask = document.createElement('div');
+  mask.className = 'sheet-mask' + (center ? ' center-mask' : '');
+  mask.innerHTML = `<div class="sheet">${html}</div>`;
+  mask.addEventListener('pointerdown', e=>{ if(e.target===mask) closeSheet(mask); });
+  $('#modal-root').appendChild(mask);
+  return mask;
+}
+function closeSheet(mask){
+  mask = mask || $('#modal-root .sheet-mask:last-child'); if(!mask) return;
+  mask.classList.add('closing'); setTimeout(()=>mask.remove(), 380);
+}
+
+/* ---------- 路由：淡入 + 轻微上滑 + 背景渐变流动 ---------- */
+const TABS = ['home','record','analyze','community','profile'];
+function go(page){
+  if(S.page===page) return;
+  S.prevPage = S.page; S.page = page;
+  $$('.page').forEach(p=>{
+    const on = p.dataset.page===page;
+    p.classList.toggle('current', on);
+    if(on){ p.classList.remove('enter'); void p.offsetWidth; p.classList.add('enter'); p.scrollTop=0; }
+  });
+  $$('.tab-item').forEach(t=>t.classList.toggle('active', t.dataset.tab===page));
+  $('#tabbar').style.display = TABS.includes(page) ? 'flex' : 'none';
+  $('#blindFab').style.display = page==='record' ? 'none' : 'flex';
+  render[page] && render[page]();
+}
+$$('.tab-item').forEach(t => t.onclick = ()=>go(t.dataset.tab));
+
+/* ---------- 全局粒子系统：星尘漂浮，指针避让 ---------- */
+const cv = $('#particles'), ctx = cv.getContext('2d');
+let pts = [], ptr = {x:-999, y:-999};
+function sizeCanvas(){
+  const r = $('#phone').getBoundingClientRect();
+  cv.width = r.width * devicePixelRatio; cv.height = r.height * devicePixelRatio;
+  cv.style.width = r.width+'px'; cv.style.height = r.height+'px';
+  ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
+}
+function initParticles(){
+  const r = $('#phone').getBoundingClientRect();
+  pts = Array.from({length:46}, ()=>({
+    x:rand(0,r.width), y:rand(0,r.height), r:rand(.6,2.1),
+    vx:rand(-.14,.14), vy:rand(-.2,-.05), tw:rand(0,Math.PI*2), hue:pick(['248,250,252','139,92,246','6,182,212','236,72,153'])
+  }));
+}
+function drawParticles(t){
+  const r = $('#phone').getBoundingClientRect();
+  ctx.clearRect(0,0,r.width,r.height);
+  for(const p of pts){
+    /* 指针避让 */
+    const dx=p.x-ptr.x, dy=p.y-ptr.y, d2=dx*dx+dy*dy;
+    if(d2<5200){ const f=(5200-d2)/5200*.5; p.x+=dx/Math.sqrt(d2+1)*f*8; p.y+=dy/Math.sqrt(d2+1)*f*8; }
+    p.x+=p.vx; p.y+=p.vy;
+    if(p.y<-6){ p.y=r.height+6; p.x=rand(0,r.width); }
+    if(p.x<-6) p.x=r.width+6; if(p.x>r.width+6) p.x=-6;
+    const a = .25 + Math.abs(Math.sin(t/1400 + p.tw))*.55;
+    ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,7);
+    ctx.fillStyle = `rgba(${p.hue},${a})`; ctx.fill();
+  }
+  requestAnimationFrame(drawParticles);
+}
+$('#phone').addEventListener('pointermove', e=>{
+  const r = $('#phone').getBoundingClientRect();
+  ptr.x = e.clientX-r.left; ptr.y = e.clientY-r.top;
+});
+$('#phone').addEventListener('pointerleave', ()=>{ ptr.x=ptr.y=-999; });
+
+/* ---------- 启动页逻辑 ---------- */
+(function splash(){
+  const stars = $('#splashStars');
+  for(let i=0;i<70;i++){ /* 随机闪烁的星星，明灭周期各异 */
+    const s = document.createElement('i'); s.className='splash-star';
+    const sz = rand(1,2.6);
+    s.style.cssText = `left:${rand(0,100)}%;top:${rand(0,100)}%;width:${sz}px;height:${sz}px;--tw:${rand(2,5.5)}s;animation-delay:-${rand(0,5)}s`;
+    stars.appendChild(s);
+  }
+  /* 四周漂浮的梦境碎片元素（视差速度不同） */
+  const elems = ['📖','🌀','👁️','🕰️','🪶','🗝️','🚪','🌙','☁️','🎠','🫧','🃏'];
+  const wrap = $('#splashElems');
+  elems.forEach((g,i)=>{
+    const d = document.createElement('div'); d.className='splash-elem'; d.textContent=g;
+    d.style.cssText = `--sz:${rand(20,44)}px;--dur:${rand(8,17)}s;--r:${rand(-24,24)}deg;
+      left:${rand(2,88)}%;top:${rand(4,88)}%;animation-delay:-${rand(0,10)}s;opacity:${rand(.35,.85)}`;
+    wrap.appendChild(d);
+  });
+  const enter = ()=>{ if($('#splash').classList.contains('leaving'))return;
+    $('#splash').classList.add('leaving'); $('#app').classList.remove('hide');
+    sizeCanvas(); initParticles(); requestAnimationFrame(drawParticles);
+    /* 支持 URL hash 深链（作品集嵌入时可直达指定页面，如 index.html#analyze） */
+    const h = (location.hash||'').slice(1);
+    go(TABS.includes(h) || h==='train' ? h : 'home');
+    setTimeout(()=>$('#splash').remove(), 950);
+  };
+  $('#enterBtn').onclick = enter;
+  setTimeout(enter, location.hash ? 500 : 3200); /* 深链模式快速进入，否则 3 秒后自动进入 */
+})();
+
+/* 全局盲盒入口 */
+$('#blindFab').onclick = ()=>{ shakeEl($('#blindFab')); openBlindbox(); };
+
+window.addEventListener('resize', ()=>{ sizeCanvas(); initParticles(); });
+
+/* ============================================================
+   页面渲染层（render.* 在 go() 路由中被调用）
+   ============================================================ */
+const render = {};
+
+/* ============================================================
+   🏠 首页 · 梦境银行
+   ============================================================ */
+render.home = function(){
+  const el = $('[data-page="home"]');
+  const now = new Date(2026,7,26); /* 演示日期 */
+  const weekCn = ['周日','周一','周二','周三','周四','周五','周六'][now.getDay()];
+  const w = DB.weather[S.weatherIdx % DB.weather.length];
+  const isNew = S.newDream; S.newDream = false;
+
+  el.innerHTML = `
+  ${isNew ? `<div class="newdream-bar absolute left-1/2 -translate-x-1/2 z-50 px-5 py-2 rounded-full text-xs text-white"
+     style="top:14px; background:linear-gradient(90deg,#06B6D4,#8B5CF6); box-shadow:0 8px 26px rgba(6,182,212,.45)">🕸️ 新梦已捕获，已存入梦境银行</div>`:''}
+
+  <!-- 顶部状态栏 -->
+  <header class="pt-1 pr-28">
+    <div class="text-[13px]" style="color:var(--ink-sub)">2026年8月26日 · ${weekCn}</div>
+    <h1 class="font-display font-bold text-[26px] mt-1 tracking-wide">梦境银行
+      <span class="text-xs font-normal align-middle ml-1" style="color:var(--ink-sub)">每晚都是一场私人电影</span></h1>
+    <div class="flex items-center gap-2 mt-3">
+      <span class="glass px-3 py-1.5 rounded-full text-xs flex items-center gap-1.5">
+        <span id="fireIco" class="inline-block">🔥</span> 连续捕梦 <b id="streakNum" class="mx-0.5">0</b> 天</span>
+      <span class="glass px-3 py-1.5 rounded-full text-xs flex items-center gap-1.5 pressable" id="fragChip" style="cursor:pointer">
+        ✨ <b id="fragNum">0</b></span>
+    </div>
+  </header>
+
+  <!-- 梦境天气卡（点击刷新，旋转过渡） -->
+  <div id="weatherCard" class="glass hoverable mt-5 p-5 relative overflow-hidden pressable" style="cursor:pointer">
+    <div class="absolute inset-0 pointer-events-none" id="weatherFx"></div>
+    <div class="relative z-10">
+      <div class="text-[11px] tracking-[.2em]" style="color:var(--ink-sub)">今日梦境天气 · 点击刷新</div>
+      <div class="flex items-baseline gap-2.5 mt-2">
+        <span class="text-3xl">${w.icon}</span>
+        <span class="font-display font-bold text-[26px]" style="color:${w.cls}; text-shadow:0 0 22px ${w.cls}66">${w.name}</span>
+      </div>
+      <p class="text-[13px] mt-2 leading-relaxed" style="color:var(--ink-sub)">${w.desc}</p>
+    </div>
+  </div>
+
+  <!-- 本月统计（数字滚动） -->
+  <div class="glass hoverable mt-4 p-4 grid grid-cols-3 gap-2 text-center card-float" style="animation-delay:-2s">
+    <div><div class="font-display font-bold text-xl" id="stDreams">0</div><div class="text-[11px] mt-1" style="color:var(--ink-sub)">本月已记录的梦</div></div>
+    <div><div class="text-xl">🌙</div><div class="text-[11px] mt-1" style="color:var(--ink-sub)">最常情绪 · 平静</div></div>
+    <div><div class="font-display font-bold text-xl" id="stSymbols">0</div><div class="text-[11px] mt-1" style="color:var(--ink-sub)">解锁符号</div></div>
+  </div>
+
+  <!-- 情绪泡泡区 -->
+  <div class="mt-6 flex items-end justify-between">
+    <h2 class="font-bold text-[15px]">今晚的情绪泡泡</h2>
+    <span class="text-[11px]" style="color:var(--ink-sub)">点击看梦 · 长按戳破</span>
+  </div>
+  <div id="bubbleZone" class="relative mt-2 h-44 rounded-3xl overflow-hidden glass"></div>
+
+  <!-- 最近梦境 · 明信片 -->
+  <div class="mt-6 flex items-end justify-between">
+    <h2 class="font-bold text-[15px]">最近捕获的梦</h2>
+    <span class="text-[11px]" style="color:var(--ink-sub)">左滑卡片有惊喜</span>
+  </div>
+  <div id="dreamList" class="mt-3 space-y-4"></div>
+
+  <!-- 记录今晨的梦 · 呼吸灯大按钮 -->
+  <div class="flex justify-center mt-8 mb-2">
+    <button id="btnRecord" class="magnetic pressable relative flex flex-col items-center justify-center rounded-full text-white"
+      style="width:132px;height:132px;border:none;cursor:pointer;
+             background:conic-gradient(from 210deg,#8B5CF6,#EC4899,#06B6D4,#8B5CF6);
+             animation:breatheBtn 2.8s ease-in-out infinite;">
+      <span class="text-3xl">🕸️</span>
+      <span class="text-[12px] mt-1 tracking-widest">记录今晨的梦</span>
+    </button>
+  </div>`;
+
+  /* 数字滚动 */
+  countUp($('#streakNum'), S.streak);
+  countUp($('#fragNum'), S.fragments);
+  countUp($('#stDreams'), DB.dreams.length + 12);
+  countUp($('#stSymbols'), DB.dex.filter(d=>d.got).length);
+  $('#fragChip').onclick = ()=>toast(`梦境碎片可用于合成稀有符号，当前 ${S.fragments} 枚`,'✨');
+
+  /* 天气卡：动态天气粒子 */
+  drawWeatherFx($('#weatherFx'), w);
+  $('#weatherCard').onclick = ()=>{
+    const card = $('#weatherCard');
+    card.style.transition='transform .45s cubic-bezier(.34,1.56,.64,1)';
+    card.style.transform='rotateY(90deg) scale(.92)';
+    setTimeout(()=>{
+      S.weatherIdx++; render.home();
+      const c2 = $('#weatherCard');
+      c2.style.transition='transform .45s cubic-bezier(.34,1.56,.64,1)';
+      c2.style.transform='rotateY(-90deg) scale(.92)';
+      requestAnimationFrame(()=>requestAnimationFrame(()=>{ c2.style.transform=''; }));
+    }, 430);
+  };
+
+  /* 明信片列表：错开排列 + 左滑快捷操作 */
+  const list = $('#dreamList');
+  DB.dreams.forEach((d,i)=>{
+    const row = document.createElement('div');
+    row.className = 'relative overflow-hidden rounded-[18px]';
+    row.style.transform = `rotate(${(i%2? -1:1) * (0.6 + (i%3)*0.4)}deg)`; /* 散落在桌面感 */
+    row.innerHTML = `
+      <div class="absolute inset-y-0 right-0 flex items-center gap-2 pr-3 swipe-acts">
+        <button class="act-fav w-11 h-11 rounded-full text-lg" style="background:rgba(251,191,36,.22);border:1px solid rgba(251,191,36,.5)">⭐</button>
+        <button class="act-del w-11 h-11 rounded-full text-lg" style="background:rgba(248,113,113,.2);border:1px solid rgba(248,113,113,.5)">🗑️</button>
+      </div>
+      <article class="postcard hoverable ${S.newId===d.id?'new-in':''}" style="--ec:${emoC(d.emo)}">
+        <div class="swatch"></div>
+        <div class="flex items-center justify-between">
+          <h3 class="font-bold text-[15px]">${esc(d.title)}</h3>
+          <span class="text-[11px]" style="color:var(--ink-sub)">${d.date}</span>
+        </div>
+        <p class="text-[13px] mt-2 leading-relaxed" style="color:var(--ink-sub)">${esc(d.text)}</p>
+        <div class="flex items-center gap-2 mt-3">
+          <span class="chip" style="border-color:${emoC(d.emo)}88; color:${emoC(d.emo)}">${emoE(d.emo)} ${d.emo}</span>
+          ${d.tags.map(t=>`<span class="chip">#${t}</span>`).join('')}
+        </div>
+      </article>`;
+    const card = row.querySelector('.postcard');
+    card.onclick = ()=>{ if(!row.dataset.swiped) openDreamDetail(d); };
+    row.querySelector('.act-fav').onclick = ()=>{ toast(`已收藏「${d.title}」`,'⭐'); resetSwipe(); };
+    row.querySelector('.act-del').onclick = ()=>{
+      card.style.transform='translateX(-120%)'; card.style.opacity='0';
+      setTimeout(()=>{ DB.dreams.splice(DB.dreams.indexOf(d),1); row.remove(); toast('这个梦已归还夜空','🌙'); }, 480);
+    };
+    bindSwipe(row, card);
+    list.appendChild(row);
+  });
+  S.newId = null;
+  function resetSwipe(){ $$('.postcard.swiped').forEach(c=>{ c.classList.remove('swiped'); c.style.setProperty('--swx','0px'); }); }
+
+  /* 情绪泡泡：物理漂浮 + 碰撞 + 长按戳破 */
+  initBubbles($('#bubbleZone'));
+
+  /* 记录按钮 */
+  $('#btnRecord').onclick = ()=>go('record');
+
+  /* 下拉刷新：捕梦网旋转 */
+  bindPullRefresh(el);
+
+  /* 火焰跳动提示 */
+  const fire = $('#fireIco'); fire.classList.add('fire-jump');
+  bindMagnetic(el);
+};
+
+/* 左滑显示快捷操作 */
+function bindSwipe(row, card){
+  let sx=0, dx=0, drag=false;
+  card.addEventListener('pointerdown', e=>{ sx=e.clientX; drag=true; card.style.transition='none'; });
+  window.addEventListener('pointermove', e=>{
+    if(!drag) return; dx = Math.min(0, Math.max(-130, e.clientX-sx));
+    if(Math.abs(dx)>8){ card.classList.add('swiped'); card.style.setProperty('--swx', dx+'px'); row.dataset.swiped='1'; }
+  });
+  window.addEventListener('pointerup', ()=>{
+    if(!drag) return; drag=false; card.style.transition='';
+    if(dx < -60){ card.style.setProperty('--swx','-118px'); }
+    else { card.classList.remove('swiped'); card.style.setProperty('--swx','0px'); delete row.dataset.swiped; }
+    dx=0;
+  });
+}
+
+/* 天气动态粒子（极光 / 雨 / 星 / 云） */
+function drawWeatherFx(box, w){
+  box.innerHTML='';
+  const map = { '🌌':['✦','✧','⋆'], '☁️':['·','☁','·'], '🌤️':['✦','·','☀'], '🌧️':['╱','│','╲'], '🌪️':['✦','∿','✧'] };
+  const glyphs = map[w.icon] || ['✦'];
+  for(let i=0;i<16;i++){
+    const s=document.createElement('span');
+    s.textContent = pick(glyphs);
+    s.style.cssText=`position:absolute;left:${rand(0,100)}%;top:${rand(-10,100)}%;color:${w.cls};
+      font-size:${rand(8,16)}px;opacity:${rand(.15,.55)};animation:floatX ${rand(5,11)}s ease-in-out infinite;animation-delay:-${rand(0,8)}s`;
+    box.appendChild(s);
+  }
+}
+
+/* 情绪泡泡物理（rAF：漂浮 + 相互碰撞弹开） */
+let bubbleRAF = null;
+function initBubbles(zone){
+  if(bubbleRAF) cancelAnimationFrame(bubbleRAF);
+  zone.innerHTML='';
+  const emos = DB.dreams.slice(0,7);
+  const W = zone.clientWidth || 360, H = zone.clientHeight || 176;
+  const bs = emos.map((d,i)=>({
+    d, r:rand(22,30), x:rand(30,W-30), y:rand(34,H-34),
+    vx:rand(-.25,.25)||.2, vy:rand(-.2,.2)||.15,
+    el:null, dead:false
+  }));
+  bs.forEach(b=>{
+    const el=document.createElement('div');
+    el.className='bubble'; el.textContent=emoE(b.d.emo);
+    el.style.cssText=`width:${b.r*2}px;height:${b.r*2}px;--bc:${emoC(b.d.emo)}88;left:0;top:0`;
+    /* 点击 vs 长按判定 */
+    let lp=null, long=false;
+    el.addEventListener('pointerdown', ()=>{ long=false;
+      lp=setTimeout(()=>{ long=true; burstBubble(b); }, 560); });
+    el.addEventListener('pointerup', ()=>{ clearTimeout(lp); if(!long) toast(`${b.d.date} · ${b.d.title}：${b.d.text.slice(0,22)}…`, emoE(b.d.emo)); });
+    el.addEventListener('pointerleave', ()=>clearTimeout(lp));
+    b.el=el; zone.appendChild(el);
+  });
+  function burstBubble(b){
+    if(b.dead) return; b.dead=true;
+    const rect = zone.getBoundingClientRect();
+    for(let i=0;i<12;i++){ /* 戳破粒子散开 */
+      const p=document.createElement('i');
+      p.style.cssText=`position:absolute;width:5px;height:5px;border-radius:50%;background:${emoC(b.d.emo)};
+        left:${b.x}px;top:${b.y}px;--dx:${rand(-60,60)}px;--dy:${rand(-60,60)}px;animation:burstP .8s ease-out forwards;pointer-events:none`;
+      zone.appendChild(p); setTimeout(()=>p.remove(),850);
+    }
+    b.el.remove(); toast('泡泡破掉了，梦还在银行里','🫧');
+  }
+  (function step(){
+    if(!document.body.contains(zone)) return; /* 页面重渲染后停止 */
+    for(const b of bs){ if(b.dead) continue;
+      b.x+=b.vx; b.y+=b.vy;
+      if(b.x<b.r||b.x>W-b.r) b.vx*=-1; if(b.y<b.r||b.y>H-b.r) b.vy*=-1;
+      b.x=Math.max(b.r,Math.min(W-b.r,b.x)); b.y=Math.max(b.r,Math.min(H-b.r,b.y));
+    }
+    for(let i=0;i<bs.length;i++) for(let j=i+1;j<bs.length;j++){
+      const a=bs[i], c=bs[j]; if(a.dead||c.dead) continue;
+      const dx=c.x-a.x, dy=c.y-a.y, dist=Math.hypot(dx,dy), min=a.r+c.r;
+      if(dist<min && dist>0){ /* 轻微弹开 */
+        const push=(min-dist)/2*.35, ux=dx/dist, uy=dy/dist;
+        a.x-=ux*push; a.y-=uy*push; c.x+=ux*push; c.y+=uy*push;
+        a.vx-=ux*.02; a.vy-=uy*.02; c.vx+=ux*.02; c.vy+=uy*.02;
+      }
+    }
+    for(const b of bs){ if(!b.dead) b.el.style.transform=`translate(${b.x-b.r}px,${b.y-b.r}px)`; }
+    bubbleRAF=requestAnimationFrame(step);
+  })();
+}
+
+/* 下拉刷新：捕梦网旋转 */
+function bindPullRefresh(pageEl){
+  let sy=0, pulling=false;
+  pageEl.addEventListener('touchstart', e=>{ if(pageEl.scrollTop<=0){ sy=e.touches[0].clientY; pulling=true; } }, {passive:true});
+  pageEl.addEventListener('touchmove', e=>{
+    if(!pulling) return;
+    const d = e.touches[0].clientY - sy;
+    if(d>86 && !pageEl.dataset.refreshing){
+      pageEl.dataset.refreshing='1';
+      const spin=document.createElement('div');
+      spin.className='absolute z-50 text-3xl'; spin.style.cssText='top:64px;left:50%;transform:translateX(-50%);animation:spinSlow 1s linear infinite';
+      spin.textContent='🕸️'; pageEl.appendChild(spin);
+      setTimeout(()=>{ spin.remove(); delete pageEl.dataset.refreshing; toast('捕梦网抖了抖，梦境已刷新','🕸️'); }, 1200);
+    }
+  }, {passive:true});
+  pageEl.addEventListener('touchend', ()=>pulling=false);
+}
+
+/* 梦境详情：底部弹窗 */
+function openDreamDetail(d){
+  openSheet(`
+    <div class="flex items-start justify-between">
+      <div>
+        <div class="text-[11px] tracking-[.2em]" style="color:var(--ink-sub)">${d.date} · 梦境明信片</div>
+        <h3 class="font-display font-bold text-xl mt-1.5">${esc(d.title)}</h3>
+      </div>
+      <span class="chip" style="border-color:${emoC(d.emo)}88;color:${emoC(d.emo)}">${emoE(d.emo)} ${d.emo}</span>
+    </div>
+    <div class="glass p-4 mt-4 text-[14px] leading-relaxed">${esc(d.text)}</div>
+    <div class="mt-4">
+      <div class="text-xs mb-2" style="color:var(--ink-sub)">🪶 AI 梦境诗</div>
+      <div class="glass p-4 font-poem text-[15px] leading-loose" style="border-color:${emoC(d.emo)}55">
+        ${d.poem.map(l=>`<div>${l}</div>`).join('')}
+      </div>
+    </div>
+    <div class="flex gap-2 mt-4 flex-wrap">${d.tags.map(t=>`<span class="chip">#${t}</span>`).join('')}</div>
+    <div class="flex gap-3 mt-6">
+      <button class="pressable flex-1 py-3 rounded-2xl text-sm text-white" style="background:linear-gradient(90deg,#8B5CF6,#EC4899);border:none"
+        onclick="closeSheet();toast('已分享到梦屿广场（匿名）','🌐')">匿名分享</button>
+      <button class="pressable flex-1 py-3 rounded-2xl text-sm" style="background:rgba(255,255,255,.08);border:1px solid var(--glass-brd);color:var(--ink)"
+        onclick="closeSheet()">收好这个梦</button>
+    </div>`);
+}
+
+/* ============================================================
+   🎙️ 记录页 · 捕梦网
+   ============================================================ */
+render.record = function(){
+  const el = $('[data-page="record"]');
+  const D = S.dreaming = { emotion:null, clarity:3, tags:[], text:'', poem:null };
+  el.innerHTML = `
+  <header class="pt-1">
+    <div class="text-[11px] tracking-[.25em]" style="color:var(--ink-sub)">DREAM CATCHER</div>
+    <h1 class="font-display font-bold text-2xl mt-1">捕梦网</h1>
+    <p class="text-[13px] mt-1.5" style="color:var(--ink-sub)">刚醒来？不用打字，按住说出你的梦。</p>
+  </header>
+
+  <!-- 中央录音钮：捕梦网外圈 + 水波涟漪 + 陀螺仪偏移 -->
+  <div class="flex flex-col items-center mt-8">
+    <div id="gyroWrap" style="transition:transform .3s ease-out">
+      <div id="recBtn" class="relative flex items-center justify-center rounded-full select-none"
+        style="width:150px;height:150px;cursor:pointer;touch-action:none;
+               background:radial-gradient(circle at 35% 30%, rgba(139,92,246,.5), rgba(30,27,75,.9) 70%);
+               border:1px solid rgba(139,92,246,.5); box-shadow:0 0 44px rgba(139,92,246,.35)">
+        <div class="net-ring"></div>
+        <span class="rec-wave"></span><span class="rec-wave"></span><span class="rec-wave"></span>
+        <div class="text-center pointer-events-none">
+          <div class="text-4xl" id="recIcon">🎙️</div>
+          <div class="text-[11px] mt-1 tracking-widest" id="recLabel" style="color:var(--ink-sub)">按住捕梦</div>
+        </div>
+      </div>
+    </div>
+    <div id="recHint" class="text-[11px] mt-4 h-4" style="color:var(--ink-sub)"></div>
+  </div>
+
+  <!-- 转写文本（打字机） -->
+  <div id="transcript" class="glass p-4 mt-5 min-h-[76px] text-[14px] leading-relaxed hide"></div>
+
+  <!-- 梦境诗人 AI -->
+  <div id="poemZone" class="mt-4 hide">
+    <button id="btnPoem" class="pressable w-full py-3 rounded-2xl text-sm text-white"
+      style="background:linear-gradient(90deg,#06B6D4,#8B5CF6);border:none;cursor:pointer">🪶 让 AI 写成诗</button>
+    <div id="poemCard" class="flip-card mt-3 hide" style="height:200px;cursor:pointer">
+      <div class="flip-inner">
+        <div class="flip-face glass p-5 flex flex-col justify-center" style="border-color:rgba(236,72,153,.4)">
+          <div class="text-[10px] tracking-[.25em] mb-3" style="color:var(--nebula)">DREAM POEM · 点击翻面看原梦</div>
+          <div id="poemLines" class="font-poem text-[15px] leading-loose"></div>
+        </div>
+        <div class="flip-face flip-back glass p-5 flex flex-col justify-center">
+          <div class="text-[10px] tracking-[.25em] mb-3" style="color:var(--cyan)">ORIGINAL DREAM · 点击翻回</div>
+          <div id="poemRaw" class="text-[13px] leading-relaxed" style="color:var(--ink-sub)"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 情绪选择 -->
+  <div class="mt-6">
+    <div class="text-xs mb-2.5" style="color:var(--ink-sub)">这个梦的感觉是…</div>
+    <div class="flex flex-wrap gap-2" id="emoRow">
+      ${['恐惧','兴奋','困惑','平静','悲伤','愤怒','温暖'].map(n=>`
+        <span class="emo-tag chip" data-emo="${n}" style="--c:${emoC(n)}">${emoE(n)} ${n}</span>`).join('')}
+    </div>
+  </div>
+
+  <!-- 清晰度评分 -->
+  <div class="mt-5 flex items-center justify-between">
+    <div class="text-xs" style="color:var(--ink-sub)">梦的清晰度</div>
+    <div id="starRow" class="text-xl flex gap-1.5">
+      ${[1,2,3,4,5].map(i=>`<span class="star-rate ${i<=3?'lit':''}" data-star="${i}">⭐</span>`).join('')}
+    </div>
+  </div>
+
+  <!-- 梦境元素快速标签 -->
+  <div class="mt-5">
+    <div class="text-xs mb-2.5" style="color:var(--ink-sub)">梦里出现了…（可多选）</div>
+    <div class="flex flex-wrap gap-2" id="tagRow">
+      ${DB.quickTags.map(t=>`<span class="chip pressable" data-tag="${t}">${t}</span>`).join('')}
+    </div>
+  </div>
+
+  <!-- 梦境声音化 -->
+  <div class="mt-5">
+    <button id="btnSound" class="pressable w-full py-3 rounded-2xl text-sm glass" style="color:var(--ink);cursor:pointer">🎧 生成梦境氛围音</button>
+    <div id="soundCard" class="glass p-4 mt-3 hide items-center gap-4">
+      <button id="soundPlay" class="pressable w-12 h-12 rounded-full flex-none flex items-center justify-center text-lg text-white"
+        style="background:linear-gradient(135deg,#06B6D4,#8B5CF6);border:none;cursor:pointer">▶</button>
+      <div class="flex-1">
+        <div class="text-[13px] font-medium" id="soundName">深海漂浮 · 白噪音</div>
+        <div class="wave mt-1.5" id="soundWave"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 保存 -->
+  <button id="btnSave" class="magnetic pressable w-full py-4 mt-7 rounded-2xl text-[15px] font-medium text-white"
+    style="background:linear-gradient(90deg,#8B5CF6,#EC4899);border:none;cursor:pointer;box-shadow:0 10px 34px rgba(139,92,246,.4)">
+    🕸️ 收网，把梦存进银行
+  </button>
+
+  <!-- 收网动效层 -->
+  <div id="netFx" class="hide absolute inset-0 z-50 flex items-center justify-center pointer-events-none">
+    <div id="netSpin" class="text-[110px]" style="filter:drop-shadow(0 0 30px rgba(139,92,246,.8))">🕸️</div>
+  </div>`;
+
+  /* ---- 按住录音：涟漪扩散 + 捕梦网旋转；松开：打字机转写 ---- */
+  const recBtn = $('#recBtn'), hint = $('#recHint');
+  const demoText = '我梦见自己掉进了一片会慢慢发光的深海，远处有一扇门，门上挂着我小学时的班牌。我游过去，海水忽然变成了温的，像有人在梦里给我倒了一杯热牛奶。';
+  let holding=false;
+  recBtn.addEventListener('pointerdown', e=>{ e.preventDefault(); holding=true;
+    recBtn.classList.add('recording'); $('#recLabel').textContent='正在捕梦…'; $('#recIcon').textContent='🕸️';
+    hint.textContent='松开结束 · 网正在兜住你的梦';
+    recBtn.setPointerCapture(e.pointerId);
+  });
+  const stopRec = ()=>{ if(!holding) return; holding=false;
+    recBtn.classList.remove('recording'); $('#recLabel').textContent='再补一段？'; $('#recIcon').textContent='🎙️';
+    hint.textContent=''; typewriter($('#transcript'), demoText);
+    $('#transcript').classList.remove('hide'); $('#poemZone').classList.remove('hide');
+    D.text = demoText;
+  };
+  recBtn.addEventListener('pointerup', stopRec);
+  recBtn.addEventListener('pointercancel', stopRec);
+
+  /* ---- 陀螺仪：设备倾斜时捕梦网轻微偏移 ---- */
+  window.addEventListener('deviceorientation', e=>{
+    if(S.page!=='record') return;
+    const gx = Math.max(-12, Math.min(12, (e.gamma||0)*.5)), gy = Math.max(-12, Math.min(12, (e.beta||0)*.3));
+    const g = $('#gyroWrap'); if(g) g.style.transform = `translate(${gx}px,${gy}px)`;
+  });
+
+  /* ---- 情绪选择：高亮弹跳 + 全局色调随情绪变化 ---- */
+  $('#emoRow').addEventListener('click', e=>{
+    const t = e.target.closest('[data-emo]'); if(!t) return;
+    $$('#emoRow .emo-tag').forEach(x=>x.classList.remove('sel'));
+    t.classList.add('sel'); D.emotion = t.dataset.emo;
+    const cold = ['恐惧','悲伤','困惑'].includes(D.emotion), warm = ['兴奋','温暖'].includes(D.emotion);
+    $('#tintLayer').style.setProperty('--hue-tint',
+      cold ? 'rgba(96,165,250,.10)' : warm ? 'rgba(244,114,182,.12)' : 'rgba(139,92,246,.10)');
+    document.documentElement.style.setProperty('--hue-tint',
+      cold ? 'rgba(96,165,250,.10)' : warm ? 'rgba(244,114,182,.12)' : 'rgba(139,92,246,.10)');
+  });
+
+  /* ---- 星级：依次亮起闪烁 ---- */
+  $('#starRow').addEventListener('click', e=>{
+    const s = e.target.closest('[data-star]'); if(!s) return;
+    D.clarity = +s.dataset.star;
+    $$('#starRow .star-rate').forEach((x,i)=>{
+      x.classList.remove('lit'); void x.offsetWidth;
+      if(i < D.clarity) setTimeout(()=>x.classList.add('lit'), i*110); /* 依次亮起 */
+    });
+  });
+
+  /* ---- 标签多选：点亮上浮 ---- */
+  $('#tagRow').addEventListener('click', e=>{
+    const t = e.target.closest('[data-tag]'); if(!t) return;
+    t.classList.toggle('sel');
+    const n = t.dataset.tag;
+    D.tags = t.classList.contains('sel') ? [...D.tags, n] : D.tags.filter(x=>x!==n);
+  });
+
+  /* ---- AI 写诗：逐行淡入 + 3D 翻转卡 ---- */
+  $('#btnPoem').onclick = async ()=>{
+    const btn = $('#btnPoem');
+    btn.textContent = '🪶 AI 正在酝酿意象…'; btn.disabled = true;
+    await delay(1200); /* 模拟生成 */
+    const src = D.text || demoText;
+    D.poem = makePoem(src);
+    $('#poemRaw').textContent = src;
+    const box = $('#poemLines'); box.innerHTML='';
+    D.poem.forEach((l,i)=>{
+      const d=document.createElement('div'); d.className='poem-line'; d.style.animationDelay = (i*.35)+'s'; d.textContent=l;
+      box.appendChild(d);
+    });
+    $('#poemCard').classList.remove('hide');
+    btn.textContent='🪶 再写一首'; btn.disabled=false;
+    toast('一首超现实短诗已生成','🪶');
+  };
+  $('#poemCard').onclick = function(){ this.classList.toggle('flipped'); };
+
+  /* ---- 声音化：波形动画 + 可播放卡片（视觉模拟） ---- */
+  const waveBox = $('#soundWave');
+  waveBox.innerHTML = Array.from({length:26},()=>`<i style="--wb:${rand(.5,1.3)}s;animation-delay:-${rand(0,1)}s;transform:scaleY(${rand(.2,.9)})"></i>`).join('');
+  $('#btnSound').onclick = async function(){
+    this.textContent='🎧 AI 正在把梦调成声音…'; this.disabled=true;
+    const card=$('#soundCard'); card.classList.remove('hide'); card.classList.add('flex');
+    $('#soundName').textContent='正在生成…';
+    await delay(1400);
+    $('#soundName').textContent = '深海漂浮 · 白噪音（模拟）';
+    this.textContent='🎧 重新生成'; this.disabled=false;
+    toast('梦境氛围音已生成','🎧');
+  };
+  $('#soundPlay').onclick = function(){
+    const card=$('#soundCard'); const on = card.classList.toggle('playing');
+    this.textContent = on ? '⏸' : '▶';
+  };
+
+  /* ---- 保存：收网动效 + 白屏一闪 + 回首页 + 碎片奖励 ---- */
+  $('#btnSave').onclick = async function(){
+    shakeEl(this);
+    const fx=$('#netFx'), net=$('#netSpin');
+    fx.classList.remove('hide');
+    net.style.animation='netCatch 1.15s cubic-bezier(.5,0,.75,0) forwards';
+    await delay(1000);
+    /* 屏幕一闪 */
+    const flash=document.createElement('div');
+    flash.style.cssText='position:absolute;inset:0;z-index:85;background:radial-gradient(circle,rgba(248,250,252,.9),rgba(139,92,246,.5));animation:flashOnce .55s ease forwards;pointer-events:none';
+    $('#fx-root').appendChild(flash); setTimeout(()=>flash.remove(),600);
+    fx.classList.add('hide'); net.style.animation='';
+    /* 入库 */
+    const title = (D.tags[0] ? `关于「${D.tags[0]}」的梦` : '今晨未命名的梦');
+    const nd = { id:Date.now(), title, date:'今天', emo:D.emotion||'困惑',
+      tags:D.tags.length?D.tags:['碎片'], text:D.text||demoText, poem:D.poem||makePoem(D.text||demoText) };
+    DB.dreams.unshift(nd);
+    S.newDream = true; S.newId = nd.id;
+    S.fragments += 10; save();
+    toast('+10 梦境碎片','✨');
+    await delay(500);
+    go('home');
+  };
+  bindMagnetic(el);
+};
+
+/* 打字机逐字出现 */
+function typewriter(box, text){
+  box.innerHTML=''; box.classList.add('caret');
+  let i=0;
+  (function tick(){
+    if(i<=text.length){ box.innerHTML = esc(text.slice(0,i)); i+=2; setTimeout(tick, 34); }
+    else box.classList.remove('caret');
+  })();
+}
+
+/* 超现实短诗生成器（本地 mock，按关键词拼意象） */
+function makePoem(text){
+  const pools = {
+    '海':['海水是蓝色的沉默','门后藏着没有名字的清晨'], '水':['水忘记了自己的方向','把天空当作入海口'],
+    '门':['每扇门都记得我','却都不肯承认'], '飞':['风替我收好翅膀','在云层的褶皱里'],
+    '考':['白纸长出白色的森林','笔尖在迷宫里走失'], '城':['城市学会了呼吸','街道是它柔软的血管'],
+  };
+  let lines=[];
+  for(const k in pools) if(text.includes(k)) lines.push(...pools[k]);
+  const fallbacks=['我捧着发光的碎片','像捧着不敢说出口的话','夜把影子拉得很长','像一条回不去的河','醒来时枕头很满','装着我没说完的半句话'];
+  while(lines.length<4) lines.push(fallbacks[lines.length % fallbacks.length]);
+  return lines.slice(0, 4 + Math.floor(Math.random()*3)); /* 4-6 行 */
+}
+
+/* ============================================================
+   📊 分析页 · 潜意识的形状
+   ============================================================ */
+render.analyze = function(){
+  const el = $('[data-page="analyze"]');
+  el.innerHTML = `
+  <header class="pt-1 flex items-end justify-between">
+    <div>
+      <div class="text-[11px] tracking-[.25em]" style="color:var(--ink-sub)">SUBCONSCIOUS</div>
+      <h1 class="font-display font-bold text-2xl mt-1">潜意识的形状</h1>
+    </div>
+    <div class="flex gap-1 glass p-1 rounded-full" id="rangeTabs">
+      ${['周','月','年'].map((r,i)=>`<button class="pressable px-3.5 py-1 rounded-full text-[11px] ${i===0?'text-white':''}" data-r="${r}"
+        style="border:none;cursor:pointer;${i===0?'background:linear-gradient(90deg,#8B5CF6,#EC4899)':'background:transparent;color:var(--ink-sub)'}">${r}</button>`).join('')}
+    </div>
+  </header>
+  <div id="anaBody" style="transition:opacity .3s ease">
+    <!-- 本周情绪分布环形图 -->
+    <div class="glass hoverable mt-5 p-5">
+      <div class="text-sm font-bold">本周情绪分布</div>
+      <div class="flex items-center gap-5 mt-4">
+        <div class="relative flex-none" style="width:150px;height:150px">
+          <svg viewBox="0 0 120 120" class="w-full h-full" style="transform:rotate(-90deg)" id="donutSvg"></svg>
+          <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+            <div class="text-lg" id="donutIco">🌙</div>
+            <div class="text-[11px] mt-0.5" id="donutTxt" style="color:var(--ink-sub)">点击色块</div>
+          </div>
+        </div>
+        <div class="flex-1 space-y-1.5 text-[12px]" id="donutLegend"></div>
+      </div>
+    </div>
+
+    <!-- 7 天情绪曲线 -->
+    <div class="glass hoverable mt-4 p-5">
+      <div class="text-sm font-bold">近 7 天情绪波动</div>
+      <svg viewBox="0 0 320 120" class="w-full mt-3" id="moodSvg" style="overflow:visible"></svg>
+      <div id="moodTip" class="text-[11px] mt-2 h-4 text-center" style="color:var(--cyan)"></div>
+    </div>
+
+    <!-- 重复符号 TOP5 -->
+    <div class="glass hoverable mt-4 p-5">
+      <div class="text-sm font-bold">重复符号 TOP 5</div>
+      <div class="mt-4 space-y-3.5" id="topBars"></div>
+    </div>
+
+    <!-- 梦境连续剧 -->
+    <div class="mt-5 flex items-end justify-between">
+      <h2 class="font-bold text-[15px]">📺 我的梦境连续剧</h2>
+      <span class="text-[11px]" style="color:var(--ink-sub)">自动发现重复主题</span>
+    </div>
+    <div class="mt-3 space-y-3" id="seriesList"></div>
+
+    <!-- AI 总结卡（微光扫过） -->
+    <div class="glass hoverable mt-5 p-5 relative overflow-hidden">
+      <div class="absolute inset-y-0 w-24 pointer-events-none" style="background:linear-gradient(90deg,transparent,rgba(255,255,255,.13),transparent);animation:glowSweep 3.6s ease-in-out infinite"></div>
+      <div class="flex items-center gap-2 text-sm font-bold"><span class="pulse-dot inline-block w-2 h-2 rounded-full" style="background:var(--cyan)"></span> AI 潜意识笔记</div>
+      <p class="text-[13px] leading-relaxed mt-3" style="color:var(--ink-sub)">
+        这周你有 <b style="color:var(--gold)">3 个梦</b> 和「考试」有关，可能最近压力比较大。
+        建议睡前做几次深呼吸，或者把明天的待办写下来——把担心寄存在纸上，梦会轻一点。</p>
+    </div>
+
+    <!-- 梦境日历 -->
+    <div class="glass hoverable mt-4 p-5">
+      <div class="flex items-center justify-between">
+        <div class="text-sm font-bold">8 月梦境日历</div>
+        <div class="text-[10px]" style="color:var(--ink-sub)">颜色 = 当天梦境情绪</div>
+      </div>
+      <div class="grid grid-cols-7 gap-1.5 mt-4 text-center text-[10px]" style="color:var(--ink-sub)">
+        ${['一','二','三','四','五','六','日'].map(d=>`<div>${d}</div>`).join('')}
+      </div>
+      <div class="grid grid-cols-7 gap-1.5 mt-2" id="calGrid"></div>
+    </div>
+
+    <!-- 梦境词云 -->
+    <div class="glass hoverable mt-4 p-5">
+      <div class="text-sm font-bold">梦境词云</div>
+      <div class="text-[11px] mt-1" style="color:var(--ink-sub)">点击词语筛选相关梦境</div>
+      <div class="cloud-wrap mt-2 h-48" id="wordCloud"></div>
+    </div>
+    <div id="cloudResult" class="mt-2 space-y-2"></div>
+  </div>`;
+
+  drawDonut(); drawMoodLine(); drawTopBars(); drawSeries(); drawCalendar(); drawCloud();
+
+  /* 时间范围切换：淡入淡出 */
+  $('#rangeTabs').addEventListener('click', e=>{
+    const b = e.target.closest('[data-r]'); if(!b) return;
+    $$('#rangeTabs button').forEach(x=>{ x.style.background='transparent'; x.style.color='var(--ink-sub)'; x.classList.remove('text-white'); });
+    b.style.background='linear-gradient(90deg,#8B5CF6,#EC4899)'; b.style.color='#fff';
+    const body=$('#anaBody'); body.style.opacity=0;
+    setTimeout(()=>{ body.style.opacity=1; toast(`已切换到「${b.dataset.r}」视图`,'📊'); }, 300);
+  });
+};
+
+/* 环形图：从 0 开始绘制动画 */
+function drawDonut(){
+  const svg = $('#donutSvg'), legend = $('#donutLegend');
+  const entries = Object.entries(DB.weekDist);
+  const total = entries.reduce((s,[,v])=>s+v,0);
+  const R=46, C=2*Math.PI*R; let acc=0;
+  entries.forEach(([name,v])=>{
+    const frac = v/total;
+    const seg = document.createElementNS('http://www.w3.org/2000/svg','circle');
+    seg.setAttribute('cx',60); seg.setAttribute('cy',60); seg.setAttribute('r',R);
+    seg.setAttribute('fill','none'); seg.setAttribute('stroke', emoC(name));
+    seg.setAttribute('stroke-width',16); seg.classList.add('donut-seg');
+    seg.style.color = emoC(name);
+    const len = C*frac - 3;
+    seg.setAttribute('stroke-dasharray', `0 ${C}`);
+    seg.setAttribute('stroke-dashoffset', -C*acc);
+    seg.style.transition = 'stroke-dasharray 1s cubic-bezier(.22,1,.36,1)';
+    svg.appendChild(seg);
+    requestAnimationFrame(()=>requestAnimationFrame(()=>seg.setAttribute('stroke-dasharray', `${Math.max(len,0)} ${C-len}`)));
+    seg.onclick = ()=>{
+      $$('.donut-seg').forEach(s=>s.classList.remove('sel')); seg.classList.add('sel');
+      $('#donutIco').textContent = emoE(name);
+      $('#donutTxt').textContent = `${name} · ${v} 个梦`;
+    };
+    acc += frac;
+    legend.innerHTML += `<div class="flex items-center gap-2" style="color:var(--ink-sub)">
+      <i class="w-2.5 h-2.5 rounded-full flex-none" style="background:${emoC(name)}"></i>${name}<b class="ml-auto" style="color:var(--ink)">${v}</b></div>`;
+  });
+}
+
+/* 情绪折线：描边动画 + 渐变填充 + 点击数据点 */
+function drawMoodLine(){
+  const svg = $('#moodSvg'), data = DB.weekMood;
+  const X = i => 22 + i*(276/(data.length-1)), Y = v => 104 - v*9;
+  const pts = data.map((d,i)=>[X(i),Y(d.v)]);
+  const path = pts.map((p,i)=>(i?'L':'M')+p[0]+' '+p[1]).join(' ');
+  svg.innerHTML = `
+    <defs><linearGradient id="mg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#8B5CF6" stop-opacity=".45"/><stop offset="1" stop-color="#8B5CF6" stop-opacity="0"/>
+    </linearGradient></defs>
+    <path d="${path} L ${pts[pts.length-1][0]} 112 L ${pts[0][0]} 112 Z" fill="url(#mg)" opacity="0">
+      <animate attributeName="opacity" to="1" dur="1.2s" begin=".5s" fill="freeze"/></path>
+    <path d="${path}" fill="none" stroke="url(#mg2)" stroke-width="2.5" stroke-linecap="round" id="moodPath"/>
+    <defs><linearGradient id="mg2" x1="0" x2="1"><stop offset="0" stop-color="#06B6D4"/><stop offset="1" stop-color="#EC4899"/></linearGradient></defs>
+    ${data.map((d,i)=>`<circle cx="${X(i)}" cy="${Y(d.v)}" r="8" fill="transparent" data-i="${i}" style="cursor:pointer"/>
+      <circle cx="${X(i)}" cy="${Y(d.v)}" r="3.2" fill="#fff" class="mood-pt" data-i="${i}" style="pointer-events:none;opacity:0"/>
+      <text x="${X(i)}" y="118" font-size="8.5" fill="rgba(226,232,240,.5)" text-anchor="middle">${d.d}</text>`).join('')}`;
+  const line = svg.querySelector('#moodPath');
+  const L = line.getTotalLength();
+  line.style.strokeDasharray = L; line.style.strokeDashoffset = L;
+  line.style.animation = 'lineDraw 1.6s cubic-bezier(.22,1,.36,1) forwards';
+  svg.querySelectorAll('.mood-pt').forEach((p,i)=>setTimeout(()=>p.style.opacity=1, 300+i*160));
+  svg.addEventListener('click', e=>{
+    const c = e.target.closest('[data-i]'); if(!c) return;
+    const d = data[+c.dataset.i];
+    $('#moodTip').textContent = `${d.d}：情绪积极度 ${d.v}/10 · ${d.v>=6?'梦很轻，像羽毛':'梦有点重，抱抱自己'}`;
+  });
+}
+
+/* TOP5 进度条：流光填充 */
+function drawTopBars(){
+  const box = $('#topBars'), max = DB.topSymbols[0].t;
+  box.innerHTML = DB.topSymbols.map((s,i)=>`
+    <div class="pressable" data-sym="${s.n}" style="cursor:pointer">
+      <div class="flex justify-between text-[12px] mb-1.5">
+        <span>${['🥇','🥈','🥉','4️⃣','5️⃣'][i]} ${s.n}</span><span style="color:var(--ink-sub)">${s.t} 次</span>
+      </div>
+      <div class="h-2.5 rounded-full" style="background:rgba(255,255,255,.07)">
+        <div class="bar-fill h-full rounded-full" style="width:0; background:linear-gradient(90deg,#06B6D4,#8B5CF6,#EC4899); transition:width 1.1s cubic-bezier(.22,1,.36,1) ${i*.12}s" data-w="${s.t/max*100}"></div>
+      </div>
+    </div>`).join('');
+  requestAnimationFrame(()=>requestAnimationFrame(()=>
+    $$('#topBars .bar-fill').forEach(b=>b.style.width = b.dataset.w+'%')));
+  box.onclick = e=>{
+    const it = e.target.closest('[data-sym]'); if(!it) return;
+    const sym = it.dataset.sym;
+    const hits = DB.dreams.filter(d=>d.tags.includes(sym));
+    openSheet(`<h3 class="font-display font-bold text-lg">「${sym}」出现的梦</h3>
+      <div class="mt-4 space-y-3">${hits.length ? hits.map(d=>`
+        <div class="glass p-3.5"><div class="text-[13px] font-bold">${d.title} <span class="text-[10px] font-normal ml-1" style="color:var(--ink-sub)">${d.date}</span></div>
+        <div class="text-[12px] mt-1" style="color:var(--ink-sub)">${d.text}</div></div>`).join('')
+        : `<div class="text-center py-8" style="color:var(--ink-sub)">🌫️ 这里空空如也，快去捕获一个和「${sym}」有关的梦吧</div>`}</div>`);
+  };
+}
+
+/* 连续剧卡片：点击展开 */
+function drawSeries(){
+  $('#seriesList').innerHTML = DB.series.map((s,i)=>`
+    <div class="glass hoverable p-4 pressable series-card" style="cursor:pointer">
+      <div class="flex items-center gap-3">
+        <span class="text-2xl">${s.icon}</span>
+        <div class="flex-1">
+          <div class="text-[14px] font-bold">${s.title} <span class="text-[10px] font-normal px-2 py-0.5 rounded-full ml-1" style="background:rgba(236,72,153,.2);color:var(--nebula)">已连播 ${s.count} 集</span></div>
+          <div class="text-[11px] mt-0.5" style="color:var(--ink-sub)">情绪走向：${s.arc}</div>
+        </div>
+        <span class="list-arrow" style="color:var(--ink-sub)">›</span>
+      </div>
+      <div class="series-detail overflow-hidden" style="max-height:0;transition:max-height .5s cubic-bezier(.22,1,.36,1)">
+        <p class="text-[12px] leading-relaxed pt-3" style="color:var(--ink-sub)">${s.desc}</p>
+      </div>
+    </div>`).join('');
+  $$('.series-card').forEach(c=>c.onclick = ()=>{
+    const d = c.querySelector('.series-detail');
+    const open = d.style.maxHeight !== '0px' && d.style.maxHeight;
+    d.style.maxHeight = open ? '0px' : d.scrollHeight+'px';
+  });
+}
+
+/* 梦境日历：情绪着色 + 当天脉冲光环 */
+function drawCalendar(){
+  const g = $('#calGrid');
+  const emoOf = {}; DB.dreams.forEach(d=>{ const m=d.date.match(/8月(\d+)日/); if(m) emoOf[+m[1]]=d.emo; });
+  const randEmo = ['平静','困惑','温暖','焦虑','兴奋'];
+  let html = '<div></div>'.repeat(5); /* 8/1 是周六(2026) → 前留 5 空 */
+  for(let d=1; d<=31; d++){
+    const emo = emoOf[d] || (Math.random()<.5 ? pick(randEmo) : null);
+    const isToday = d===26;
+    html += `<div class="cal-day aspect-square rounded-lg flex items-center justify-center text-[11px] relative ${isToday?'pulse-dot font-bold':''} ${emo?'pressable':''}"
+      data-day="${d}" data-emo="${emo||''}"
+      style="cursor:${emo?'pointer':'default'}; ${emo?`background:${emoC(emo)}33;border:1px solid ${emoC(emo)}66;color:#fff`:'color:rgba(226,232,240,.3)'}
+      ${isToday?';outline:2px solid var(--gold);outline-offset:1px':''}">${d}</div>`;
+  }
+  g.innerHTML = html;
+  g.onclick = e=>{
+    const c = e.target.closest('.cal-day[data-emo]'); if(!c || !c.dataset.emo) return;
+    const d = DB.dreams.find(x=>x.date===`8月${c.dataset.day}日`);
+    toast(d ? `8月${c.dataset.day}日 · ${d.title}：${d.text.slice(0,20)}…` : `8月${c.dataset.day}日 · 一个${c.dataset.emo}的梦`, emoE(c.dataset.emo));
+  };
+}
+
+/* 词云：大小=频率，缓慢漂浮，点击筛选 */
+function drawCloud(){
+  const box = $('#wordCloud');
+  const max = DB.wordCloud[0][1];
+  const pos = [[8,4],[52,8],[30,22],[68,30],[6,40],[44,44],[76,52],[16,60],[55,64],[30,74],[70,76],[8,82],[46,86],[80,14],[24,52]];
+  box.innerHTML = DB.wordCloud.map(([w,f],i)=>{
+    const sz = 11 + (f/max)*17;
+    return `<span class="cloud-w" data-w="${w}" style="left:${pos[i%pos.length][0]}%;top:${pos[i%pos.length][1]}%;
+      font-size:${sz}px; color:rgba(${i%3===0?'139,92,246':i%3===1?'6,182,212':'236,72,153'},${.5+f/max*.5});
+      --wd:${rand(4,8)}s; --wx:${rand(-8,8)}px; --wy:${rand(-9,9)}px; animation-delay:-${rand(0,6)}s">${w}</span>`;
+  }).join('');
+  box.onclick = e=>{
+    const w = e.target.closest('[data-w]'); if(!w) return;
+    const hits = DB.dreams.filter(d=>d.tags.includes(w.dataset.w)||d.text.includes(w.dataset.w));
+    $('#cloudResult').innerHTML = `
+      <div class="text-[11px] mt-1" style="color:var(--cyan)">「${w.dataset.w}」相关梦境 ${hits.length} 条：</div>
+      ${hits.map(d=>`<div class="glass p-3 text-[12px] pressable" style="cursor:pointer" onclick='openDreamDetail(${JSON.stringify(d).replace(/'/g,"&#39;")})'>
+        <b>${d.title}</b> · <span style="color:var(--ink-sub)">${d.text.slice(0,26)}…</span></div>`).join('') ||
+        `<div class="text-center py-6 text-[12px]" style="color:var(--ink-sub)">🌫️ 还没有梦到它，今晚试试睡前暗示</div>`}`;
+  };
+}
+
+/* ============================================================
+   🧪 训练页 · 清醒梦实验室（从我的页进入）
+   ============================================================ */
+render.train = function(){
+  const el = $('[data-page="train"]');
+  el.innerHTML = `
+  <header class="pt-1 flex items-center gap-3">
+    <button id="backBtn" class="pressable w-9 h-9 rounded-full glass flex items-center justify-center flex-none" style="color:var(--ink);border:1px solid var(--glass-brd)">‹</button>
+    <div>
+      <div class="text-[11px] tracking-[.25em]" style="color:var(--ink-sub)">LUCID LAB</div>
+      <h1 class="font-display font-bold text-2xl mt-0.5">清醒梦实验室</h1>
+    </div>
+  </header>
+
+  <!-- 睡前意图卡 -->
+  <div class="glass hoverable mt-5 p-5">
+    <div class="text-sm font-bold">🌙 睡前意图</div>
+    <div class="flex gap-2 mt-3">
+      <input id="intentInput" class="flex-1 rounded-xl px-4 py-3 text-sm outline-none intent-input"
+        style="background:rgba(255,255,255,.06);border:1px solid var(--glass-brd);color:var(--ink);transition:box-shadow .3s,border-color .3s"
+        placeholder="今晚我想梦到…" maxlength="20">
+      <button id="intentSave" class="pressable px-5 rounded-xl text-sm text-white" style="background:linear-gradient(90deg,#8B5CF6,#EC4899);border:none;cursor:pointer">种下</button>
+    </div>
+    <div class="flex flex-wrap gap-2 mt-3">
+      ${['大海','飞行','森林','见到某个人','一座城市','一种颜色'].map(t=>`<span class="chip pressable intent-tag">${t}</span>`).join('')}
+    </div>
+    <div id="intentList" class="mt-4 space-y-3"></div>
+  </div>
+
+  <!-- 现实检测开关 -->
+  <div class="glass hoverable mt-4 p-5">
+    <div class="flex items-center justify-between">
+      <div>
+        <div class="text-sm font-bold">👁️ 现实检测</div>
+        <div class="text-[11px] mt-1" style="color:var(--ink-sub)">白天随机提醒我：「这是梦吗？」</div>
+      </div>
+      <div class="switch" id="rcSwitch"></div>
+    </div>
+    <div id="rcFreq" class="overflow-hidden" style="max-height:0;transition:max-height .5s cubic-bezier(.22,1,.36,1)">
+      <div class="flex gap-2 pt-4">
+        ${['每天 3 次','每天 5 次','每小时'].map((f,i)=>`<span class="chip pressable rc-f ${i===1?'sel':''}">${f}</span>`).join('')}
+      </div>
+    </div>
+  </div>
+
+  <!-- 训练进度 -->
+  <div class="glass hoverable mt-4 p-5">
+    <div class="flex justify-between items-baseline">
+      <div class="text-sm font-bold">🎯 清醒梦成功率</div>
+      <div class="font-display font-bold text-2xl" style="color:var(--cyan)"><span id="lucidRate">0</span>%</div>
+    </div>
+    <div class="h-2.5 rounded-full mt-3" style="background:rgba(255,255,255,.07)">
+      <div id="lucidBar" class="progress-glow h-full rounded-full" style="width:0;background:linear-gradient(90deg,#06B6D4,#8B5CF6);transition:width 1.2s cubic-bezier(.22,1,.36,1)"></div>
+    </div>
+    <div class="mt-4 space-y-2 text-[12px]" style="color:var(--ink-sub)">
+      <div class="glass p-3 flex justify-between"><span>👁️ 梦里发现钟没有指针，意识到在做梦</span><span>8月22日</span></div>
+      <div class="glass p-3 flex justify-between"><span>👁️ 捏鼻子还能呼吸，成功起飞 3 秒</span><span>8月9日</span></div>
+    </div>
+  </div>
+
+  <!-- 助眠音频 -->
+  <div class="mt-6 text-sm font-bold">🎧 助眠音景</div>
+  <div class="scroll-h mt-3" id="audioRow"></div>
+
+  <!-- 每周梦境挑战 -->
+  <div class="glass hoverable mt-5 p-5 relative overflow-hidden">
+    <div class="flex items-center gap-4">
+      <div class="relative flex-none" style="width:74px;height:74px">
+        <svg viewBox="0 0 80 80" class="w-full h-full" style="transform:rotate(-90deg)">
+          <circle cx="40" cy="40" r="34" fill="none" stroke="rgba(255,255,255,.1)" stroke-width="7"/>
+          <circle id="chRing" cx="40" cy="40" r="34" fill="none" stroke="url(#chg)" stroke-width="7" stroke-linecap="round"
+            stroke-dasharray="213.6" stroke-dashoffset="213.6" style="transition:stroke-dashoffset 1.2s cubic-bezier(.22,1,.36,1)"/>
+          <defs><linearGradient id="chg"><stop offset="0" stop-color="#FBBF24"/><stop offset="1" stop-color="#EC4899"/></linearGradient></defs>
+        </svg>
+        <div class="absolute inset-0 flex items-center justify-center text-[12px] font-bold" id="chPct">0%</div>
+      </div>
+      <div class="flex-1">
+        <div class="text-sm font-bold">🚩 ${DB.weeklyChallenge.title}</div>
+        <div class="text-[11px] mt-1.5" style="color:var(--ink-sub)">记录含颜色意象的梦即可推进 (${DB.weeklyChallenge.done}/${DB.weeklyChallenge.target})</div>
+        <button id="chBtn" class="pressable mt-3 px-4 py-2 rounded-xl text-[12px] text-white" style="background:linear-gradient(90deg,#FBBF24,#EC4899);border:none;cursor:pointer">打卡一次</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 成就徽章 -->
+  <div class="mt-6 text-sm font-bold">🏅 成就徽章</div>
+  <div class="grid grid-cols-3 gap-3 mt-3" id="badgeGrid"></div>`;
+
+  $('#backBtn').onclick = ()=>go('profile');
+  S.intents = S.intents || ['一片会唱歌的大海'];
+
+  /* 意图卡：漂浮 + 长按撕毁 */
+  function drawIntents(){
+    $('#intentList').innerHTML = S.intents.map((t,i)=>`
+      <div class="glass p-3.5 flex items-center gap-3 card-float pressable intent-card" data-i="${i}"
+        style="animation-delay:-${i*1.7}s;cursor:grab" draggable="false">
+        <span class="text-lg">🎑</span>
+        <span class="text-[13px] flex-1">今晚我想梦到 <b style="color:var(--gold)">${esc(t)}</b></span>
+        <span class="text-[10px]" style="color:var(--ink-sub)">长按撕毁</span>
+      </div>`).join('');
+    $$('.intent-card').forEach(c=>{
+      let lp=null, sx=0, sy=0;
+      c.addEventListener('pointerdown', e=>{ sx=e.clientX; sy=e.clientY;
+        lp=setTimeout(()=>tearCard(c, +c.dataset.i), 620); });
+      ['pointerup','pointerleave'].forEach(ev=>c.addEventListener(ev, ()=>clearTimeout(lp)));
+      c.addEventListener('pointermove', e=>{ if(Math.hypot(e.clientX-sx,e.clientY-sy)>10) clearTimeout(lp); });
+    });
+  }
+  function tearCard(c, i){
+    /* 撕纸：裂成两半飘落 */
+    const r = c.getBoundingClientRect(), host = $('#fx-root'), pr = $('#phone').getBoundingClientRect();
+    [-1,1].forEach(side=>{
+      const half = document.createElement('div');
+      half.textContent = c.textContent.trim().slice(0,10);
+      half.style.cssText = `position:absolute;left:${r.left-pr.left}px;top:${r.top-pr.top}px;width:${r.width/2}px;height:${r.height}px;
+        overflow:hidden;background:rgba(30,27,75,.9);border:1px solid rgba(255,255,255,.15);color:rgba(226,232,240,.7);font-size:12px;
+        display:flex;align-items:center;padding:0 10px;${side<0?'border-radius:14px 0 0 14px':'border-radius:0 14px 14px 0;margin-left:'+r.width/2+'px'};
+        --tx:${side*46}px;--tr:${side*22}deg;animation:tearHalf .9s cubic-bezier(.5,0,.75,0) forwards;z-index:85`;
+      host.appendChild(half); setTimeout(()=>half.remove(), 950);
+    });
+    c.remove(); S.intents.splice(i,1); toast('意图已撕毁，今晚换个愿望','🎑');
+    setTimeout(drawIntents, 200);
+  }
+  drawIntents();
+  $('#intentSave').onclick = ()=>{
+    const v = $('#intentInput').value.trim(); if(!v) return toast('先写一个今晚的愿望吧','🌙');
+    S.intents.unshift(v); $('#intentInput').value=''; drawIntents(); toast('意图已种下，睡前默念三遍','🌙');
+  };
+  $$('.intent-tag').forEach(t=>t.onclick = ()=>{ $('#intentInput').value = t.textContent; $('#intentInput').focus(); });
+  $('#intentInput').addEventListener('focus', function(){ this.style.borderColor='#8B5CF6'; this.style.boxShadow='0 0 16px rgba(139,92,246,.4)'; });
+  $('#intentInput').addEventListener('blur', function(){ this.style.borderColor=''; this.style.boxShadow=''; });
+
+  /* 现实检测开关：果冻弹跳 */
+  const sw = $('#rcSwitch');
+  sw.onclick = ()=>{
+    sw.classList.toggle('on'); sw.classList.remove('jelly'); void sw.offsetWidth; sw.classList.add('jelly');
+    const fq = $('#rcFreq');
+    fq.style.maxHeight = sw.classList.contains('on') ? fq.scrollHeight+'px' : '0px';
+    toast(sw.classList.contains('on') ? '现实检测已开启，白天见 👁️' : '现实检测已关闭','👁️');
+  };
+  $$('.rc-f').forEach(f=>f.onclick = ()=>{ $$('.rc-f').forEach(x=>x.classList.remove('sel')); f.classList.add('sel'); });
+
+  /* 成功率滚动增长 */
+  countUp($('#lucidRate'), 23, {dur:1300});
+  requestAnimationFrame(()=>requestAnimationFrame(()=>$('#lucidBar').style.width='23%'));
+
+  /* 助眠音频卡 */
+  $('#audioRow').innerHTML = DB.audios.map(([n,i],idx)=>`
+    <div class="glass hoverable pressable flex-none audio-card ${S.playingAudio===n?'playing':''}" data-au="${n}"
+      style="width:118px;padding:14px 12px;cursor:pointer;${S.playingAudio===n?'box-shadow:0 0 22px rgba(6,182,212,.5);border-color:rgba(6,182,212,.6)':''}">
+      <div class="text-2xl">${i}</div>
+      <div class="text-[12px] mt-1.5 font-medium">${n}</div>
+      <div class="wave mt-2" style="height:22px">${Array.from({length:12},()=>`<i style="--wb:${rand(.5,1.2)}s;animation-delay:-${rand(0,1)}s;transform:scaleY(${rand(.2,.85)})"></i>`).join('')}</div>
+    </div>`).join('');
+  $('#audioRow').onclick = e=>{
+    const c = e.target.closest('[data-au]'); if(!c) return;
+    const name = c.dataset.au;
+    S.playingAudio = S.playingAudio===name ? null : name;
+    $$('.audio-card').forEach(x=>{
+      const on = x.dataset.au===S.playingAudio;
+      x.classList.toggle('playing', on);
+      x.style.boxShadow = on?'0 0 22px rgba(6,182,212,.5)':''; x.style.borderColor = on?'rgba(6,182,212,.6)':'';
+    });
+    toast(S.playingAudio ? `正在播放「${S.playingAudio}」（模拟）` : '已暂停','🎧');
+  };
+
+  /* 挑战打卡：进度环 + 完成 confetti + 徽章弹窗 */
+  const chg = DB.weeklyChallenge;
+  function drawChallenge(){
+    const pct = Math.round(chg.done/chg.target*100);
+    $('#chPct').textContent = pct+'%';
+    $('#chRing').style.strokeDashoffset = 213.6*(1-pct/100);
+  }
+  requestAnimationFrame(()=>requestAnimationFrame(drawChallenge));
+  $('#chBtn').onclick = function(){
+    if(chg.done>=chg.target) return toast('本周挑战已完成，去领徽章吧','🏅');
+    chg.done++; shakeEl(this); drawChallenge();
+    if(chg.done>=chg.target){ confetti(); setTimeout(()=>badgePopup('色彩捕手','🌈','完成每周梦境挑战'), 900); }
+    else toast('打卡成功，离徽章更近一步','🚩');
+  };
+
+  /* 徽章：点击翻转看详情 */
+  $('#badgeGrid').innerHTML = DB.badges.map(b=>`
+    <div class="flip-card pressable badge-card" style="height:118px;cursor:pointer">
+      <div class="flip-inner">
+        <div class="flip-face glass flex flex-col items-center justify-center gap-1.5 p-2 ${b.got?'':''}" style="${b.got?'':'filter:grayscale(1);opacity:.45'}">
+          <span class="text-3xl">${b.icon}</span>
+          <span class="text-[10.5px] text-center leading-tight">${b.n}</span>
+        </div>
+        <div class="flip-face flip-back glass flex flex-col items-center justify-center p-2.5 text-center">
+          <span class="text-[10px] leading-relaxed" style="color:var(--ink-sub)">${b.desc}</span>
+          <span class="text-[9px] mt-1.5" style="color:${b.got?'var(--gold)':'var(--ink-sub)'}">${b.got?'已获得 ✓':'未解锁'}</span>
+        </div>
+      </div>
+    </div>`).join('');
+  $$('.badge-card').forEach(c=>c.onclick=()=>c.classList.toggle('flipped'));
+};
+
+/* 全屏 confetti 庆祝 */
+function confetti(){
+  const host = $('#fx-root');
+  const colors=['#8B5CF6','#EC4899','#06B6D4','#FBBF24','#34D399'];
+  for(let i=0;i<70;i++){
+    const c=document.createElement('i');
+    c.style.cssText=`position:absolute;top:-4vh;left:${rand(0,100)}%;width:${rand(5,9)}px;height:${rand(8,14)}px;
+      background:${pick(colors)};border-radius:2px;animation:confettiFall ${rand(2,3.6)}s cubic-bezier(.3,.6,.6,1) ${rand(0,.7)}s forwards;z-index:86`;
+    host.appendChild(c); setTimeout(()=>c.remove(), 4600);
+  }
+}
+/* 徽章获得弹窗 */
+function badgePopup(name, icon, desc){
+  openSheet(`<div class="text-center py-4">
+    <div class="text-6xl logo-breathe inline-block">${icon}</div>
+    <h3 class="font-display font-bold text-xl mt-4">获得徽章「${name}」</h3>
+    <p class="text-[13px] mt-2" style="color:var(--ink-sub)">${desc}</p>
+    <button class="pressable mt-6 px-10 py-3 rounded-full text-sm text-white" style="background:linear-gradient(90deg,#FBBF24,#EC4899);border:none" onclick="closeSheet()">别在胸前</button>
+  </div>`, {center:true});
+}
+
+/* ============================================================
+   🌐 社区页 · 梦屿广场
+   ============================================================ */
+render.community = function(){
+  const el = $('[data-page="community"]');
+  const tags = ['全部','离奇','治愈','细思极恐','似曾相识','电影感','连续剧','诗歌'];
+  S.feedTag = S.feedTag || '全部';
+  el.innerHTML = `
+  <header class="pt-1 pr-28">
+    <div class="text-[11px] tracking-[.25em]" style="color:var(--ink-sub)">DREAM SQUARE</div>
+    <h1 class="font-display font-bold text-2xl mt-1">梦屿广场</h1>
+  </header>
+
+  <!-- 标签筛选：胶囊滑动指示器 -->
+  <div class="relative mt-4">
+    <div class="scroll-h" id="tagScroll" style="padding-bottom:4px">
+      ${tags.map(t=>`<span class="chip feed-tag ${t===S.feedTag?'sel':''}" data-t="${t}">#${t}</span>`).join('')}
+    </div>
+  </div>
+
+  <!-- 拆盲盒大入口 -->
+  <button id="bigBlind" class="magnetic pressable w-full mt-3 p-4 rounded-3xl text-left relative overflow-hidden"
+    style="background:linear-gradient(120deg,rgba(251,191,36,.22),rgba(236,72,153,.22),rgba(139,92,246,.22));
+           border:1px solid rgba(251,191,36,.4);cursor:pointer">
+    <div class="absolute -right-4 -top-6 text-7xl opacity-30" style="animation:floatX 6s ease-in-out infinite">🎁</div>
+    <div class="font-bold text-[15px]">拆一个梦境盲盒</div>
+    <div class="text-[11px] mt-1" style="color:var(--ink-sub)">随机打开一个陌生人的匿名梦 · 普通 / 稀有 / 传说</div>
+  </button>
+
+  <!-- 梦境匹配 -->
+  <div class="glass hoverable mt-4 p-4 pressable" id="matchCard" style="cursor:pointer">
+    <div class="flex items-center gap-3">
+      <span class="text-2xl">🧲</span>
+      <div class="text-[13px] flex-1">有 <b style="color:var(--nebula)">128 个人</b> 也梦到过「从高处坠落」</div>
+      <span class="list-arrow" style="color:var(--ink-sub)">›</span>
+    </div>
+    <div id="matchList" class="overflow-hidden" style="max-height:0;transition:max-height .55s cubic-bezier(.22,1,.36,1)">
+      <div class="pt-3 space-y-2 text-[12px]" style="color:var(--ink-sub)">
+        <div class="glass p-3">🪂 @风的邻居：我坠落时抓住了云，云说「你也失眠啊」。</div>
+        <div class="glass p-3">🪂 @夜航员：从 40 层掉下来，落地变成了一片叶子。</div>
+        <div class="glass p-3">🪂 @匿名 #219：永远在坠落，从来没着地，像被暂停的恐惧。</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 梦境接龙 -->
+  <div class="glass hoverable mt-4 p-4 pressable" id="chainCard" style="cursor:pointer">
+    <div class="flex items-center gap-3">
+      <span class="text-2xl">🪢</span>
+      <div class="flex-1">
+        <div class="text-[13px] font-bold">一个永远不会结束的梦</div>
+        <div class="text-[11px] mt-0.5" style="color:var(--ink-sub)">全岛接龙中 · 已 ${DB.chain.length} 棒</div>
+      </div>
+      <span class="list-arrow" style="color:var(--ink-sub)">›</span>
+    </div>
+  </div>
+
+  <!-- 本周榜单 -->
+  <div class="mt-5 flex items-center justify-between">
+    <h2 class="font-bold text-[15px]">🏆 本周榜单</h2>
+    <div class="flex gap-1.5 text-[11px]" id="rankTabs">
+      ${['最离奇','最多同感','最佳诗人'].map((r,i)=>`<span class="chip pressable rank-t ${i===0?'sel':''}" data-r="${i}">${r}</span>`).join('')}
+    </div>
+  </div>
+  <div class="glass mt-3 p-4 overflow-hidden"><div id="rankBody" style="transition:transform .4s cubic-bezier(.22,1,.36,1), opacity .4s"></div></div>
+
+  <!-- 时间胶囊广场 -->
+  <div class="mt-5 text-sm font-bold">⏳ 时间胶囊广场</div>
+  <div class="scroll-h mt-3" id="capRow"></div>
+
+  <!-- 梦境卡片流 -->
+  <div class="mt-5 flex items-end justify-between">
+    <h2 class="font-bold text-[15px]">大家的梦</h2>
+    <span class="text-[11px]" style="color:var(--ink-sub)">长按卡片可收藏 / 举报</span>
+  </div>
+  <div id="feedList" class="mt-3 space-y-4"></div>
+  <div id="feedMore" class="mt-4 space-y-4"></div>
+  <div class="text-center text-[11px] py-5" style="color:var(--ink-sub)">上滑加载更多梦…</div>`;
+
+  /* 标签筛选 */
+  $('#tagScroll').addEventListener('click', e=>{
+    const t = e.target.closest('.feed-tag'); if(!t) return;
+    S.feedTag = t.dataset.t;
+    $$('.feed-tag').forEach(x=>x.classList.toggle('sel', x===t));
+    drawFeed(true);
+  });
+
+  $('#bigBlind').onclick = ()=>openBlindbox();
+
+  /* 梦境匹配展开 */
+  $('#matchCard').onclick = ()=>{
+    const m = $('#matchList');
+    const open = m.style.maxHeight && m.style.maxHeight!=='0px';
+    m.style.maxHeight = open ? '0px' : m.scrollHeight+'px';
+  };
+
+  /* 梦境接龙弹窗：飘带连接 */
+  $('#chainCard').onclick = ()=>{
+    openSheet(`
+      <h3 class="font-display font-bold text-lg">🪢 一个永远不会结束的梦</h3>
+      <p class="text-[11px] mt-1" style="color:var(--ink-sub)">每人接一句，梦就永远不会醒</p>
+      <div class="mt-5 space-y-0" id="chainList">
+        ${DB.chain.map((c,i)=>`
+          <div class="relative pl-6 pb-5">
+            ${i<DB.chain.length-1?'<i class="absolute left-[7px] top-5 bottom-0 w-[2px]" style="background:linear-gradient(180deg,#8B5CF6,#EC4899);opacity:.5"></i>':''}
+            <i class="absolute left-0 top-1 w-4 h-4 rounded-full" style="background:radial-gradient(circle,#EC4899,#8B5CF6);box-shadow:0 0 10px rgba(236,72,153,.7)"></i>
+            <div class="glass p-3 text-[12.5px] leading-relaxed" style="animation:fadeUp .5s ${i*.12}s both">${c}</div>
+          </div>`).join('')}
+      </div>
+      <div class="flex gap-2 mt-1">
+        <input id="chainInput" class="flex-1 rounded-xl px-4 py-3 text-sm outline-none" placeholder="接着梦下去…"
+          style="background:rgba(255,255,255,.06);border:1px solid var(--glass-brd);color:var(--ink)">
+        <button id="chainSend" class="pressable px-5 rounded-xl text-sm text-white" style="background:linear-gradient(90deg,#8B5CF6,#EC4899);border:none">接上</button>
+      </div>`);
+    $('#chainSend').onclick = ()=>{
+      const v = $('#chainInput').value.trim(); if(!v) return toast('先写一句再接龙','🪢');
+      DB.chain.push('@我：'+v); closeSheet(); toast('你的那一棒已接上','🪢');
+    };
+  };
+
+  /* 榜单切换：滑动动画 */
+  const ranks = [
+    [['🥇','电梯没有 13 层，但它停在了 13 层','同感 96'],['🥈','全宇宙只剩我一家便利店','同感 77'],['🥉','所有的钟都倒着走','同感 64']],
+    [['🥇','又梦到那片海，这次门开了','同感 210'],['🥈','把坠落梦写成了诗','同感 154'],['🥉','我在梦里给月亮充了一次电','同感 128']],
+    [['🥇','@梦游诗人 「我一直在下落…」','收藏 88'],['🥈','@雾中信箱 「雪落得很慢…」','收藏 61'],['🥉','@深海漫游者 「门后是另一片海」','收藏 57']],
+  ];
+  function drawRank(i){
+    const b = $('#rankBody');
+    b.style.transform='translateX(-14px)'; b.style.opacity=0;
+    setTimeout(()=>{
+      b.innerHTML = ranks[i].map(r=>`
+        <div class="flex items-center gap-3 py-2.5 border-b last:border-0" style="border-color:rgba(255,255,255,.06)">
+          <span class="text-lg">${r[0]}</span>
+          <span class="text-[12.5px] flex-1">${r[1]}</span>
+          <span class="text-[10px]" style="color:var(--gold)">${r[2]}</span>
+        </div>`).join('');
+      b.style.transform=''; b.style.opacity=1;
+    }, 220);
+  }
+  drawRank(0);
+  $('#rankTabs').onclick = e=>{
+    const t = e.target.closest('.rank-t'); if(!t) return;
+    $$('.rank-t').forEach(x=>x.classList.remove('sel')); t.classList.add('sel');
+    drawRank(+t.dataset.r);
+  };
+
+  /* 时间胶囊广场：倒计时 + 围观 */
+  $('#capRow').innerHTML = DB.capsules.map((c,i)=>`
+    <div class="capsule glass flex-none pressable" style="min-width:220px;cursor:pointer;${c.opened?'opacity:.6':''}" data-cap="${i}">
+      <div class="text-[12px] font-bold">${c.opened?'🔓':'🔒'} ${esc(c.title)}</div>
+      <div class="text-[10px] mt-1.5" style="color:var(--gold)" data-cd="${c.openAt}">${c.opened?'已开启':'计算中…'}</div>
+      <div class="text-[10px] mt-1" style="color:var(--ink-sub)">👀 ${c.watchers} 人围观</div>
+    </div>`).join('');
+  tickCountdowns();
+  $('#capRow').onclick = e=>{
+    const c = e.target.closest('[data-cap]'); if(!c) return;
+    const cap = DB.capsules[+c.dataset.cap];
+    if(cap.opened) return toast('这个胶囊已经开启过了','🔓');
+    cap.watchers++;
+    toast('围观成功，开启那天会提醒你','⏳'); render.community();
+  };
+
+  /* 梦境卡片流 */
+  function drawFeed(withSkeleton){
+    const list = $('#feedList');
+    const build = ()=>{
+      const posts = DB.posts.filter(p=>S.feedTag==='全部'||p.tags.includes(S.feedTag));
+      list.innerHTML = posts.length ? '' : `<div class="text-center py-10" style="color:var(--ink-sub)">
+        <div class="text-4xl mb-3">🌫️</div>这个标签下还很安静，把你的梦第一个丢进来吧</div>`;
+      posts.forEach((p,i)=>{
+        const card = document.createElement('div');
+        card.className = 'glass hoverable p-4 relative';
+        card.style.animation = `fadeUp .5s ${i*.09}s both`;
+        card.innerHTML = `
+          <div class="flex items-center gap-2.5">
+            <span class="w-9 h-9 rounded-full flex items-center justify-center text-lg flex-none"
+              style="background:linear-gradient(135deg,rgba(139,92,246,.4),rgba(6,182,212,.3))">${p.avatar}</span>
+            <div class="flex-1">
+              <div class="text-[12px] font-medium">${p.nick}</div>
+              <div class="text-[10px]" style="color:var(--ink-sub)">匿名梦境 · 昨夜</div>
+            </div>
+          </div>
+          <div class="text-[14px] font-bold mt-3">${esc(p.title)}</div>
+          <p class="text-[12.5px] mt-1.5 leading-relaxed" style="color:var(--ink-sub)">${esc(p.text)}</p>
+          <div class="flex items-center justify-between mt-3">
+            <div class="flex gap-1.5">${p.tags.map(t=>`<span class="chip" style="font-size:10px;padding:3px 9px">#${t}</span>`).join('')}</div>
+            <button class="pressable like-btn flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px]"
+              style="background:rgba(236,72,153,.14);border:1px solid rgba(236,72,153,.4);color:#F9A8D4;cursor:pointer">
+              💗 <span class="like-n">${p.likes + (S.likes[p.id]?1:0)}</span> 同感</button>
+          </div>`;
+        /* 同感：星光粒子 + 数字弹跳 */
+        const btn = card.querySelector('.like-btn');
+        btn.onclick = e=>{
+          e.stopPropagation();
+          if(S.likes[p.id]) return toast('已经感同身受过啦','💗');
+          S.likes[p.id]=1;
+          const n = btn.querySelector('.like-n');
+          n.textContent = +n.textContent + 1;
+          n.style.animation='tabBounce .5s cubic-bezier(.34,1.56,.64,1)';
+          setTimeout(()=>n.style.animation='',500);
+          for(let k=0;k<8;k++){ /* 心形粒子飞散 */
+            const h=document.createElement('i'); h.textContent='✦';
+            const r=btn.getBoundingClientRect(), pr=$('#phone').getBoundingClientRect();
+            h.style.cssText=`position:absolute;left:${r.left-pr.left+r.width/2}px;top:${r.top-pr.top}px;color:#F472B6;font-size:11px;
+              --dx:${rand(-46,46)}px;--dy:${rand(-60,-14)}px;animation:heartFly .9s ease-out forwards;z-index:85;pointer-events:none`;
+            $('#fx-root').appendChild(h); setTimeout(()=>h.remove(),950);
+          }
+        };
+        /* 长按：收藏 / 举报 */
+        let lp=null, moved=false;
+        card.addEventListener('pointerdown', ()=>{ moved=false; lp=setTimeout(()=>{
+          openSheet(`<div class="space-y-2.5">
+            <button class="pressable w-full glass p-4 text-left text-sm" style="color:var(--ink)" onclick="closeSheet();toast('已收藏这个陌生人的梦','⭐')">⭐ 收藏这个梦</button>
+            <button class="pressable w-full glass p-4 text-left text-sm" style="color:var(--ink)" onclick="closeSheet();toast('已收到举报，巡梦人会处理','🛡️')">🛡️ 举报不适内容</button>
+            <button class="pressable w-full glass p-4 text-left text-sm" style="color:var(--ink)" onclick="closeSheet()">取消</button></div>`);
+        }, 600); });
+        card.addEventListener('pointermove', ()=>{ moved=true; clearTimeout(lp); });
+        ['pointerup','pointerleave'].forEach(ev=>card.addEventListener(ev, ()=>clearTimeout(lp)));
+        list.appendChild(card);
+      });
+    };
+    if(withSkeleton){ /* 骨架屏 + 淡入 */
+      list.innerHTML = Array.from({length:3},()=>'<div class="skl h-32"></div>').join('');
+      setTimeout(build, 620);
+    } else build();
+  }
+  drawFeed(false);
+
+  /* 上滑加载更多：骨架屏 + 淡入（onscroll 赋值，避免重复渲染累积监听） */
+  let moreLoaded=false;
+  el.onscroll = ()=>{
+    if(moreLoaded) return;
+    if(el.scrollTop + el.clientHeight > el.scrollHeight - 120){
+      moreLoaded=true;
+      const more = $('#feedMore');
+      more.innerHTML = '<div class="skl h-32"></div><div class="skl h-32"></div>';
+      setTimeout(()=>{
+        more.innerHTML = `<div class="glass p-4 text-[13px]" style="animation:fadeUp .5s both">
+          <b>🌙 @拾贝人：海边捡到一台老式放映机</b>
+          <p class="mt-1.5 text-[12px]" style="color:var(--ink-sub)">放映机里没有胶片，装着的是别人没做完的梦。我按下播放键，沙滩上开始下星星。</p></div>`;
+      }, 900);
+    }
+  };
+};
+
+/* 倒计时实时更新 */
+let cdTimer=null;
+function tickCountdowns(){
+  if(cdTimer) clearInterval(cdTimer);
+  const tick=()=>{
+    $$('[data-cd]').forEach(elm=>{
+      const t = new Date(elm.dataset.cd.replace(' ','T')) - Date.now();
+      if(t<=0){ elm.textContent='🎉 可以开启了'; return; }
+      const d=Math.floor(t/864e5), h=Math.floor(t%864e5/36e5), m=Math.floor(t%36e5/6e4), s=Math.floor(t%6e4/1e3);
+      elm.textContent=`⏳ 距开启 ${d}天 ${h}时 ${m}分 ${s}秒`;
+    });
+  };
+  tick(); cdTimer=setInterval(tick, 1000);
+}
+
+/* ---------- 梦境盲盒：3D 摇晃 + 稀有度光效 ---------- */
+function openBlindbox(){
+  const mask = openSheet(`
+    <div class="text-center pt-2 pb-4" id="blindStage">
+      <div class="text-[11px] tracking-[.25em]" style="color:var(--ink-sub)">DREAM BLIND BOX</div>
+      <h3 class="font-display font-bold text-xl mt-1">梦境盲盒</h3>
+      <div class="gift-3d mt-8" id="giftBox"><div class="gift-face">🎁</div></div>
+      <p class="text-[12px] mt-8" style="color:var(--ink-sub)">摇晃中…正在随机连接一个陌生人的梦</p>
+    </div>`, {center:true});
+  setTimeout(()=>{
+    const item = pick(DB.blindbox);
+    const cls = item.r==='传说'?'rarity-legend':item.r==='稀有'?'rarity-rare':'rarity-common';
+    const rcolor = item.r==='传说'?'#FBBF24':item.r==='稀有'?'#06B6D4':'#94A3B8';
+    $('#blindStage').innerHTML = `
+      <div style="animation:popIn .6s cubic-bezier(.34,1.56,.64,1) both">
+        <span class="chip" style="border-color:${rcolor};color:${rcolor};box-shadow:0 0 16px ${rcolor}66">✦ ${item.r}梦境 ✦</span>
+        <div class="glass p-5 mt-4 text-left ${cls}" style="border-color:${rcolor}88">
+          <div class="text-[11px]" style="color:var(--ink-sub)">${item.nick}</div>
+          <p class="text-[14px] leading-relaxed mt-2.5 font-poem">${item.text}</p>
+        </div>
+        <div class="flex gap-3 mt-6">
+          <button class="pressable flex-1 py-3 rounded-2xl text-sm text-white" style="background:linear-gradient(90deg,#8B5CF6,#EC4899);border:none"
+            onclick="closeSheet();toast('已把同感放进对方的梦里','💗')">💗 隔空同感</button>
+          <button class="pressable flex-1 py-3 rounded-2xl text-sm" style="background:rgba(255,255,255,.08);border:1px solid var(--glass-brd);color:var(--ink)"
+            onclick="closeSheet();setTimeout(openBlindbox,420)">再拆一个</button>
+        </div>
+      </div>`;
+    if(item.r==='传说') confetti();
+  }, 1700);
+}
+
+/* ============================================================
+   👤 我的页面
+   ============================================================ */
+render.profile = function(){
+  const el = $('[data-page="profile"]');
+  const got = DB.dex.filter(d=>d.got).length;
+  el.innerHTML = `
+  <!-- 用户信息 -->
+  <div class="flex items-center gap-4 pt-2 pr-24">
+    <button id="avatarBtn" class="pressable relative w-16 h-16 rounded-full flex-none flex items-center justify-center text-3xl"
+      style="background:conic-gradient(from 120deg,#8B5CF6,#06B6D4,#EC4899,#8B5CF6);border:2px solid rgba(255,255,255,.3);cursor:pointer">
+      ${S.avatar||'🌙'}
+      <span class="absolute -bottom-0.5 -right-0.5 w-5 h-5 rounded-full text-[10px] flex items-center justify-center"
+        style="background:var(--gold);color:#1E1B4B">✎</span>
+    </button>
+    <div>
+      <div class="font-bold text-lg">捕梦新手</div>
+      <div class="text-[11px] mt-0.5" style="color:var(--ink-sub)">ID dream_0826 · 上岛 42 天</div>
+    </div>
+  </div>
+
+  <!-- 核心数据 -->
+  <div class="glass hoverable mt-5 p-4 grid grid-cols-4 gap-1 text-center card-float">
+    <div><div class="font-display font-bold text-lg" id="pf1">0</div><div class="text-[10px] mt-1" style="color:var(--ink-sub)">总梦境</div></div>
+    <div><div class="font-display font-bold text-lg" id="pf2">0</div><div class="text-[10px] mt-1" style="color:var(--ink-sub)">清醒梦</div></div>
+    <div><div class="font-display font-bold text-lg" style="color:var(--cyan)">飞翔</div><div class="text-[10px] mt-1" style="color:var(--ink-sub)">最常符号</div></div>
+    <div><div class="font-display font-bold text-lg" id="pf3">0</div><div class="text-[10px] mt-1" style="color:var(--ink-sub)">梦境碎片</div></div>
+  </div>
+
+  <!-- 梦境图鉴 -->
+  <div class="mt-6 flex items-end justify-between">
+    <h2 class="font-bold text-[15px]">📖 梦境图鉴</h2>
+    <span class="text-[11px]" style="color:var(--ink-sub)">还有 ${DB.dex.filter(d=>!d.got).length + 8} 个符号待发现</span>
+  </div>
+  <div class="h-1.5 rounded-full mt-3 progress-glow" style="background:rgba(255,255,255,.07)">
+    <div class="h-full rounded-full" style="width:${got/DB.dex.length*100}%;background:linear-gradient(90deg,#FBBF24,#EC4899)"></div>
+  </div>
+  <div class="grid grid-cols-4 gap-2.5 mt-3" id="dexGrid"></div>
+
+  <!-- 我的时间胶囊 -->
+  <div class="mt-6 text-sm font-bold">⏳ 我的时间胶囊</div>
+  <div class="mt-3 space-y-2.5">
+    ${DB.capsules.filter(c=>c.mine).map(c=>`
+      <div class="glass hoverable p-3.5 flex items-center gap-3 pressable" style="cursor:pointer" onclick="toast('${c.opened?'🔓 胶囊已开启：里面是一句「别害怕长大」':'🔒 还没到时间，梦正在发酵'}','⏳')">
+        <span class="text-xl">${c.opened?'🔓':'🔒'}</span>
+        <div class="flex-1">
+          <div class="text-[13px] font-medium">${esc(c.title)}</div>
+          <div class="text-[10px] mt-0.5" style="color:var(--gold)" ${c.opened?'':`data-cd="${c.openAt}"`}>${c.opened?'已于 6月1日 开启':''}</div>
+        </div>
+        <span class="list-arrow" style="color:var(--ink-sub)">›</span>
+      </div>`).join('')}
+    <button class="pressable w-full py-3 rounded-2xl text-[12px]" style="background:rgba(251,191,36,.12);border:1px dashed rgba(251,191,36,.5);color:var(--gold);cursor:pointer"
+      onclick="openCapsule()">＋ 封存一个梦给未来</button>
+  </div>
+
+  <!-- 我的梦境连续剧 -->
+  <div class="mt-6 text-sm font-bold">📺 我的梦境连续剧</div>
+  <div class="mt-3 space-y-2.5">
+    ${DB.series.map(s=>`
+      <div class="glass hoverable p-3.5 flex items-center gap-3 pressable" style="cursor:pointer" onclick="toast('${s.title} · 下一集也许在今晚','📺')">
+        <span class="text-xl">${s.icon}</span>
+        <div class="flex-1 text-[13px]">${s.title} <span class="text-[10px]" style="color:var(--ink-sub)">· ${s.count} 集 · ${s.arc}</span></div>
+        <span class="list-arrow" style="color:var(--ink-sub)">›</span>
+      </div>`).join('')}
+  </div>
+
+  <!-- 功能列表 -->
+  <div class="glass mt-6 overflow-hidden" id="menuList">
+    ${[['⭐','我的收藏'],['📤','导出梦境'],['🔔','提醒设置'],['🧪','清醒梦实验室'],['🌗','深色 / 明亮模式','theme'],['🔒','隐私设置'],['💌','关于梦屿']].map(([i,n,k])=>`
+      <div class="list-row flex items-center gap-3 px-4 py-3.5 border-b last:border-0" style="border-color:rgba(255,255,255,.06)" data-m="${k||n}">
+        <span class="text-base">${i}</span>
+        <span class="flex-1 text-[13px]">${n}</span>
+        ${k==='theme' ? '<div class="switch" id="themeSw"></div>' : '<span class="list-arrow" style="color:var(--ink-sub)">›</span>'}
+      </div>`).join('')}
+  </div>
+
+  <button class="pressable w-full mt-5 py-3.5 rounded-2xl text-[13px]" style="background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.35);color:#FCA5A5;cursor:pointer"
+    onclick="toast('梦境银行会替你保管好每一个梦，晚安','🌙')">退出登录</button>
+  <div class="text-center text-[10px] mt-5" style="color:var(--ink-sub)">梦屿 Dream Bank · 你的梦，值得被记住</div>`;
+
+  countUp($('#pf1'), 42); countUp($('#pf2'), 3); countUp($('#pf3'), S.fragments);
+  tickCountdowns();
+
+  /* 头像选择器 */
+  $('#avatarBtn').onclick = ()=>{
+    openSheet(`<h3 class="font-display font-bold text-lg">换一个梦的脸</h3>
+      <div class="grid grid-cols-5 gap-3 mt-5">${['🌙','🦉','🐋','🪐','🦊','🐚','🕊️','🍄','🫧','🃏'].map(a=>`
+        <button class="pressable text-3xl p-3 rounded-2xl glass" onclick="S.avatar='${a}';closeSheet();render.profile();toast('头像已更换','${a}')">${a}</button>`).join('')}
+      </div>`, {center:true});
+  };
+
+  /* 图鉴 */
+  $('#dexGrid').innerHTML = DB.dex.map(d=>`
+    <div class="dex-item glass ${d.got?'':'locked'}" data-dex="${d.n}">
+      <span class="text-2xl">${d.got?d.icon:'❔'}</span>
+      <span class="text-[10px]">${d.got?d.n:'？？？'}</span>
+    </div>`).join('');
+  $('#dexGrid').onclick = e=>{
+    const it = e.target.closest('[data-dex]'); if(!it) return;
+    const d = DB.dex.find(x=>x.n===it.dataset.dex);
+    if(!d.got) return toast('这个符号还没在你的梦里出现过，继续捕梦吧','❔');
+    openSheet(`<div class="text-center pt-2">
+      <div class="text-5xl logo-breathe inline-block">${d.icon}</div>
+      <h3 class="font-display font-bold text-xl mt-3">「${d.n}」</h3>
+      <p class="text-[13px] mt-3 leading-relaxed" style="color:var(--ink-sub)">${d.desc}</p>
+      <div class="glass p-3 mt-4 text-[12px]" style="color:var(--ink-sub)">已出现 <b style="color:var(--gold)">${d.times}</b> 次 · 相关梦境 ${DB.dreams.filter(x=>x.tags.includes(d.n)).length} 条</div>
+      <button class="pressable mt-5 px-10 py-3 rounded-full text-sm text-white" style="background:linear-gradient(90deg,#8B5CF6,#EC4899);border:none" onclick="closeSheet()">收进图鉴</button>
+    </div>`, {center:true});
+  };
+
+  /* 功能列表 */
+  $('#menuList').onclick = e=>{
+    const row = e.target.closest('[data-m]'); if(!row) return;
+    const m = row.dataset.m;
+    if(m==='theme') return; /* 开关自己处理 */
+    if(m==='清醒梦实验室') return go('train');
+    if(m==='关于梦屿') return openSheet(`<div class="text-center py-4">
+        <div class="font-display font-black text-3xl bg-clip-text text-transparent" style="background-image:linear-gradient(135deg,#F8FAFC,#8B5CF6,#EC4899)">梦屿</div>
+        <div class="text-[11px] tracking-[.4em] mt-2" style="color:var(--ink-sub)">DREAM BANK · v0.1</div>
+        <p class="text-[13px] mt-4 leading-relaxed" style="color:var(--ink-sub)">每晚都是一场私人电影。<br>我们把散场的票根，替你一张张收好。</p>
+        <button class="pressable mt-6 px-10 py-3 rounded-full text-sm text-white" style="background:linear-gradient(90deg,#8B5CF6,#EC4899);border:none" onclick="closeSheet()">晚安</button>
+      </div>`, {center:true});
+    toast(`「${m}」演示原型中暂未开放`,'🛠️');
+  };
+  /* 深色/明亮切换：渐变过渡 */
+  const tsw = $('#themeSw');
+  tsw.classList.toggle('on', $('#phone').classList.contains('light'));
+  tsw.onclick = e=>{
+    e.stopPropagation();
+    $('#phone').classList.toggle('light');
+    tsw.classList.toggle('on'); tsw.classList.add('jelly');
+    toast($('#phone').classList.contains('light') ? '天亮了，梦先存着' : '夜幕降临，适合做梦','🌗');
+  };
+};
+
+/* 封存时间胶囊 */
+function openCapsule(){
+  openSheet(`<h3 class="font-display font-bold text-lg">⏳ 封存一个梦给未来</h3>
+    <textarea id="capText" rows="4" class="w-full rounded-xl px-4 py-3 text-sm mt-4 outline-none"
+      style="background:rgba(255,255,255,.06);border:1px solid var(--glass-brd);color:var(--ink);resize:none"
+      placeholder="写给未来的自己，或封存今晚的梦…"></textarea>
+    <div class="flex gap-2 mt-3">
+      ${['一个月后','半年后','一年后的今天'].map((t,i)=>`<span class="chip pressable cap-when ${i===2?'sel':''}" data-w="${t}">${t}</span>`).join('')}
+    </div>
+    <button id="capSeal" class="pressable w-full py-3.5 mt-5 rounded-2xl text-sm text-white"
+      style="background:linear-gradient(90deg,#FBBF24,#EC4899);border:none">🔒 封进胶囊</button>`);
+  $$('.cap-when').forEach(c=>c.onclick=()=>{ $$('.cap-when').forEach(x=>x.classList.remove('sel')); c.classList.add('sel'); });
+  $('#capSeal').onclick = ()=>{
+    if(!$('#capText').value.trim()) return toast('胶囊里不能是空的哦','⏳');
+    closeSheet(); confetti(); toast('胶囊已沉入梦海，到点会浮上来','⏳');
+  };
+}
+
+/* ============================================================
+   初始化
+   ============================================================ */
+bindMagnetic(document);
+/* ====APPEND-JS==== */
+</script>
+</body>
+</html>

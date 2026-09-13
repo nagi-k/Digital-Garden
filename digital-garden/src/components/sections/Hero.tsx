@@ -119,7 +119,7 @@ const Hero = () => {
             <motion.div variants={staggerItem} className="flex flex-wrap gap-4 pt-4">
               <MagneticButton>
                 <a
-                  href="/#/ui"
+                  href="/ui/"
                   className="magnetic-btn inline-flex items-center gap-2"
                 >
                   <span>浏览作品</span>

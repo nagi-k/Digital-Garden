@@ -88,7 +88,7 @@ const Portfolio = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-32">
               <FadeIn delay={0.1}>
                 <a
-                  href="/"
+                  href="/ui/"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="card p-8 lg:p-12 group relative overflow-hidden h-full min-h-[280px] flex flex-col justify-between"
