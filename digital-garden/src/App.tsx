@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
 import Navbar from '@/components/layout/Navbar';
@@ -17,6 +18,10 @@ import Guestbook from '@/pages/Guestbook';
 
 function App() {
   const location = useLocation();
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'auto' });
+  }, [location.pathname]);
 
   return (
     <div className="min-h-screen bg-bg-primary text-text-primary">
