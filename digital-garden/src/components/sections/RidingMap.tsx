@@ -61,11 +61,6 @@ const RidingMap = () => {
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const svgRef = useRef<SVGSVGElement>(null);
 
-  const riddenCount = ridingRoutes.filter((r) => r.ridden).length;
-  const totalLength = ridingRoutes
-    .filter((r) => r.ridden)
-    .reduce((acc, r) => acc + parseInt(r.length.replace(/\D/g, '')), 0);
-
   // 图标/文字尺寸：按 1/√zoom 反向缩放
   // 放大时图标适度变大（不会被地图甩得太小），缩小时也不会过大遮挡
   const zs = (v: number) => v / Math.sqrt(zoom);
@@ -154,10 +149,6 @@ const RidingMap = () => {
                   <div className="flex items-center gap-2">
                     <div className="w-5 h-0.5 bg-[#0a0a0a]" />
                     <span className="text-[#666]">已骑行</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-5 h-0.5 border-t-2 border-dashed border-[#999]" />
-                    <span className="text-[#666]">待骑行</span>
                   </div>
                 </div>
               </div>
@@ -369,7 +360,7 @@ const RidingMap = () => {
                           fontSize={zs(11)}
                           fontFamily="'Inter', sans-serif"
                         >
-                          {route.length} · {route.ridden ? '已骑行' : '待骑行'}
+                          {route.length} · 已骑行
                         </text>
                       </g>
                     );
@@ -381,26 +372,6 @@ const RidingMap = () => {
 
           {/* 侧边信息面板 */}
           <div className="lg:col-span-4 space-y-6">
-            {/* 统计卡片 */}
-            <FadeIn delay={0.1}>
-              <div className="grid grid-cols-3 gap-3">
-                <div className="card p-4 text-center">
-                  <div className="text-2xl font-display-zh text-text-primary">{riddenCount}</div>
-                  <div className="text-xs text-text-muted mt-1">已骑行路线</div>
-                </div>
-                <div className="card p-4 text-center">
-                  <div className="text-2xl font-display-zh text-text-primary">{totalLength}km</div>
-                  <div className="text-xs text-text-muted mt-1">总里程</div>
-                </div>
-                <div className="card p-4 text-center">
-                  <div className="text-2xl font-display-zh text-text-primary">
-                    {ridingRoutes.length - riddenCount}
-                  </div>
-                  <div className="text-xs text-text-muted mt-1">待探索</div>
-                </div>
-              </div>
-            </FadeIn>
-
             {/* 路线列表 */}
             <FadeIn delay={0.2}>
               <div className="card p-5 max-h-[480px] overflow-y-auto">
@@ -423,15 +394,9 @@ const RidingMap = () => {
                     >
                       <div className="flex items-center justify-between mb-1">
                         <span className="font-medium text-sm">{route.name}</span>
-                        {route.ridden ? (
-                          <span className="text-xs px-2 py-0.5 bg-text-primary text-text-inverse">
-                            已骑行
-                          </span>
-                        ) : (
-                          <span className="text-xs px-2 py-0.5 bg-border text-text-muted">
-                            待骑行
-                          </span>
-                        )}
+                        <span className="text-xs px-2 py-0.5 bg-text-primary text-text-inverse">
+                          已骑行
+                        </span>
                       </div>
                       <div className="flex items-center gap-3 text-xs text-text-muted">
                         <span className="flex items-center gap-1">
@@ -490,11 +455,6 @@ const RidingMap = () => {
                   )}
                 </div>
 
-                {!selectedRoute.ridden && (
-                  <button className="mt-4 w-full py-2 border border-text-primary text-text-primary text-sm hover:bg-text-primary hover:text-text-inverse transition-colors">
-                    标记为已骑行
-                  </button>
-                )}
               </motion.div>
             )}
           </div>
