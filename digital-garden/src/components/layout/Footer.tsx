@@ -40,7 +40,14 @@ const Footer = () => {
             <p className="text-xs text-text-muted">
               © 2026 Wang Ying · 数字花园
             </p>
-            <p className="text-xs text-text-muted">{siteData.icp}</p>
+            <a
+              href="https://beian.miit.gov.cn/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs text-text-muted hover:text-accent-terracotta transition-colors"
+            >
+              {siteData.icp}
+            </a>
           </div>
         </div>
       </div>
