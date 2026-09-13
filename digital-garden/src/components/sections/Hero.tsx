@@ -105,7 +105,7 @@ const Hero = () => {
               variants={staggerItem}
               className="text-h3 font-display-zh text-text-secondary"
             >
-              Wang Ying · UI/UX 设计师 · 在上海记录设计与生活
+              Wang Ying · UI/UX 设计师 · 记录设计与生活
             </motion.p>
 
             <motion.p
