@@ -113,7 +113,7 @@ let ui = null
 const sound = new SoundFX()
 
 const loader = new GLTFLoader()
-loader.load('./public/models/robot.glb', (gltf) => {
+loader.load('./models/robot.glb', (gltf) => {
   const model = gltf.scene
   scene.add(model)
 
