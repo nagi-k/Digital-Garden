@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NOVA-1 · Web3D 演示</title>
+  <script type="module" crossorigin src="./assets/index-BOijRrjo.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-Ce8Bnel2.css">
+</head>
+<body>
+  <canvas id="scene"></canvas>
+
+  <!-- 顶部状态栏（精简，无品牌标题） -->
+  <header id="hud-top" class="embed-hud-top">
+    <div class="brand" style="opacity:0; pointer-events:none;">
+      <span class="logo-dot"></span>
+      <span class="brand-name">NOVA-1</span>
+      <span class="brand-sub">智能人形机器人</span>
+    </div>
+    <div class="status-cluster">
+      <div class="state-badge" id="stateBadge"><span class="pulse"></span><span id="stateText">待机</span></div>
+      <div class="metric"><label>电量</label><div class="bar"><div id="batteryBar"></div></div><span id="batteryText">87%</span></div>
+      <div class="metric"><label>关节温度</label><span id="tempText">36.5°C</span></div>
+    </div>
+    <button id="btnFullscreen" class="chip" title="全屏体验" style="margin-left:auto;">⛶ 全屏</button>
+  </header>
+
+  <!-- 左侧面板 -->
+  <aside id="panel" class="embed-panel">
+    <nav id="tabs">
+      <button class="tab active" data-tab="motion">运动</button>
+      <button class="tab" data-tab="pose">姿态</button>
+      <button class="tab" data-tab="comm">交流</button>
+      <button class="tab" data-tab="view">视图</button>
+    </nav>
+
+    <section class="tab-page active" id="tab-motion">
+      <h3>运动控制</h3>
+      <div class="dpad">
+        <button class="dbtn up" data-move="forward" title="前进">▲</button>
+        <button class="dbtn left" data-move="left" title="左转">◀</button>
+        <button class="dbtn stop" id="btnStop" title="停止">■</button>
+        <button class="dbtn right" data-move="right" title="右转">▲</button>
+        <button class="dbtn down" data-move="back" title="后退">▼</button>
+      </div>
+      <p class="hint">键盘 WASD / 方向键同样有效</p>
+      <label class="slider-row">移动速度 <span id="speedVal">1.0 m/s</span>
+        <input type="range" id="speed" min="0.4" max="2.0" step="0.1" value="1.0" />
+      </label>
+      <div class="btn-row">
+        <button class="chip gait active" data-gait="0.7">慢走</button>
+        <button class="chip gait" data-gait="1.0">正常</button>
+        <button class="chip gait" data-gait="1.5">快步</button>
+      </div>
+      <div class="btn-row">
+        <button class="chip" id="btnCharge">返回充电</button>
+        <button class="chip" id="btnSleep">休眠 / 唤醒</button>
+      </div>
+    </section>
+
+    <section class="tab-page" id="tab-pose">
+      <h3>姿态动作</h3>
+      <div class="btn-grid">
+        <button class="chip" data-pose="wave">挥手致意</button>
+        <button class="chip" data-pose="bow">鞠躬</button>
+        <button class="chip" data-pose="handshake">握手</button>
+        <button class="chip" data-pose="dance">舞蹈</button>
+        <button class="chip" data-pose="reset">复位</button>
+      </div>
+      <p class="hint">行走中不可执行姿态动作</p>
+    </section>
+
+    <section class="tab-page" id="tab-comm">
+      <h3>人机交流</h3>
+      <div class="btn-row">
+        <button class="chip expr active" data-expr="normal">自然</button>
+        <button class="chip expr" data-expr="happy">开心</button>
+        <button class="chip expr" data-expr="thinking">思考</button>
+        <button class="chip expr" data-expr="listening">倾听</button>
+      </div>
+      <label class="switch-row">注视跟随
+        <input type="checkbox" id="gazeToggle" checked /><span class="switch"></span>
+      </label>
+      <div class="dialog-input">
+        <input id="chatInput" placeholder="对机器人说点什么…" />
+        <button id="chatSend">发送</button>
+      </div>
+    </section>
+
+    <section class="tab-page" id="tab-view">
+      <h3>结构与视图</h3>
+      <label class="slider-row">爆炸拆解 <span id="explodeVal">0%</span>
+        <input type="range" id="explode" min="0" max="100" value="0" />
+      </label>
+      <label class="switch-row">外壳透视
+        <input type="checkbox" id="xrayToggle" /><span class="switch"></span>
+      </label>
+      <label class="switch-row">激光雷达扫描
+        <input type="checkbox" id="lidarToggle" /><span class="switch"></span>
+      </label>
+      <label class="switch-row">视觉视锥
+        <input type="checkbox" id="frustumToggle" /><span class="switch"></span>
+      </label>
+      <div class="btn-row">
+        <button class="chip" id="btnDemo">自动演示</button>
+        <button class="chip" id="btnCamReset">视角复位</button>
+      </div>
+    </section>
+  </aside>
+
+  <!-- 虚拟摇杆 -->
+  <div id="joystick"><div id="stick"></div></div>
+
+  <!-- 底部字幕 -->
+  <footer id="hud-bottom">
+    <div id="subtitle">NOVA-1 已就绪，等待指令。</div>
+  </footer>
+
+  <div id="loading"><div class="spinner"></div><p>正在加载机器人模型…</p></div>
+
+  <script type="module" src="/src/main.js"></script>
+  <script>
+    // 嵌入场景全屏切换
+    document.getElementById('btnFullscreen').addEventListener('click', () => {
+      const el = document.documentElement;
+      if (!document.fullscreenElement) {
+        el.requestFullscreen?.() || el.webkitRequestFullscreen?.();
+      } else {
+        document.exitFullscreen?.() || document.webkitExitFullscreen?.();
+      }
+    });
+  </script>
+</body>
+</html>

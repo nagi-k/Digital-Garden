@@ -144,13 +144,43 @@ const Portfolio = () => {
               </div>
             </FadeIn>
 
-            {/* Web3D 滚筒洗衣机交互演示 */}
+            {/* Web3D NOVA-1 机器人交互演示 */}
             <FadeIn delay={0.2}>
               <div className="mb-24">
                 <div className="flex items-center gap-3 mb-8">
                   <Sparkles size={20} className="text-accent-terracotta" />
                   <h3 className="font-display-zh text-h3">Web3D 交互作品</h3>
                 </div>
+                <div className="card p-6 lg:p-8">
+                  <div className="mb-6">
+                    <h4 className="font-display-zh text-xl mb-2">NOVA-1 · 智能人形机器人 Web3D 交互平台</h4>
+                    <p className="text-sm text-text-secondary">
+                      基于 Blender 程序化建模与 Three.js 实时渲染，可在此区域操作机器人行走、姿态、对话、爆炸拆解与透视视图。
+                    </p>
+                  </div>
+                  <div
+                    className="w-full rounded-[20px] overflow-hidden border border-[rgba(56,225,255,0.18)]"
+                    style={{ boxShadow: '0 0 40px rgba(56,225,255,0.08)', background: '#070b12' }}
+                  >
+                    <iframe
+                      src="/assets/nova1-robot/embed.html"
+                      title="NOVA-1 Web3D 交互演示"
+                      allow="fullscreen"
+                      loading="lazy"
+                      className="w-full border-0 block"
+                      style={{ aspectRatio: '16 / 9', minHeight: '480px' }}
+                    />
+                  </div>
+                  <p className="text-xs text-text-secondary mt-3">
+                    提示：可在上方直接操作机器人，右下角按钮可进入全屏。
+                  </p>
+                </div>
+              </div>
+            </FadeIn>
+
+            {/* Web3D 滚筒洗衣机交互演示 */}
+            <FadeIn delay={0.2}>
+              <div className="mb-24">
                 <div className="card p-6 lg:p-8">
                   <div className="mb-6">
                     <h4 className="font-display-zh text-xl mb-2">智能滚筒洗衣机交互演示</h4>

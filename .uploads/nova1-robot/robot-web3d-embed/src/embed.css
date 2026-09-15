@@ -1,0 +1,89 @@
+/* ============================================================
+   嵌入作品集网站时的覆盖样式
+   用途：让 NOVA-1 Web3D 作为 iframe 组件更融入外部页面
+   ============================================================ */
+
+/* 顶部状态栏：更矮、靠右、无品牌 */
+#hud-top.embed-hud-top {
+  height: 46px;
+  padding: 0 14px 0 16px;
+  justify-content: flex-end;
+  gap: 14px;
+  background: linear-gradient(180deg, rgba(7,11,18,0.85), rgba(7,11,18,0.0));
+}
+
+#hud-top.embed-hud-top .status-cluster {
+  gap: 12px;
+}
+
+#hud-top.embed-hud-top .state-badge {
+  padding: 5px 11px;
+  font-size: 11px;
+}
+
+#hud-top.embed-hud-top .metric {
+  font-size: 11px;
+}
+
+#hud-top.embed-hud-top .bar {
+  width: 72px;
+}
+
+#btnFullscreen {
+  font-size: 11px;
+  padding: 6px 10px;
+  border-color: rgba(56,225,255,0.25);
+  background: rgba(56,225,255,0.08);
+}
+
+/* 左侧面板：顶部避开更矮的 hud */
+#panel.embed-panel {
+  top: 60px;
+  left: 12px;
+  width: 250px;
+  padding: 10px 12px 14px;
+}
+
+/* 摇杆位置上移，避免被作品集 footer 遮挡 */
+#joystick {
+  right: 18px;
+  bottom: 84px;
+  width: 108px;
+  height: 108px;
+}
+
+#stick {
+  width: 44px;
+  height: 44px;
+}
+
+/* 底部字幕稍微缩小 */
+#hud-bottom {
+  padding: 10px;
+}
+#subtitle {
+  font-size: 13px;
+  padding: 9px 18px;
+  max-width: 640px;
+}
+
+/* iframe 内触控设备适配 */
+@media (max-width: 760px) {
+  #panel.embed-panel {
+    width: 200px;
+    top: 52px;
+    left: 8px;
+  }
+  #hud-top.embed-hud-top {
+    height: 42px;
+  }
+  #hud-top.embed-hud-top .metric label {
+    display: none;
+  }
+  #joystick {
+    width: 92px;
+    height: 92px;
+    right: 12px;
+    bottom: 68px;
+  }
+}
