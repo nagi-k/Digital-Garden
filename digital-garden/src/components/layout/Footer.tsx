@@ -52,8 +52,13 @@ const Footer = () => {
               href="https://beian.mps.gov.cn/#/query/webSearch?code=32010402002660"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-xs text-text-muted hover:text-accent-terracotta transition-colors"
+              className="text-xs text-text-muted hover:text-accent-terracotta transition-colors flex items-center gap-1"
             >
+              <img
+                src="/images/beian.png"
+                alt="备案图标"
+                className="w-4 h-4"
+              />
               苏公网安备32010402002660号
             </a>
           </div>
