@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion, useMotionValue, useSpring, useTransform, useScroll } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import { ArrowRight, Sparkles } from 'lucide-react';
 import MagneticButton from '@/components/ui/MagneticButton';
 import { siteData } from '@/data/site';
@@ -118,13 +119,13 @@ const Hero = () => {
 
             <motion.div variants={staggerItem} className="flex flex-wrap gap-4 pt-4">
               <MagneticButton>
-                <a
-                  href="/ui/"
+                <Link
+                  to="/portfolio"
                   className="magnetic-btn inline-flex items-center gap-2"
                 >
                   <span>浏览作品</span>
                   <ArrowRight size={16} />
-                </a>
+                </Link>
               </MagneticButton>
             </motion.div>
           </motion.div>
