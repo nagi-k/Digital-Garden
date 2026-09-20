@@ -48,6 +48,14 @@ const Footer = () => {
             >
               {siteData.icp}
             </a>
+            <a
+              href="https://beian.mps.gov.cn/#/query/webSearch?code=32010402002660"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs text-text-muted hover:text-accent-terracotta transition-colors"
+            >
+              苏公网安备32010402002660号
+            </a>
           </div>
         </div>
       </div>
