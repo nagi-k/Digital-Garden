@@ -1,33 +1,10 @@
 import { ArrowUpRight, Monitor, Box, Sparkles } from 'lucide-react';
-import { useEffect, useRef } from 'react';
 import PageTransition from '@/components/layout/PageTransition';
 import SectionTitle from '@/components/ui/SectionTitle';
 import FadeIn from '@/components/effects/FadeIn';
 import GlbViewer from '@/components/3d/GlbViewer';
 
-declare global {
-  interface Window {
-    WashingMachineEmbed?: {
-      init: (selector: string | Element | Element[], options?: Record<string, unknown>) => void;
-    };
-  }
-}
-
 const Portfolio = () => {
-  const washingMachineRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (washingMachineRef.current && window.WashingMachineEmbed) {
-      window.WashingMachineEmbed.init(washingMachineRef.current, {
-        src: '/assets/washing-machine/demo/',
-        ratio: '16/9',
-        minHeight: 720,
-        maxHeight: 1200,
-        borderRadius: '20px',
-      });
-    }
-  }, []);
-
   return (
     <PageTransition>
       <div className="relative overflow-hidden">
@@ -174,21 +151,6 @@ const Portfolio = () => {
                   <p className="text-xs text-text-secondary mt-3">
                     提示：可在上方直接操作机器人，右下角按钮可进入全屏。
                   </p>
-                </div>
-              </div>
-            </FadeIn>
-
-            {/* Web3D 滚筒洗衣机交互演示 */}
-            <FadeIn delay={0.2}>
-              <div className="mb-24">
-                <div className="card p-6 lg:p-8">
-                  <div className="mb-6">
-                    <h4 className="font-display-zh text-xl mb-2">智能滚筒洗衣机交互演示</h4>
-                    <p className="text-sm text-text-secondary">
-                      基于 Blender 程序化建模与 Three.js 实时渲染，可在此区域开关舱门、选择程序、启动洗涤。
-                    </p>
-                  </div>
-                  <div ref={washingMachineRef} />
                 </div>
               </div>
             </FadeIn>
